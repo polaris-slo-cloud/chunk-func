@@ -1,9 +1,9 @@
 specVersion: 0.35.0
 name: extract-successes
 runtime: typescript
-registry: localhost:5001/chunk-func
-image: localhost:5001/chunk-func/extract-successes:latest
-imageDigest: sha256:74f165438517a029eb56ce7ef3e7950e7e570465c67b1b2c71e89e134ee44cbf
+registry: polarissloc
+image: polarissloc/chunk-func-extract-successes:latest
+imageDigest: sha256:53f0224fd7f7d2a320863b04032af925689ba8ade66c1470ea9572acd8c05763
 created: 2023-05-31T14:37:36.818205802+02:00
 build:
   builder: pack
