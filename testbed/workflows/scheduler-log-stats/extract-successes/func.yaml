@@ -1,0 +1,11 @@
+specVersion: 0.35.0
+name: extract-successes
+runtime: typescript
+registry: localhost:5001/chunk-func
+image: localhost:5001/chunk-func/extract-successes:latest
+created: 2023-05-31T14:37:36.818205802+02:00
+build:
+  buildEnvs:
+  - name: BP_NODE_RUN_SCRIPTS
+    value: build
+  pvcSize: 256Mi
