@@ -1,53 +1,38 @@
-import {
-    CloudEventFunction,
-    Context,
-    Function as FaasFunction,
-    HTTPFunction,
-    IncomingBody,
-    StructuredReturn
-} from 'faas-js-runtime';
+import { Context, Function as FaasFunction, IncomingBody, StructuredReturn } from 'faas-js-runtime';
+import { S3ObjectClient, isValidS3ObjectReference } from './s3';
+
+function reportInvalidS3ObjRef(): StructuredReturn {
+    return {
+        statusCode: 400,
+        body: {
+            message: 'Incoming body is not a valid S3ObjectReference.',
+        },
+        headers: {
+            'content-type': 'application/json',
+        },
+    };
+}
 
 const func: FaasFunction = {
-    /**
-     * Your HTTP handling function, invoked with each request. This is an example
-     * function that logs the incoming request and echoes its input to the caller.
-     *
-     * It can be invoked with `func invoke`
-     * It can be tested with `npm test`
-     *
-     * It can be invoked with `func invoke`
-     * It can be tested with `npm test`
-     *
-     * @param {Context} context a context object.
-     * @param {object} context.body the request body if any
-     * @param {object} context.query the query string deserialized as an object, if any
-     * @param {object} context.log logging object with methods for 'info', 'warn', 'error', etc.
-     * @param {object} context.headers the HTTP request headers
-     * @param {string} context.method the HTTP request method
-     * @param {string} context.httpVersion the HTTP protocol version
-     * See: https://github.com/knative/func/blob/main/docs/guides/nodejs.md#the-context-object
-     */
     handle: async (context: Context, body?: IncomingBody): Promise<StructuredReturn> => {
-        // YOUR CODE HERE
-        context.log.info(`
-        -----------------------------------------------------------
-        Headers:
-        ${JSON.stringify(context.headers)}
+        if (!isValidS3ObjectReference(body)) {
+            return reportInvalidS3ObjRef();
+        }
 
-        Query:
-        ${JSON.stringify(context.query)}
+        const s3Client = new S3ObjectClient(body);
+        const reader = s3Client.createObjectReader(body);
+        let data: Buffer | undefined;
+        while ((data = await reader.readBytes(1024 * 1024))) {
+            console.log(data);
+        }
 
-        Body:
-        ${JSON.stringify(body)}
-        -----------------------------------------------------------
-        `);
         return {
             body: body,
             headers: {
-                'content-type': 'application/json'
-            }
+                'content-type': 'application/json',
+            },
         };
-    }
+    },
 };
 
 export default func;
