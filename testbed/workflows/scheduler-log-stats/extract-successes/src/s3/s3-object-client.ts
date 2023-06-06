@@ -15,6 +15,7 @@ export class S3ObjectClient {
                 secretAccessKey: credentials.secretKey,
             },
             endpoint: credentials.url,
+            region: 'us-east-1',
         });
     }
 
