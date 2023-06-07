@@ -75,7 +75,7 @@ async function readFile(objRef: ObjectStoreReference): Promise<number> {
     while ((data = await reader.readBytes(1024 * 1024))) {
         console.log(`Read ${data.length} bytes`);
         bytesRead += data.length;
-        // console.log(data);
+        console.log(data);
     }
     console.log('Finished reading object.');
     s3Client.destroy();
