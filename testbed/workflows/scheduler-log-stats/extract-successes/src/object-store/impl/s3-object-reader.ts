@@ -1,7 +1,8 @@
 import { GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
-import { createWriteStream, createReadStream } from 'fs';
 import { ObjectStoreReference } from '../model';
-import { ObjectReader } from '../object-store';
+import { ObjectReader, ReadLineByLineOptions } from '../object-store';
+import * as readline from 'readline';
+import { ObjectStreamReadable } from './streams';
 
 export interface S3ObjectInfo {
     objRef: ObjectStoreReference;
@@ -9,20 +10,44 @@ export interface S3ObjectInfo {
 }
 
 export class S3ObjectReader implements ObjectReader {
-    /** The index of the byte that was last read. */
-    private lastReadPos = -1;
+    /** The index of the byte that would be read on the next read operation. */
+    private _currPos = 0;
 
-    constructor(private s3Client: S3Client, private objInfo: S3ObjectInfo) {}
+    private s3Client: S3Client | undefined;
 
-    size(): number {
+    constructor(s3Client: S3Client, private objInfo: S3ObjectInfo) {
+        this.s3Client = s3Client;
+    }
+
+    get size(): number {
         return this.objInfo.size;
     }
 
-    async readBytes(count: number): Promise<Uint8Array | undefined> {
-        const readStart = this.lastReadPos + 1;
-        let readEnd = this.lastReadPos + count;
+    get currPos(): number {
+        return this._currPos;
+    }
+
+    close(): void {
+        this.s3Client = undefined;
+    }
+
+    seekTo(pos: number): void {
+        if (pos <= this.size) {
+            if (pos >= 0) {
+                this._currPos = pos;
+            } else {
+                this._currPos = 0;
+            }
+        } else {
+            this._currPos = this.size;
+        }
+    }
+
+    async readBytes(count: number): Promise<Uint8Array | null> {
+        const readStart = this._currPos;
+        let readEnd = readStart + count - 1;
         if (readStart === this.objInfo.size) {
-            return undefined;
+            return null;
         }
         if (readEnd >= this.objInfo.size) {
             readEnd = this.objInfo.size - 1;
@@ -34,9 +59,36 @@ export class S3ObjectReader implements ObjectReader {
         }
 
         const range = this.getRangeAndLength(response.ContentRange);
-        this.lastReadPos = range.end;
+        this._currPos = range.end + 1;
 
         return await response.Body.transformToByteArray();
+    }
+
+    readLineByLine(options: ReadLineByLineOptions): void {
+        const objReadable = new ObjectStreamReadable(this, options.encoding || 'utf8');
+        const rl = readline.createInterface(objReadable);
+        let aborted = false;
+
+        rl.on('line', (line) => {
+            if (!aborted) {
+                if (!options.onLineRead(line)) {
+                    aborted = true;
+                    objReadable.abort();
+                }
+            }
+        });
+
+        rl.on('close', () => {
+            if (options.onEnd) {
+                options.onEnd();
+            }
+        });
+
+        objReadable.on('error', (err) => {
+            if (options.onError) {
+                options.onError(err);
+            }
+        });
     }
 
     private getObjectRange(start: number, end: number): Promise<GetObjectCommandOutput> {
@@ -45,6 +97,10 @@ export class S3ObjectReader implements ObjectReader {
             Key: this.objInfo.objRef.objectKey,
             Range: `bytes=${start}-${end}`,
         });
+
+        if (!this.s3Client) {
+            throw new Error('This reader has already been closed.');
+        }
 
         return this.s3Client.send(command);
     }

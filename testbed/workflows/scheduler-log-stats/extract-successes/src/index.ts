@@ -1,5 +1,5 @@
 import { Context, HTTPFunction, HealthCheck, IncomingBody, StructuredReturn } from 'faas-js-runtime';
-import { isValidObjectStoreReference, ObjectStoreReference } from './object-store';
+import { isValidObjectStoreReference, ObjectReader, ObjectStoreReference } from './object-store';
 import { createS3ObjectStoreClient } from './object-store/impl/factories';
 
 function reportInvalidS3ObjRef(): StructuredReturn {
@@ -48,9 +48,9 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
 
     let bytesRead = 0;
     try {
-        bytesRead = await readFile(body);
+        bytesRead = await readFileLineByLine(body);
     } catch (err) {
-        return createErrorResponse(err);
+        return createErrorResponse(err as Error);
     }
 
     return {
@@ -64,6 +64,36 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
     };
 };
 
+async function readFileLineByLine(objRef: ObjectStoreReference): Promise<number> {
+    const s3Client = createS3ObjectStoreClient(objRef);
+    const reader = await s3Client.createObjectReader(objRef);
+    console.log('Created ObjectReader');
+
+    try {
+        return await readLineByLineInternal(reader);
+    } finally {
+        s3Client.destroy();
+    }
+}
+
+function readLineByLineInternal(reader: ObjectReader): Promise<number> {
+    return new Promise((resolve, reject) => {
+        let linesRead = 0;
+        reader.readLineByLine({
+            onLineRead: (line) => {
+                console.log(line);
+                ++linesRead;
+                return true;
+            },
+            onError: (err) => reject(err),
+            onEnd: () => {
+                console.log('Finished reading object.');
+                resolve(linesRead);
+            },
+        });
+    });
+}
+
 async function readFile(objRef: ObjectStoreReference): Promise<number> {
     const s3Client = createS3ObjectStoreClient(objRef);
     const reader = await s3Client.createObjectReader(objRef);
@@ -71,7 +101,7 @@ async function readFile(objRef: ObjectStoreReference): Promise<number> {
     console.log('Created ObjectReader');
 
     let bytesRead = 0;
-    let data: Uint8Array | undefined;
+    let data: Uint8Array | null;
     while ((data = await reader.readBytes(1024 * 1024))) {
         console.log(`Read ${data.length} bytes`);
         bytesRead += data.length;
