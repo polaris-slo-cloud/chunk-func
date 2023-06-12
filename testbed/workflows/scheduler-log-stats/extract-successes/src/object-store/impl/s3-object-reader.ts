@@ -1,7 +1,6 @@
 import { GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
-import { Readable } from 'node:stream';
 import { ObjectStoreReference } from '../model';
-import { ObjectReader } from '../object-store';
+import { ObjectReader, ReadableStream } from '../object-store';
 import { ObjectStreamReadable } from './object-stream-readable';
 import { ReadLineByLine } from '../read-line-by-line';
 import { ReadLineByLineImpl } from './read-line-by-line.impl';
@@ -66,7 +65,7 @@ export class S3ObjectReader implements ObjectReader {
         return response.Body.transformToByteArray();
     }
 
-    getReadableStream(encoding?: BufferEncoding): Readable {
+    getReadableStream(encoding?: BufferEncoding): ReadableStream {
         return this.createObjectStreamReadable(encoding);
     }
 

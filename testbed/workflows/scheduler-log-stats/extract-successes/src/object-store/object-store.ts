@@ -22,6 +22,15 @@ export interface ObjectStoreClient {
      * @param objRef The ObjectStoreReference that indicates the object to be read.
      */
     createObjectReader(objRef: ObjectStoreReference): Promise<ObjectReader>;
+
+    /**
+     * Creates a {@link WritableStream} for a new or existing object.
+     *
+     * @param objRef The ObjectStoreReference that indicates the object to be created/overwritten.
+     * @param encoding (optional) The encoding to use when writing a string. Default: `utf8`.
+     * This has no effect on writing `Buffer` or `Uint8Array` objects.
+     */
+    createObjectWritableStream(objRef: ObjectStoreReference, encoding?: BufferEncoding): Promise<WritableStream>;
 }
 
 /**
@@ -54,7 +63,7 @@ export interface ObjectReader {
      * If an encoding is specified, the stream data will be returned as strings.
      * If no encoding is specified (default), the stream data will be returned as `Buffer` objects.
      */
-    getReadableStream(encoding?: BufferEncoding): Readable;
+    getReadableStream(encoding?: BufferEncoding): ReadableStream;
 
     /**
      * Creates a {@link ReadLineByLine} reader for this object.
@@ -70,4 +79,31 @@ export interface ObjectReader {
      * Closes the reader and releases any resources that exclusively belong to the reader.
      */
     close(): void;
+}
+
+/**
+ * A readable stream for an object in an object store.
+ */
+export interface ReadableStream extends NodeJS.ReadableStream {
+    /**
+     * Instructs the stream to abort any asynchronous read operation that is currently in progress.
+     */
+    abort(): void;
+}
+
+/**
+ * A writable stream for creating or overwriting an object in an object store.
+ */
+export interface WritableStream extends NodeJS.WritableStream {
+    /**
+     * @return A promise that resolves when the stream is ready for writing (i.e., the internal buffer has been drained).
+     */
+    readyToWrite(): Promise<void>;
+
+    /**
+     * Writes any remaining data in the buffer and closes the stream.
+     *
+     * @return A promise that resolves when the stream has been successfully closed.
+     */
+    end$(): Promise<void>;
 }

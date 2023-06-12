@@ -52,7 +52,7 @@ export class ReadLineByLineImpl implements ReadLineByLine {
         }
         this.onLineReadCallback = callback;
 
-        this.readLine.on('line', (line) => {
+        this.readLine.on('line', line => {
             this.handleNextLine(line);
         });
     }
@@ -62,7 +62,7 @@ export class ReadLineByLineImpl implements ReadLineByLine {
     }
 
     onError(callback: (err: Error) => void): void {
-        this.objStreamReadable.on('error', (err) => callback(err));
+        this.objStreamReadable.on('error', err => callback(err));
     }
 
     private handleNextLine(line: string): void {

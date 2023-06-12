@@ -1,7 +1,8 @@
 import { HeadObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { ObjectStoreCredentials, ObjectStoreReference } from '../model';
-import { ObjectReader, ObjectStoreClient } from '../object-store';
+import { ObjectReader, ObjectStoreClient, WritableStream } from '../object-store';
 import { S3ObjectReader } from './s3-object-reader';
+import { S3ObjectStreamWritable } from './s3-object-stream-writable';
 
 /**
  * A client for an S3 object store.
@@ -43,5 +44,13 @@ export class S3ObjectStoreClient implements ObjectStoreClient {
         }
 
         return new S3ObjectReader(this.s3Client, { objRef, size: objInfo.ContentLength });
+    }
+
+    createObjectWritableStream(objRef: ObjectStoreReference, encoding: BufferEncoding = 'utf8'): Promise<WritableStream> {
+        if (!this.s3Client) {
+            throw new Error('This client has already been destroyed.');
+        }
+
+        return Promise.resolve(new S3ObjectStreamWritable(this.s3Client, objRef, encoding));
     }
 }

@@ -1,10 +1,10 @@
 import { Readable } from 'node:stream';
-import { ObjectReader } from '../object-store';
+import { ObjectReader, ReadableStream } from '../object-store';
 
 /**
  * Extends {@link Readable} for an ObjectStore object.
  */
-export class ObjectStreamReadable extends Readable {
+export class ObjectStreamReadable extends Readable implements ReadableStream {
     // For details on how to implement a Readable see:
     // https://nodejs.org/api/stream.html#implementing-a-readable-stream
     // https://nodejs.org/api/stream.html#an-example-counting-stream
@@ -28,8 +28,8 @@ export class ObjectStreamReadable extends Readable {
     _read(size: number): void {
         this.objReader
             .readBytes(size)
-            .then((data) => this.push(data))
-            .catch((err) => this.destroy(err));
+            .then(data => this.push(data))
+            .catch(err => this.destroy(err));
     }
 
     /**

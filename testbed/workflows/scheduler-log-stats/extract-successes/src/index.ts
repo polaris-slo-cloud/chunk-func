@@ -80,12 +80,12 @@ function readLineByLineInternal(reader: ObjectReader): Promise<number> {
     return new Promise((resolve, reject) => {
         let linesRead = 0;
         const rl = reader.readLineByLine();
-        rl.onLineRead((line) => {
+        rl.onLineRead(line => {
             console.log(line);
             ++linesRead;
             return true;
         });
-        rl.onError((err) => reject(err));
+        rl.onError(err => reject(err));
         rl.onEnd(() => {
             console.log('Finished reading object.');
             resolve(linesRead);
