@@ -79,17 +79,16 @@ async function readFileLineByLine(objRef: ObjectStoreReference): Promise<number>
 function readLineByLineInternal(reader: ObjectReader): Promise<number> {
     return new Promise((resolve, reject) => {
         let linesRead = 0;
-        reader.readLineByLine({
-            onLineRead: (line) => {
-                console.log(line);
-                ++linesRead;
-                return true;
-            },
-            onError: (err) => reject(err),
-            onEnd: () => {
-                console.log('Finished reading object.');
-                resolve(linesRead);
-            },
+        const rl = reader.readLineByLine();
+        rl.onLineRead((line) => {
+            console.log(line);
+            ++linesRead;
+            return true;
+        });
+        rl.onError((err) => reject(err));
+        rl.onEnd(() => {
+            console.log('Finished reading object.');
+            resolve(linesRead);
         });
     });
 }

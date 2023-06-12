@@ -1,9 +1,10 @@
 import { GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
-import * as readline from 'node:readline';
 import { Readable } from 'node:stream';
 import { ObjectStoreReference } from '../model';
-import { ObjectReader, ReadLineByLineOptions } from '../object-store';
-import { ObjectStreamReadable } from './streams';
+import { ObjectReader } from '../object-store';
+import { ObjectStreamReadable } from './object-stream-readable';
+import { ReadLineByLine } from '../read-line-by-line';
+import { ReadLineByLineImpl } from './read-line-by-line.impl';
 
 export interface S3ObjectInfo {
     objRef: ObjectStoreReference;
@@ -69,31 +70,9 @@ export class S3ObjectReader implements ObjectReader {
         return this.createObjectStreamReadable(encoding);
     }
 
-    readLineByLine(options: ReadLineByLineOptions): void {
-        const objReadable = this.createObjectStreamReadable(options.encoding || 'utf8');
-        const rl = readline.createInterface(objReadable);
-        let aborted = false;
-
-        rl.on('line', (line) => {
-            if (!aborted) {
-                if (!options.onLineRead(line)) {
-                    aborted = true;
-                    objReadable.abort();
-                }
-            }
-        });
-
-        rl.on('close', () => {
-            if (options.onEnd) {
-                options.onEnd();
-            }
-        });
-
-        objReadable.on('error', (err) => {
-            if (options.onError) {
-                options.onError(err);
-            }
-        });
+    readLineByLine(encoding: BufferEncoding = 'utf8'): ReadLineByLine {
+        const objReadable = this.createObjectStreamReadable(encoding);
+        return new ReadLineByLineImpl(encoding, objReadable);
     }
 
     private createObjectStreamReadable(encoding?: BufferEncoding): ObjectStreamReadable {

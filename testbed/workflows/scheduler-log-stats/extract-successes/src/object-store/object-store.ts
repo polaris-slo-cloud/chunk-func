@@ -1,5 +1,6 @@
 import { Readable } from 'stream';
 import { ObjectStoreReference } from './model';
+import { ReadLineByLine } from './read-line-by-line';
 
 /**
  * Client for an object store.
@@ -56,42 +57,17 @@ export interface ObjectReader {
     getReadableStream(encoding?: BufferEncoding): Readable;
 
     /**
-     * Reads the object line by line and calls the `onLineRead` callback for each line.
+     * Creates a {@link ReadLineByLine} reader for this object.
      *
      * Since the file is read in buffered chunks in the background, the `currPos` normally does not reflect the end of
      * the last read line.
+     *
+     * @param encoding The text encoding to be used for reading. Defaults to `utf8` if not set.
      */
-    readLineByLine(options: ReadLineByLineOptions): void;
+    readLineByLine(encoding?: BufferEncoding): ReadLineByLine;
 
     /**
      * Closes the reader and releases any resources that exclusively belong to the reader.
      */
     close(): void;
-}
-
-/**
- * Configuration object for the `readLineByLine()` method of {@link ObjectReader}.
- */
-export interface ReadLineByLineOptions {
-    /**
-     * The callback function called for every line that is read. The callback must return
-     * `true` to proceed the reading process or `false` to abort it.
-     */
-    onLineRead: (line: string) => boolean;
-
-    /**
-     * Called when the end of the object has been reached.
-     */
-    onEnd?: () => void;
-
-    /**
-     * Called when an error occurs.
-     */
-    onError?: (err: Error) => void;
-
-    /**
-     * The text encoding of the object.
-     * If not set, this defaults to `'utf8'`.
-     */
-    encoding?: BufferEncoding;
 }
