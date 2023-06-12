@@ -1,7 +1,8 @@
 import { GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
+import * as readline from 'node:readline';
+import { Readable } from 'node:stream';
 import { ObjectStoreReference } from '../model';
 import { ObjectReader, ReadLineByLineOptions } from '../object-store';
-import * as readline from 'readline';
 import { ObjectStreamReadable } from './streams';
 
 export interface S3ObjectInfo {
@@ -61,11 +62,15 @@ export class S3ObjectReader implements ObjectReader {
         const range = this.getRangeAndLength(response.ContentRange);
         this._currPos = range.end + 1;
 
-        return await response.Body.transformToByteArray();
+        return response.Body.transformToByteArray();
+    }
+
+    getReadableStream(encoding?: BufferEncoding): Readable {
+        return this.createObjectStreamReadable(encoding);
     }
 
     readLineByLine(options: ReadLineByLineOptions): void {
-        const objReadable = new ObjectStreamReadable(this, options.encoding || 'utf8');
+        const objReadable = this.createObjectStreamReadable(options.encoding || 'utf8');
         const rl = readline.createInterface(objReadable);
         let aborted = false;
 
@@ -89,6 +94,10 @@ export class S3ObjectReader implements ObjectReader {
                 options.onError(err);
             }
         });
+    }
+
+    private createObjectStreamReadable(encoding?: BufferEncoding): ObjectStreamReadable {
+        return new ObjectStreamReadable(this, encoding);
     }
 
     private getObjectRange(start: number, end: number): Promise<GetObjectCommandOutput> {

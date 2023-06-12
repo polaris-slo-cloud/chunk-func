@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import { ObjectStoreReference } from './model';
 
 /**
@@ -44,6 +45,15 @@ export interface ObjectReader {
      * @returns A buffer with the read bytes or `null` if the end of the object has been reached.
      */
     readBytes(count: number): Promise<Uint8Array | null>;
+
+    /**
+     * Creates a `Readable` stream for reading this object.
+     *
+     * @param encoding (optional) The text encoding to use. Default: none.
+     * If an encoding is specified, the stream data will be returned as strings.
+     * If no encoding is specified (default), the stream data will be returned as `Buffer` objects.
+     */
+    getReadableStream(encoding?: BufferEncoding): Readable;
 
     /**
      * Reads the object line by line and calls the `onLineRead` callback for each line.
