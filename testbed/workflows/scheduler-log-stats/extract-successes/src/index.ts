@@ -1,6 +1,8 @@
 import { Context, HTTPFunction, HealthCheck, IncomingBody, StructuredReturn } from 'faas-js-runtime';
+import { randomUUID } from 'node:crypto';
 import { isValidObjectStoreReference, ObjectReader, ObjectStoreReference } from './object-store';
 import { createS3ObjectStoreClient } from './object-store/impl/factories';
+import { LineByLineTransformer } from './object-store/transformer';
 
 function reportInvalidS3ObjRef(): StructuredReturn {
     return {
@@ -46,9 +48,16 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
     }
     console.log('Received request');
 
-    let bytesRead = 0;
+    // let bytesRead = 0;
+    // try {
+    //     bytesRead = await readFileLineByLine(body);
+    // } catch (err) {
+    //     return createErrorResponse(err as Error);
+    // }
+
+    let outFile: ObjectStoreReference;
     try {
-        bytesRead = await readFileLineByLine(body);
+        outFile = await transformFile(body);
     } catch (err) {
         return createErrorResponse(err as Error);
     }
@@ -56,13 +65,39 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
     return {
         statusCode: 200,
         body: {
-            bytesRead: bytesRead,
+            outFile: outFile.objectKey,
         },
         headers: {
             'content-type': 'application/json',
         },
     };
 };
+
+async function transformFile(objRef: ObjectStoreReference): Promise<ObjectStoreReference> {
+    const targetFileName = randomUUID();
+    const targetObjRef: ObjectStoreReference = {
+        ...objRef,
+        objectKey: `${targetFileName}.log`,
+    };
+    const s3Client = createS3ObjectStoreClient(objRef);
+    const reader = await s3Client.createObjectReader(objRef);
+    const writer = await s3Client.createObjectWritableStream(targetObjRef, 'utf-8');
+    const lineByLineReader = reader.readLineByLine('utf-8');
+
+    const transformer = new LineByLineTransformer({
+        input: lineByLineReader,
+        output: writer,
+        transformLine: line => {
+            if (line.indexOf('SchedulingSuccess') !== -1) {
+                return line;
+            }
+            return undefined;
+        },
+    });
+
+    await transformer.start();
+    return targetObjRef;
+}
 
 async function readFileLineByLine(objRef: ObjectStoreReference): Promise<number> {
     const s3Client = createS3ObjectStoreClient(objRef);

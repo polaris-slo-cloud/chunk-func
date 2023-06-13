@@ -96,14 +96,14 @@ export interface ReadableStream extends NodeJS.ReadableStream {
  */
 export interface WritableStream extends NodeJS.WritableStream {
     /**
-     * @return A promise that resolves when the stream is ready for writing (i.e., the internal buffer has been drained).
+     * @returns A promise that resolves when the stream is ready for writing (i.e., the internal buffer has been drained).
      */
     readyToWrite(): Promise<void>;
 
     /**
      * Writes any remaining data in the buffer and closes the stream.
      *
-     * @return A promise that resolves when the stream has been successfully closed.
+     * @returns A promise that resolves when the stream has been successfully closed.
      */
     end$(): Promise<void>;
 }

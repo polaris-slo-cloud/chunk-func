@@ -1,6 +1,6 @@
 import * as readline from 'node:readline';
 import { ReadLineByLine } from '../read-line-by-line';
-import { ObjectStreamReadable } from './object-stream-readable';
+import { ReadableStream } from '../object-store';
 
 export class ReadLineByLineImpl implements ReadLineByLine {
     readonly encoding: BufferEncoding;
@@ -11,7 +11,7 @@ export class ReadLineByLineImpl implements ReadLineByLine {
     private paused = false;
     private pauseBuffer: string[] | undefined;
 
-    constructor(encoding: BufferEncoding, private objStreamReadable: ObjectStreamReadable) {
+    constructor(encoding: BufferEncoding, private objStreamReadable: ReadableStream) {
         this.encoding = encoding;
         this.readLine = readline.createInterface(this.objStreamReadable);
     }

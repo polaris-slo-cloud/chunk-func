@@ -56,7 +56,12 @@ export class S3ObjectStreamWritable extends Writable implements WritableStream {
             }
         }
 
-        result$.then(() => callback()).catch(err => callback(err));
+        result$
+            .then(() => callback(null))
+            .catch(err => {
+                const errorMsg = JSON.stringify(err, undefined, 4);
+                callback(new Error(errorMsg));
+            });
     }
 
     end(cb?: (() => void) | undefined): this;
@@ -81,8 +86,21 @@ export class S3ObjectStreamWritable extends Writable implements WritableStream {
     }
 
     end$(): Promise<void> {
-        return new Promise(resolve => {
-            this.end(() => resolve());
+        return new Promise((resolve, reject) => {
+            let errorFromEvent: Error;
+            this.once('error', err => {
+                errorFromEvent = err;
+            });
+
+            this.end(errorFromCallback => {
+                // According to the API definition end() does not pass the error to the callback, but apparently it does.
+                const rejectReason: Error = errorFromCallback || errorFromEvent;
+                if (!rejectReason) {
+                    resolve();
+                } else {
+                    reject(rejectReason);
+                }
+            });
         });
     }
 
@@ -136,7 +154,7 @@ export class S3ObjectStreamWritable extends Writable implements WritableStream {
         this.uploadedPartsETags[partNumber - 1] = response.ETag;
     }
 
-    private finishMultiPartUpload(): Promise<void> {
+    private async finishMultiPartUpload(): Promise<void> {
         const cmd = new CompleteMultipartUploadCommand({
             Bucket: this.objRef.bucket,
             Key: this.objRef.objectKey,
@@ -149,8 +167,10 @@ export class S3ObjectStreamWritable extends Writable implements WritableStream {
             },
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        return this.s3Client.send(cmd).then(() => {});
+        const response = await this.s3Client.send(cmd);
+        if (!response.ChecksumSHA256) {
+            throw new Error('CompleteMultipartUploadCommand failed');
+        }
     }
 
     private handleDrainEvent(): void {
