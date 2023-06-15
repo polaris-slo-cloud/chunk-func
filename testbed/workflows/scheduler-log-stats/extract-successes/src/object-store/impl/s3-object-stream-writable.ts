@@ -12,10 +12,19 @@ interface PromiseHandle<T> {
 }
 
 export class S3ObjectStreamWritable extends Writable implements WritableStream {
+    /** The upload ID of a multi-part upload. */
     private uploadId: string | undefined;
-    private finalPart = false;
+
+    /** Set to true when end() is called. */
+    private ending = false;
+
+    /** The ID of the last previous part of a multi-part upload that was uploaded. */
     private lastPartId = 0;
+
+    /** The ETags of completed multi-part upload chunks. */
     private uploadedPartsETags: string[] = [];
+
+    /** Promises currently waiting for the drain event. */
     private readyToWritePromises: PromiseHandle<void>[] = [];
 
     constructor(private s3Client: S3Client, private objRef: ObjectStoreReference, encoding?: BufferEncoding) {
@@ -29,17 +38,24 @@ export class S3ObjectStreamWritable extends Writable implements WritableStream {
     }
 
     _write(chunk: any, encoding: BufferEncoding, callback: (error?: Error | null | undefined) => void): void {
-        // Since we set decodeStrings = true, chunk will always be a Buffer
+        // Since we set decodeStrings = true, chunk should always be a Buffer.
+        if (!(chunk instanceof Buffer)) {
+            callback(new Error(`_write() expects chunk to be a Buffer, instead it is ${chunk}`));
+            return;
+        }
+
+        // It is the final part if end() was called and if the length of the chunk is equal to the total length of the buffer.
+        const finalPart = this.ending && chunk.length === this.writableLength;
+
         // We need to cover the following cases:
         // - First part of a multi-part upload (uploadId === undefined && finalPart === false)
-        // - Subsequent part of a multi-part upload (uploadId !== undefined && finalPart === false)
-        // - Final part of a multi-part upload (uploadId !== undefined && finalPart === true)
+        // - Subsequent part of a multi-part upload (uploadId !== undefined && (finalPart === true || finalPart === false))
         // - Only part of a single upload file (uploadId === undefined && finalPart === true)
 
         let result$: Promise<void>;
 
         if (!this.uploadId) {
-            if (!this.finalPart) {
+            if (!finalPart) {
                 // First part of a multi-part upload (uploadId === undefined && finalPart === false)
                 result$ = this.startMultiPartUpload().then(() => this.uploadPart(chunk));
             } else {
@@ -47,41 +63,38 @@ export class S3ObjectStreamWritable extends Writable implements WritableStream {
                 result$ = this.uploadSinglePartFile(chunk);
             }
         } else {
-            if (!this.finalPart) {
-                // Subsequent part of a multi-part upload (uploadId !== undefined && finalPart === false)
-                result$ = this.uploadPart(chunk);
-            } else {
-                // Final part of a multi-part upload (uploadId !== undefined && finalPart === true)
-                result$ = this.uploadPart(chunk).then(() => this.finishMultiPartUpload());
-            }
+            // Subsequent part of a multi-part upload (uploadId !== undefined && (finalPart === true || finalPart === false))
+            // We don't care if this is the final part, because finishMultiPartUpload() will be called by _final()
+            result$ = this.uploadPart(chunk);
         }
 
+        // eslint-disable-next-line prettier/prettier
         result$
             .then(() => callback(null))
-            .catch(err => {
-                const errorMsg = JSON.stringify(err, undefined, 4);
-                callback(new Error(errorMsg));
-            });
+            .catch(err => this.relayErrorToCallback(err, callback));
+    }
+
+    /**
+     * Called by `Writable` before the stream is closed, after the buffer has been flushed.
+     */
+    _final(callback: (error?: Error | null | undefined) => void): void {
+        if (this.uploadId) {
+            // We are in a multi-part upload, so we need to finish it now.
+            this.finishMultiPartUpload()
+                .then(() => callback(null))
+                .catch(err => this.relayErrorToCallback(err, callback));
+        } else {
+            // We are not in a multi-part upload. It was either a single-part upload, which was completed by _write()
+            // or no data was written at all. In either case, we are done.
+            callback(null);
+        }
     }
 
     end(cb?: (() => void) | undefined): this;
     end(chunk: any, cb?: (() => void) | undefined): this;
     end(chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined): this;
     end(chunk?: any, encoding?: any, cb?: any): this {
-        this.finalPart = true;
-
-        // If the buffer is currently empty, we need to finish the upload here, because _write() will not be called any more.
-        if (this.writableLength === 0) {
-            // We only need to finish the upload, if we have already uploaded a part.
-            // Otherwise, if no data has been written, no file will be created,.
-            if (this.uploadId) {
-                this.finishMultiPartUpload()
-                    .then(() => super.end(chunk, encoding, cb))
-                    .catch(err => this.destroy(err));
-                return this;
-            }
-        }
-
+        this.ending = true;
         return super.end(chunk, encoding, cb);
     }
 
@@ -104,6 +117,10 @@ export class S3ObjectStreamWritable extends Writable implements WritableStream {
         });
     }
 
+    /**
+     * @returns A promise that resolves when the stream is ready for writing (i.e., the buffer has been drained).
+     * Note that any error relayed through the promise will also be propagated through the on('error') event.
+     */
     readyToWrite(): Promise<void> {
         if (!this.writableNeedDrain) {
             return Promise.resolve();
@@ -184,6 +201,15 @@ export class S3ObjectStreamWritable extends Writable implements WritableStream {
             }
         }
         this.readyToWritePromises = this.readyToWritePromises.splice(0, resolvedCount);
+    }
+
+    private relayErrorToCallback(err: any, callback: (error?: Error | null | undefined) => void): void {
+        if (!(err instanceof Error)) {
+            const errorMsg = JSON.stringify(err, undefined, 4);
+            err = new Error(errorMsg);
+        }
+        callback(err);
+        this.relayErrorToReadyToWritePromises(err);
     }
 
     private relayErrorToReadyToWritePromises(err: Error): void {
