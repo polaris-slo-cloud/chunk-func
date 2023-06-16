@@ -1,4 +1,3 @@
-import { Readable } from 'stream';
 import { ObjectStoreReference } from './model';
 import { ReadLineByLine } from './read-line-by-line';
 

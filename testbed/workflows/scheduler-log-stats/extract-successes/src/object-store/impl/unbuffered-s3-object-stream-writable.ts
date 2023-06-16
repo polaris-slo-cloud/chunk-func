@@ -3,8 +3,8 @@ import { Writable } from 'node:stream';
 import { ObjectStoreReference } from '../model';
 import { WritableStream } from '../object-store';
 
-/** AWS requires multi-part uploads to have chunk size of at least 5 MB. */
-export const s3MinChunkSize = 5 * 1024 * 1024;
+/** AWS requires multi-part uploads to have a size of at least 5 MB. */
+export const s3MinMultiPartSize = 5 * 1024 * 1024;
 
 interface PromiseHandle<T> {
     resolve: (value: T) => void;
@@ -32,11 +32,13 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
     /** Promises currently waiting for the drain event. */
     private readyToWritePromises: PromiseHandle<void>[] = [];
 
-    constructor(private s3Client: S3Client, private objRef: ObjectStoreReference, encoding?: BufferEncoding) {
+    private totalBytesWritten = 0;
+
+    constructor(private s3Client: S3Client, private objRef: ObjectStoreReference, highWaterMark: number, encoding?: BufferEncoding) {
         super({
             defaultEncoding: encoding,
             decodeStrings: true,
-            highWaterMark: s3MinChunkSize,
+            highWaterMark: highWaterMark,
         });
 
         this.on('drain', () => this.handleDrainEvent());
@@ -73,6 +75,8 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
             result$ = this.uploadPart(chunk);
         }
 
+        this.totalBytesWritten += chunk.length;
+
         // eslint-disable-next-line prettier/prettier
         result$
             .then(() => callback(null))
@@ -83,6 +87,7 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
      * Called by `Writable` before the stream is closed, after the buffer has been flushed.
      */
     _final(callback: (error?: Error | null | undefined) => void): void {
+        console.log(`Total bytes written: ${this.totalBytesWritten}`);
         if (this.uploadId) {
             // We are in a multi-part upload, so we need to finish it now.
             this.finishMultiPartUpload()
@@ -190,7 +195,7 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
         });
 
         const response = await this.s3Client.send(cmd);
-        if (!response.ChecksumSHA256) {
+        if (!response.ETag) {
             throw new Error('CompleteMultipartUploadCommand failed');
         }
     }
