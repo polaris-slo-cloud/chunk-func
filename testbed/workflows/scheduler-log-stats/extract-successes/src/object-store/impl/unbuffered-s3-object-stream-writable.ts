@@ -4,14 +4,19 @@ import { ObjectStoreReference } from '../model';
 import { WritableStream } from '../object-store';
 
 /** AWS requires multi-part uploads to have chunk size of at least 5 MB. */
-const minChunkSize = 5 * 1024 * 1024;
+export const s3MinChunkSize = 5 * 1024 * 1024;
 
 interface PromiseHandle<T> {
     resolve: (value: T) => void;
     reject: (err: Error) => void;
 }
 
-export class S3ObjectStreamWritable extends Writable implements WritableStream {
+/**
+ * Implements a WritableStream for an S3 object.
+ * This stream assumes that each chunk that is written is either at least 5 MB or is the only chunk of the object.
+ * Do not use this class directly, use {@link S3ObjectStreamWritable} instead, which provides buffering of smaller chunks.
+ */
+export class UnbufferedS3ObjectStreamWritable extends Writable implements WritableStream {
     /** The upload ID of a multi-part upload. */
     private uploadId: string | undefined;
 
@@ -31,7 +36,7 @@ export class S3ObjectStreamWritable extends Writable implements WritableStream {
         super({
             defaultEncoding: encoding,
             decodeStrings: true,
-            highWaterMark: minChunkSize,
+            highWaterMark: s3MinChunkSize,
         });
 
         this.on('drain', () => this.handleDrainEvent());
