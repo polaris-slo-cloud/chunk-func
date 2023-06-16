@@ -1,4 +1,4 @@
-import { CompleteMultipartUploadCommand, CreateMultipartUploadCommand, PutObjectCommand, S3Client, UploadPartCommand } from '@aws-sdk/client-s3';
+import { CompleteMultipartUploadCommand, CreateMultipartUploadCommand, S3Client, UploadPartCommand } from '@aws-sdk/client-s3';
 import { Writable } from 'node:stream';
 import { ObjectStoreReference } from '../model';
 import { WritableStream } from '../object-store';
@@ -20,9 +20,6 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
     /** The upload ID of a multi-part upload. */
     private uploadId: string | undefined;
 
-    /** Set to true when end() is called. */
-    private ending = false;
-
     /** The ID of the last previous part of a multi-part upload that was uploaded. */
     private lastPartId = 0;
 
@@ -32,7 +29,7 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
     /** Promises currently waiting for the drain event. */
     private readyToWritePromises: PromiseHandle<void>[] = [];
 
-    private totalBytesWritten = 0;
+    private totalBytesUploaded = 0;
 
     constructor(private s3Client: S3Client, private objRef: ObjectStoreReference, highWaterMark: number, encoding?: BufferEncoding) {
         super({
@@ -51,35 +48,24 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
             return;
         }
 
-        // It is the final part if end() was called and if the length of the chunk is equal to the total length of the buffer.
-        const finalPart = this.ending && chunk.length === this.writableLength;
-
-        // We need to cover the following cases:
-        // - First part of a multi-part upload (uploadId === undefined && finalPart === false)
-        // - Subsequent part of a multi-part upload (uploadId !== undefined && (finalPart === true || finalPart === false))
-        // - Only part of a single upload file (uploadId === undefined && finalPart === true)
-
         let result$: Promise<void>;
 
+        // If it's the first part, we need to start a new multi-part upload, otherwise we just upload the new part.
+        // In either case we don't care if this is the final part, because finishMultiPartUpload() will be called by _final().
+        // This works even if the object only consists of a single part (which may be smaller than s3MinMultiPartSize).
         if (!this.uploadId) {
-            if (!finalPart) {
-                // First part of a multi-part upload (uploadId === undefined && finalPart === false)
-                result$ = this.startMultiPartUpload().then(() => this.uploadPart(chunk));
-            } else {
-                // Final and only part of a single upload file (uploadId === undefined && finalPart === true)
-                result$ = this.uploadSinglePartFile(chunk);
-            }
+            // First part of a multi-part upload.
+            result$ = this.startMultiPartUpload().then(() => this.uploadPart(chunk));
         } else {
-            // Subsequent part of a multi-part upload (uploadId !== undefined && (finalPart === true || finalPart === false))
-            // We don't care if this is the final part, because finishMultiPartUpload() will be called by _final()
+            // Subsequent part of a multi-part upload.
             result$ = this.uploadPart(chunk);
         }
 
-        this.totalBytesWritten += chunk.length;
-
-        // eslint-disable-next-line prettier/prettier
         result$
-            .then(() => callback(null))
+            .then(() => {
+                this.totalBytesUploaded += chunk.length;
+                callback(null);
+            })
             .catch(err => this.relayErrorToCallback(err, callback));
     }
 
@@ -87,7 +73,7 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
      * Called by `Writable` before the stream is closed, after the buffer has been flushed.
      */
     _final(callback: (error?: Error | null | undefined) => void): void {
-        console.log(`Total bytes written: ${this.totalBytesWritten}`);
+        console.log(`Total bytes uploaded: ${this.totalBytesUploaded}`);
         if (this.uploadId) {
             // We are in a multi-part upload, so we need to finish it now.
             this.finishMultiPartUpload()
@@ -98,14 +84,6 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
             // or no data was written at all. In either case, we are done.
             callback(null);
         }
-    }
-
-    end(cb?: (() => void) | undefined): this;
-    end(chunk: any, cb?: (() => void) | undefined): this;
-    end(chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined): this;
-    end(chunk?: any, encoding?: any, cb?: any): this {
-        this.ending = true;
-        return super.end(chunk, encoding, cb);
     }
 
     end$(): Promise<void> {
@@ -138,17 +116,6 @@ export class UnbufferedS3ObjectStreamWritable extends Writable implements Writab
         return new Promise((resolve, reject) => {
             this.readyToWritePromises.push({ resolve, reject });
         });
-    }
-
-    private uploadSinglePartFile(data: Buffer): Promise<void> {
-        const cmd = new PutObjectCommand({
-            Bucket: this.objRef.bucket,
-            Key: this.objRef.objectKey,
-            Body: data,
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        return this.s3Client.send(cmd).then(() => {});
     }
 
     private async startMultiPartUpload(): Promise<void> {
