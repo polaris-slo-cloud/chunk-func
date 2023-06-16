@@ -74,7 +74,7 @@ export class LineByLineTransformer {
             return;
         }
 
-        const readyToContinueWriting = this.config.output.write(transformed);
+        const readyToContinueWriting = this.config.output.write(transformed + '\n');
         if (!readyToContinueWriting) {
             this.config.input.pause();
             this.config.output
