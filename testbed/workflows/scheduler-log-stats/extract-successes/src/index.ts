@@ -43,6 +43,7 @@ const readiness: HealthCheck = () => {
 };
 
 const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Promise<StructuredReturn> => {
+    const start = new Date();
     if (!isValidObjectStoreReference(body)) {
         return reportInvalidS3ObjRef();
     }
@@ -62,10 +63,13 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
         return createErrorResponse(err as Error);
     }
 
+    const end = new Date();
+    const durationMs = end.valueOf() - start.valueOf();
     return {
         statusCode: 200,
         body: {
             outFile: outFile.objectKey,
+            durationMs: durationMs,
         },
         headers: {
             'content-type': 'application/json',

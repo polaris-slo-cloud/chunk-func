@@ -174,7 +174,7 @@ export class S3ObjectStreamWritable extends UnbufferedS3ObjectStreamWritable imp
         for (const cb of this.bufferedCallbacks) {
             cb(result);
         }
-        this.bufferedCallbacks = [];
+        this.bufferedCallbacks.length = 0;
     }
 
     private resetBuffer(): void {
