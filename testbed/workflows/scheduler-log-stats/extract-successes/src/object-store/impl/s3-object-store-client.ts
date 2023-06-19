@@ -1,4 +1,4 @@
-import { HeadObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { HeadObjectCommand, HeadObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
 import { ObjectStoreCredentials, ObjectStoreReference } from '../model';
 import { ObjectReader, ObjectStoreClient, WritableStream } from '../object-store';
 import { S3ObjectReader } from './s3-object-reader';
@@ -38,9 +38,15 @@ export class S3ObjectStoreClient implements ObjectStoreClient {
             Key: objRef.objectKey,
         });
 
-        const objInfo = await this.s3Client.send(command).catch(() => undefined);
-        if (!objInfo || typeof objInfo.ContentLength !== 'number') {
-            throw new Error(`Could not fetch information about object ${objRef.objectKey}`);
+        let objInfo: HeadObjectCommandOutput;
+        try {
+            objInfo = await this.s3Client.send(command);
+        } catch (err) {
+            const errMsg = JSON.stringify(err, undefined, 4);
+            throw new Error(`Could not fetch information about object ${objRef.objectKey}. Internal error: ${errMsg}`);
+        }
+        if (typeof objInfo.ContentLength !== 'number') {
+            throw new Error(`Could not fetch information about object ${objRef.objectKey}. Internal error: no ContentLength`);
         }
 
         return new S3ObjectReader(this.s3Client, { objRef, size: objInfo.ContentLength });
