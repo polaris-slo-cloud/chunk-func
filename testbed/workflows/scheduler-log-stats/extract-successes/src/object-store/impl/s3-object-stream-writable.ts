@@ -17,21 +17,27 @@ export type WriteCallback = (error: Error | null | undefined) => void;
  */
 export class S3ObjectStreamWritable extends UnbufferedS3ObjectStreamWritable implements WritableStream {
     /**
+     * The size of the internal buffer.
+     * (same as the minimum single multi-part upload size = 5 MB)
+     */
+    static readonly bufferSize = s3MinMultiPartSize;
+
+    /**
      * The maximum size of the chunks that can be passed to write().
      *
-     * They may not be larger than the size of a single multi-upload part (5 MB)
+     * They may not be larger than the size of the buffer
      * to simplify the buffering logic in this simple use case application.
      */
-    static readonly maxChunkSize = s3MinMultiPartSize;
+    static readonly maxChunkSize = S3ObjectStreamWritable.bufferSize;
 
-    private writeBuffer = Buffer.alloc(s3MinMultiPartSize);
+    private writeBuffer = Buffer.alloc(S3ObjectStreamWritable.bufferSize);
     private bytesInBuffer = 0;
     private bufferedCallbacks: WriteCallback[] = [];
     private flushInProgress = false;
     private totalBytesReceived = 0;
 
     constructor(s3Client: S3Client, objRef: ObjectStoreReference, private encoding: BufferEncoding = 'utf8') {
-        super(s3Client, objRef, s3MinMultiPartSize, encoding);
+        super(s3Client, objRef, S3ObjectStreamWritable.bufferSize, encoding);
     }
 
     write(chunk: any, callback?: ((error: Error | null | undefined) => void) | undefined): boolean;
