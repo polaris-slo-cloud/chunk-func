@@ -65,6 +65,8 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
 
     const end = new Date();
     const durationMs = end.valueOf() - start.valueOf();
+    console.log('Request completed in (ms):', durationMs);
+
     return {
         statusCode: 200,
         body: {
