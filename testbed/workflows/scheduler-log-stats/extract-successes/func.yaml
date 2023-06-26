@@ -1,0 +1,17 @@
+specVersion: 0.35.0
+name: extract-successes
+runtime: typescript
+registry: polarissloc
+image: polarissloc/chunk-func-extract-successes:latest
+imageDigest: sha256:b3052a618fbce7d4b88a853ee501516415a81143f4636ca8fe9a817cddb6902d
+created: 2023-05-31T14:37:36.818205802+02:00
+build:
+  builder: pack
+  buildEnvs:
+  - name: BP_NODE_RUN_SCRIPTS
+    value: build
+  - name: BP_NODE_VERSION
+    value: 18.16.0
+  pvcSize: 256Mi
+deploy:
+  namespace: default
