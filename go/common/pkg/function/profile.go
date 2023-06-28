@@ -9,5 +9,5 @@ type ResourceProfile struct {
 	MilliCpu int64 `json:"milliCpu" yaml:"milliCpu"`
 
 	// The price for this configuration for 100ms of uptime.
-	Price100Ms float64
+	Price100Ms float64 `json:"price100Ms" yaml:"price100Ms"`
 }
