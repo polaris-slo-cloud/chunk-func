@@ -12,6 +12,9 @@ type FunctionDescription struct {
 	// in the same namespace as the FunctionDescription.
 	FunctionName string `json:"functionName" yaml:"functionName"`
 
+	// The name of the container in the pod that hosts the function code.
+	FunctionContainer string `json:"functionContainer" yaml:"functionContainer"`
+
 	// The typical inputs of various sizes.
 	TypicalInputs []FunctionInput `json:"typicalInputs" yaml:"typicalInputs"`
 
@@ -22,7 +25,7 @@ type FunctionDescription struct {
 // Combines a reference to a function Service with the description of the ChunkFunc function.
 type FunctionWithDescription struct {
 
-	// The Knative Service for the function.
+	// The serverless function object stored in Kubernetes.
 	Function *knServing.Service
 
 	// The ChunkFunc description of the function.

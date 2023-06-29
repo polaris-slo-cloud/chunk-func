@@ -35,6 +35,10 @@ spec:
           spec:
             description: FunctionDescriptionSpec defines the desired state of FunctionDescription
             properties:
+              functionContainer:
+                description: The name of the container in the pod that hosts the function
+                  code.
+                type: string
               functionName:
                 description: The name of the function. This must be the name of a
                   Knative Service object in the same namespace as the FunctionDescription.
@@ -66,6 +70,7 @@ spec:
                   type: object
                 type: array
             required:
+            - functionContainer
             - functionName
             - maxResponseTimeMs
             - typicalInputs

@@ -12,6 +12,7 @@ metadata:
     app.kubernetes.io/part-of: chunk-func-controller
 spec:
   functionName: extract-successes
+  functionContainer: user-container
   maxResponseTimeMs: 4000
   typicalInputs:
     - sizeBytes: 2467840 # 2.4 MiB
