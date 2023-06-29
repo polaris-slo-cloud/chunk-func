@@ -1,0 +1,27 @@
+# permissions for end users to view functiondescriptions.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: functiondescription-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: chunk-func-controller
+    app.kubernetes.io/part-of: chunk-func-controller
+    app.kubernetes.io/managed-by: kustomize
+  name: functiondescription-viewer-role
+rules:
+- apiGroups:
+  - chunk-func.polaris-slo-cloud.github.io
+  resources:
+  - functiondescriptions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - chunk-func.polaris-slo-cloud.github.io
+  resources:
+  - functiondescriptions/status
+  verbs:
+  - get

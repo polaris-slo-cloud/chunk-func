@@ -8,6 +8,10 @@ import (
 // its typical inputs for profiling or its response time SLO.
 type FunctionDescription struct {
 
+	// The name of the function. This must be the name of a Knative Service object
+	// in the same namespace as the FunctionDescription.
+	FunctionName string `json:"functionName" yaml:"functionName"`
+
 	// The typical inputs of various sizes.
 	TypicalInputs []FunctionInput `json:"typicalInputs" yaml:"typicalInputs"`
 

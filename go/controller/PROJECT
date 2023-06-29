@@ -7,4 +7,14 @@ layout:
 - go.kubebuilder.io/v4
 projectName: chunk-func-controller
 repo: polaris-slo-cloud.github.io/chunk-func/controller
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: polaris-slo-cloud.github.io
+  group: chunk-func
+  kind: FunctionDescription
+  path: polaris-slo-cloud.github.io/chunk-func/controller/api/v1
+  version: v1
 version: "3"
