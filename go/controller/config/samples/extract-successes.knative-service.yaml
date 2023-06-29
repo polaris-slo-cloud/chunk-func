@@ -1,0 +1,80 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations:
+    dapr.io/app-id: extract-successes
+    dapr.io/app-port: "8080"
+    dapr.io/enable-api-logging: "true"
+    dapr.io/enabled: "true"
+    dapr.io/metrics-port: "9092"
+    serving.knative.dev/creator: admin
+    serving.knative.dev/lastModifier: admin
+  labels:
+    boson.dev/function: "true"
+    boson.dev/runtime: typescript
+    function.knative.dev: "true"
+    function.knative.dev/name: extract-successes
+    function.knative.dev/runtime: typescript
+  name: extract-successes
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        dapr.io/app-id: extract-successes
+        dapr.io/app-port: "8080"
+        dapr.io/enable-api-logging: "true"
+        dapr.io/enabled: "true"
+        dapr.io/metrics-port: "9092"
+      creationTimestamp: null
+      labels:
+        boson.dev/function: "true"
+        boson.dev/runtime: typescript
+        function.knative.dev: "true"
+        function.knative.dev/name: extract-successes
+        function.knative.dev/runtime: typescript
+    spec:
+      containerConcurrency: 0
+      containers:
+      - env:
+        - name: BUILT
+          value: 20230627T120303
+        image: polarissloc/chunk-func-extract-successes@sha256:33304d6e84b70243f77fe570cdc2bb21f75ab9378dabd2871bc787d38010c4a3
+        livenessProbe:
+          httpGet:
+            path: /health/liveness
+            port: 0
+        name: user-container
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: 0
+          successThreshold: 1
+        resources: {}
+      enableServiceLinks: false
+      timeoutSeconds: 300
+  traffic:
+  - latestRevision: true
+    percent: 100
+## For informational purposes, this is what a typical status of a Knative Service looks like.
+# status:
+#   address:
+#     url: http://extract-successes.default.svc.cluster.local
+#   conditions:
+#   - lastTransitionTime: "2023-06-27T10:03:08Z"
+#     status: "True"
+#     type: ConfigurationsReady
+#   - lastTransitionTime: "2023-06-27T10:03:08Z"
+#     status: "True"
+#     type: Ready
+#   - lastTransitionTime: "2023-06-27T10:03:08Z"
+#     status: "True"
+#     type: RoutesReady
+#   latestCreatedRevisionName: extract-successes-00001
+#   latestReadyRevisionName: extract-successes-00001
+#   observedGeneration: 1
+#   traffic:
+#   - latestRevision: true
+#     percent: 100
+#     revisionName: extract-successes-00001
+#   url: http://extract-successes.default.example.com
