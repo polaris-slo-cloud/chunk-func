@@ -1,7 +1,9 @@
 package profiler
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	core "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -61,4 +63,30 @@ func IsKnativeServiceReady(svc *knServing.Service) bool {
 		}
 	}
 	return false
+}
+
+// Creates a new service for the specified resource profile and waits for it to be ready.
+//
+// Important: If there is an error when waiting for the service to become ready,
+// BOTH a service AND an error are returned. The caller must ensure that the service gets deleted again.
+func (pr *exhaustiveFunctionProfilerSession) CreateAndWaitForService(
+	ctx context.Context,
+	fn *function.FunctionWithDescription,
+	targetNamespace string,
+	resourceProfile *function.ResourceProfile,
+	deploymentMgr FunctionDeploymentManager,
+	timeout time.Duration,
+) (*knServing.Service, error) {
+	svc, err := CreateKnativeServiceWithProfile(fn, targetNamespace, resourceProfile)
+	if err != nil {
+		return nil, err
+	}
+
+	deployedSvc, err := deploymentMgr.DeployFunction(ctx, svc)
+	if err != nil {
+		return nil, err
+	}
+
+	err = deploymentMgr.WaitForFunctionToBeReady(ctx, deployedSvc, timeout)
+	return svc, err
 }

@@ -16,7 +16,7 @@ type FunctionDescription struct {
 	FunctionContainer string `json:"functionContainer" yaml:"functionContainer"`
 
 	// The typical inputs of various sizes.
-	TypicalInputs []FunctionInput `json:"typicalInputs" yaml:"typicalInputs"`
+	TypicalInputs []*FunctionInput `json:"typicalInputs" yaml:"typicalInputs"`
 
 	// The SLO that describes the maximum allowed response time (in milliseconds) for this function.
 	MaxResponseTimeMs int64 `json:"maxResponseTimeMs" yaml:"maxResponseTimeMs"`
