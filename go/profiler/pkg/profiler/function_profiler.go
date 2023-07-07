@@ -28,6 +28,7 @@ type ProfilingConfig struct {
 }
 
 // Performs profiling operations on single functions.
+// A FunctionProfiler must safe for use from multiple goroutines.
 type FunctionProfiler interface {
 
 	// Profiles the specified function using the parameters from the config.
