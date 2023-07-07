@@ -6,7 +6,14 @@ import (
 
 // Collects the result of a single profiling session.
 type ProfilingResult struct {
+	// The HTTP status code returned by the function execution.
+	// If the function is not triggered via REST, this contains the
+	// exit code of the function converted into an HTTP status code.
+	StatusCode int32 `json:"statusCode" yaml:"statusCode"`
+
 	// The execution time of the function in milliseconds.
+	//
+	// If the function execution resulted in an error, this value is -1.
 	ExecutionTimeMs int64 `json:"executionTimeMs" yaml:"executionTimeMs"`
 
 	// The size of the used input in bytes.

@@ -189,6 +189,7 @@ func (pr *exhaustiveFunctionProfilerSession) profileFunctionCall(
 	}
 
 	profResult := &function.ProfilingResult{
+		StatusCode:      int32(execResult.StatusCode),
 		InputSizeBytes:  input.SizeBytes,
 		ExecutionTimeMs: execResult.ResponseTime.Milliseconds(),
 	}

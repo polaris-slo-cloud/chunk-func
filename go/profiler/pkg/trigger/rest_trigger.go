@@ -28,7 +28,6 @@ func NewRestTrigger() *RestTrigger {
 	return rt
 }
 
-// TriggerFunction implements TimedFunctionTrigger.
 func (rt *RestTrigger) TriggerFunction(ctx context.Context, fn *knServing.Service, input *function.FunctionInput) (*FunctionExecutionResult[any], error) {
 	reqURI := fn.Status.URL.String()
 	bodyBuffer, err := input.MessageAsJsonBuffer()
@@ -48,7 +47,13 @@ func (rt *RestTrigger) TriggerFunction(ctx context.Context, fn *knServing.Servic
 	stopwatch.Stop()
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(
+			"error while invoking function via REST. URI: %s, statusCode: %d, status: %s, error: %v",
+			reqURI,
+			httpResp.StatusCode,
+			httpResp.Status,
+			err,
+		)
 	}
 	if httpResp.Body != nil {
 		defer httpResp.Body.Close()
@@ -58,21 +63,14 @@ func (rt *RestTrigger) TriggerFunction(ctx context.Context, fn *knServing.Servic
 		}
 	}
 
-	if httpResp.StatusCode == http.StatusOK || httpResp.StatusCode == http.StatusCreated {
-		execResult := &FunctionExecutionResult[any]{
-			Response:     responseBody,
-			ResponseTime: stopwatch.Duration(),
-		}
-		return execResult, nil
-	} else {
-		return nil, fmt.Errorf(
-			"error while invoking function via REST. URI: %s, statusCode: %d, status: %s, error: %v",
-			reqURI,
-			httpResp.StatusCode,
-			httpResp.Status,
-			err,
-		)
+	// We return the result of a successful or a failed function execution in the same way,
+	// because a failed execution might indicate the the function did not have enough resources.
+	execResult := &FunctionExecutionResult[any]{
+		StatusCode:   httpResp.StatusCode,
+		Response:     responseBody,
+		ResponseTime: stopwatch.Duration(),
 	}
+	return execResult, nil
 }
 
 func (rt *RestTrigger) createPostRequest(ctx context.Context, requestURI string, bodyBuffer *bytes.Buffer) (*http.Request, error) {
