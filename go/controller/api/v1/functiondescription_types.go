@@ -33,6 +33,9 @@ type FunctionDescriptionSpec struct {
 
 // FunctionDescriptionStatus defines the observed state of FunctionDescription
 type FunctionDescriptionStatus struct {
+	// The results of the profiling session.
+	// +optional
+	ProfilingResults *function.ProfilingSessionResults `json:"profilingResults,omitempty"`
 }
 
 //+kubebuilder:object:root=true

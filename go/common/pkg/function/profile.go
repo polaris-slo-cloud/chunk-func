@@ -18,6 +18,11 @@ type ResourceProfile struct {
 	Price100Ms float64 `json:"price100Ms" yaml:"price100Ms"`
 }
 
+// Returns a unique ID for this resource profile that can be used, e.g., as a map key.
+func (rp *ResourceProfile) ID() string {
+	return rp.StringifyForK8sObj()
+}
+
 // Returns a string with details about this profile, which can be appended to a Kubernetes object name,
 // e.g., "1024MiB-1000m".
 func (rp *ResourceProfile) StringifyForK8sObj() string {

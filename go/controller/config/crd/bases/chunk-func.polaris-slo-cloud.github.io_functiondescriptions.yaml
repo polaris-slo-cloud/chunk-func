@@ -77,6 +77,59 @@ spec:
             type: object
           status:
             description: FunctionDescriptionStatus defines the observed state of FunctionDescription
+            properties:
+              profilingResults:
+                description: The results of the profiling session.
+                properties:
+                  profilingDurationSeconds:
+                    description: The number of seconds that the profiling session
+                      lasted.
+                    format: int32
+                    type: integer
+                  profilingStarted:
+                    description: The time when the profiling session started.
+                    format: date-time
+                    type: string
+                  results:
+                    description: The list of results grouped by ResourceProfiles.
+                    items:
+                      description: Collects all profiling results for a ResourceProfile.
+                      properties:
+                        resourceProfileId:
+                          description: The ID of the ResourceProfile that was used
+                            for this profiling session.
+                          type: string
+                        results:
+                          description: The profiling results ordered by increasing
+                            input size.
+                          items:
+                            description: Collects the result of a single profiling
+                              session.
+                            properties:
+                              executionTimeMs:
+                                description: The execution time of the function in
+                                  milliseconds.
+                                format: int64
+                                type: integer
+                              inputSizeBytes:
+                                description: The size of the used input in bytes.
+                                format: int64
+                                type: integer
+                            required:
+                            - executionTimeMs
+                            - inputSizeBytes
+                            type: object
+                          type: array
+                      required:
+                      - resourceProfileId
+                      - results
+                      type: object
+                    type: array
+                required:
+                - profilingDurationSeconds
+                - profilingStarted
+                - results
+                type: object
             type: object
         type: object
     served: true

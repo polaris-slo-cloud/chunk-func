@@ -25,7 +25,7 @@ type exhaustiveFunctionProfilerSession struct {
 	// Used to access Knative Services in the cluster.
 	servingClient knServingClient.ServingV1Interface
 
-	// Stores the results, using resourceProfile.StringifyForK8sObj() as keys.
+	// Stores the results, using resourceProfile.ID() as keys.
 	// This map is protected by resultsMutex.
 	results      map[string]*function.ResourceProfileResults
 	resultsMutex sync.Mutex
@@ -66,7 +66,7 @@ func (pr *exhaustiveFunctionProfilerSession) ExecuteProfilingSession(ctx context
 	wg.Add(workersCount)
 
 	abortFn := func(resProfile *function.ResourceProfile, err error) {
-		err = fmt.Errorf("profiling with %s resulted in an error: %v", resProfile.StringifyForK8sObj(), err)
+		err = fmt.Errorf("profiling with %s resulted in an error: %v", resProfile.ID(), err)
 		// If the context has already been cancelled, this does nothing.
 		cancelFn(err)
 	}
@@ -102,7 +102,7 @@ func (pr *exhaustiveFunctionProfilerSession) runProfilingWorker(
 			return
 		}
 
-		profileId := resProfile.StringifyForK8sObj()
+		profileId := resProfile.ID()
 		pr.resultsMutex.Lock()
 		pr.results[profileId] = results
 		pr.resultsMutex.Unlock()
@@ -129,8 +129,8 @@ func (pr *exhaustiveFunctionProfilerSession) evaluateResourceProfile(ctx context
 
 	var fnTrigger trigger.TimedFunctionTrigger[any] = trigger.NewRestTrigger()
 	results := &function.ResourceProfileResults{
-		ResourceProfile: resourceProfile,
-		Results:         make([]*function.ProfilingResult, len(pr.fn.Description.TypicalInputs)),
+		ResourceProfileId: resourceProfile.ID(),
+		Results:           make([]*function.ProfilingResult, len(pr.fn.Description.TypicalInputs)),
 	}
 
 	// Warm the function up.
@@ -202,7 +202,7 @@ func (pr *exhaustiveFunctionProfilerSession) aggregateAllResults() *function.Pro
 
 	for i, resProfile := range pr.profilingConfig.CandidateProfiles {
 		// No locking needed anymore, because this is the only goroutine accessing the results.
-		resProfileResults := pr.results[resProfile.StringifyForK8sObj()]
+		resProfileResults := pr.results[resProfile.ID()]
 		ret.Results[i] = resProfileResults
 	}
 
