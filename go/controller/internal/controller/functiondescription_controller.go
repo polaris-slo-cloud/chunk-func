@@ -33,6 +33,7 @@ import (
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
 	chunkFunc "polaris-slo-cloud.github.io/chunk-func/controller/api/v1"
+	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/optimizer"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/profile"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/profiler"
 )
@@ -46,8 +47,9 @@ type FunctionDescriptionReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	restClient rest.Interface
-	fnProfiler profiler.FunctionProfiler
+	restClient  rest.Interface
+	fnProfiler  profiler.FunctionProfiler
+	fnOptimizer optimizer.FunctionOptimizer
 }
 
 // ChunkFunc FunctionDescriptions:
@@ -101,7 +103,14 @@ func (fdr *FunctionDescriptionReconciler) Reconcile(ctx context.Context, req ctr
 
 	log.Info("Profiling complete", "FunctionDescription", req.NamespacedName)
 
+	optimizedConfigs, err := fdr.fnOptimizer.FindOptimizedConfigs(fnWidthDesc, profilingResults)
+	if err != nil {
+		log.Error(err, "Error while trying to find optimized configs")
+		return ctrl.Result{}, err
+	}
+
 	fnDesc.Status.ProfilingResults = profilingResults
+	fnDesc.Status.OptimizedConfigs = optimizedConfigs
 	if err := fdr.Client.Update(ctx, &fnDesc); err != nil {
 		log.Error(err, "Error updating FunctionDescription")
 		return ctrl.Result{}, err
@@ -120,6 +129,7 @@ func (fdr *FunctionDescriptionReconciler) SetupWithManager(mgr ctrl.Manager) err
 
 	profilerLog := mgr.GetLogger().WithName("profiler")
 	fdr.fnProfiler = profiler.NewExhaustiveFunctionProfiler(restClient, &profilerLog)
+	fdr.fnOptimizer = optimizer.NewResponseTimeSloAndCostOptimizer()
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&chunkFunc.FunctionDescription{}).

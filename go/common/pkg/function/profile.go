@@ -6,13 +6,21 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
-// Represents a set of configuration parameters for a serverless function.
-type ResourceProfile struct {
+// Represents a set of resource configuration parameters for a serverless function.
+type ResourceConfiguration struct {
 	// The amount of memory for a single function instance in MiB.
 	MemoryMiB int64 `json:"memoryMiB" yaml:"memoryMiB"`
 
 	// The amount of milli CPU cores for a single function instance.
 	MilliCpu int64 `json:"milliCpu" yaml:"milliCpu"`
+}
+
+// Represents a set of resource configuration parameters for a serverless function and the associated cost.
+// This is a distinct struct to keep the price floating point number out of the ResourceConfiguration to
+// allow it to be easily stored in a CRD.
+type ResourceProfile struct {
+	// The resource configuration parameters.
+	ResourceConfiguration `json:",inline" yaml:",inline"`
 
 	// The price for this configuration for 100ms of uptime.
 	Price100Ms float64 `json:"price100Ms" yaml:"price100Ms"`

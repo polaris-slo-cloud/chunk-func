@@ -1,6 +1,8 @@
 package function
 
 import (
+	"sort"
+
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -39,6 +41,22 @@ type ProfilingSessionResults struct {
 	// The number of seconds that the profiling session lasted.
 	ProfilingDurationSeconds int32 `json:"profilingDurationSeconds" yaml:"profilingDurationSeconds"`
 
-	// The list of results grouped by ResourceProfiles.
+	// The list of results grouped by ResourceProfiles, ordered by increasing cost.
 	Results []*ResourceProfileResults `json:"results" yaml:"results"`
+}
+
+// Returns the result that exactly matches the specified input size or nil.
+func (rpr *ResourceProfileResults) FindResultForInputSize(inputSizeBytes int64) *ProfilingResult {
+	index := sort.Search(
+		len(rpr.Results),
+		func(i int) bool { return rpr.Results[i].InputSizeBytes >= inputSizeBytes },
+	)
+
+	if index < len(rpr.Results) {
+		result := rpr.Results[index]
+		if result.InputSizeBytes == inputSizeBytes {
+			return result
+		}
+	}
+	return nil
 }

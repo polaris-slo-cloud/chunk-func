@@ -36,6 +36,11 @@ type FunctionDescriptionStatus struct {
 	// The results of the profiling session.
 	// +optional
 	ProfilingResults *function.ProfilingSessionResults `json:"profilingResults,omitempty"`
+
+	// The function configurations optimized using the profiling results.
+	// This array, if set, contains one entry for each function input size.
+	// +optional
+	OptimizedConfigs []*function.OptimizedFunctionConfig `json:"optimizedConfigs,omitempty"`
 }
 
 //+kubebuilder:object:root=true

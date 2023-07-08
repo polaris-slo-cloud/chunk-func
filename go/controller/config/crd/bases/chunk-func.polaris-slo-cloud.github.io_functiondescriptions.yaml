@@ -78,6 +78,45 @@ spec:
           status:
             description: FunctionDescriptionStatus defines the observed state of FunctionDescription
             properties:
+              optimizedConfigs:
+                description: The function configurations optimized using the profiling
+                  results. This array, if set, contains one entry for each function
+                  input size.
+                items:
+                  description: A function configuration for a specific input size,
+                    optimized for a specific purpose.
+                  properties:
+                    config:
+                      description: The resource configuration.
+                      properties:
+                        memoryMiB:
+                          description: The amount of memory for a single function
+                            instance in MiB.
+                          format: int64
+                          type: integer
+                        milliCpu:
+                          description: The amount of milli CPU cores for a single
+                            function instance.
+                          format: int64
+                          type: integer
+                      required:
+                      - memoryMiB
+                      - milliCpu
+                      type: object
+                    inputSizeBytes:
+                      description: The size of the input, for which this configuration
+                        is intended.
+                      format: int64
+                      type: integer
+                    optimizedFor:
+                      description: Describes the objective of the optimization.
+                      type: string
+                  required:
+                  - config
+                  - inputSizeBytes
+                  - optimizedFor
+                  type: object
+                type: array
               profilingResults:
                 description: The results of the profiling session.
                 properties:
@@ -107,17 +146,26 @@ spec:
                               session.
                             properties:
                               executionTimeMs:
-                                description: The execution time of the function in
-                                  milliseconds.
+                                description: "The execution time of the function in
+                                  milliseconds. \n If the function execution resulted
+                                  in an error, this value is -1."
                                 format: int64
                                 type: integer
                               inputSizeBytes:
                                 description: The size of the used input in bytes.
                                 format: int64
                                 type: integer
+                              statusCode:
+                                description: The HTTP status code returned by the
+                                  function execution. If the function is not triggered
+                                  via REST, this contains the exit code of the function
+                                  converted into an HTTP status code.
+                                format: int32
+                                type: integer
                             required:
                             - executionTimeMs
                             - inputSizeBytes
+                            - statusCode
                             type: object
                           type: array
                       required:
