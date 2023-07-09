@@ -23,6 +23,7 @@ spec:
         password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
         bucket: logs
         objectKey: scheduler-scalability-jobs-01.log
+        objectSizeBytes: 2467840
 
     - sizeBytes: 56909824 # 54.2 MiB
       message:
@@ -32,6 +33,7 @@ spec:
         password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
         bucket: logs
         objectKey: scheduler-scalability-jobs-13.log
+        objectSizeBytes: 56909824
 
     - sizeBytes: 100449280 # 95.8 MiB
       message:
@@ -41,3 +43,4 @@ spec:
         password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
         bucket: logs
         objectKey: scheduler-scalability-jobs-15.log
+        objectSizeBytes: 100449280
