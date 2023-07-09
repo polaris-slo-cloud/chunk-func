@@ -9,6 +9,8 @@ import (
 )
 
 // Describes an input for a serverless function.
+//
+// +kubebuilder:object:generate=true
 type FunctionInput struct {
 	// The size of the input in bytes.
 	SizeBytes int64 `json:"sizeBytes" yaml:"sizeBytes"`

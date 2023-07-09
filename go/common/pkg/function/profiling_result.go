@@ -7,6 +7,8 @@ import (
 )
 
 // Collects the result of a single profiling session.
+//
+// +kubebuilder:object:generate=true
 type ProfilingResult struct {
 	// The HTTP status code returned by the function execution.
 	// If the function is not triggered via REST, this contains the
@@ -23,6 +25,8 @@ type ProfilingResult struct {
 }
 
 // Collects all profiling results for a ResourceProfile.
+//
+// +kubebuilder:object:generate=true
 type ResourceProfileResults struct {
 
 	// The ID of the ResourceProfile that was used for this profiling session.
@@ -33,6 +37,8 @@ type ResourceProfileResults struct {
 }
 
 // A collection of profiling results from a complete profiling session.
+//
+// +kubebuilder:object:generate=true
 type ProfilingSessionResults struct {
 
 	// The time when the profiling session started.

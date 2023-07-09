@@ -1,6 +1,8 @@
 package function
 
 // A function configuration for a specific input size, optimized for a specific purpose.
+//
+// +kubebuilder:object:generate=true
 type OptimizedFunctionConfig struct {
 	// Describes the objective of the optimization.
 	OptimizedFor string `json:"optimizedFor" yaml:"optimizedFor"`

@@ -6,6 +6,8 @@ import (
 
 // Collects information about a serverless function, such as
 // its typical inputs for profiling or its response time SLO.
+//
+// +kubebuilder:object:generate=true
 type FunctionDescription struct {
 
 	// The name of the function. This must be the name of a Knative Service object
@@ -23,6 +25,8 @@ type FunctionDescription struct {
 }
 
 // Combines a reference to a function Service with the description of the ChunkFunc function.
+//
+// +kubebuilder:object:generate=true
 type FunctionWithDescription struct {
 
 	// The serverless function object stored in Kubernetes.

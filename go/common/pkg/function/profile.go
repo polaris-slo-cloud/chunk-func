@@ -7,6 +7,8 @@ import (
 )
 
 // Represents a set of resource configuration parameters for a serverless function.
+//
+// +kubebuilder:object:generate=true
 type ResourceConfiguration struct {
 	// The amount of memory for a single function instance in MiB.
 	MemoryMiB int64 `json:"memoryMiB" yaml:"memoryMiB"`
