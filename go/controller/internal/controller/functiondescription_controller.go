@@ -32,6 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
+	"polaris-slo-cloud.github.io/chunk-func/common/pkg/kubeutil"
 	chunkFunc "polaris-slo-cloud.github.io/chunk-func/controller/api/v1"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/optimizer"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/profile"
@@ -121,7 +122,11 @@ func (fdr *FunctionDescriptionReconciler) Reconcile(ctx context.Context, req ctr
 
 // SetupWithManager sets up the controller with the Manager.
 func (fdr *FunctionDescriptionReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	restClient, err := rest.RESTClientFor(mgr.GetConfig())
+	k8sConfig := mgr.GetConfig()
+	if err := kubeutil.SetKubernetesConfigDefaults(k8sConfig); err != nil {
+		return err
+	}
+	restClient, err := rest.RESTClientFor(k8sConfig)
 	if err != nil {
 		return err
 	}
