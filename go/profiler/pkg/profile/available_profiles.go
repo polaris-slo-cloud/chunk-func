@@ -12,43 +12,59 @@ import (
 func GetAvailableResourceProfiles() []*function.ResourceProfile {
 	return []*function.ResourceProfile{
 		{
-			MemoryMiB:  128,
-			MilliCpu:   83,
+			ResourceConfiguration: function.ResourceConfiguration{
+				MemoryMiB: 128,
+				MilliCpu:  83,
+			},
 			Price100Ms: 0.000000324,
 		},
 		{
-			MemoryMiB:  256,
-			MilliCpu:   167,
+			ResourceConfiguration: function.ResourceConfiguration{
+				MemoryMiB: 256,
+				MilliCpu:  167,
+			},
 			Price100Ms: 0.000000648,
 		},
 		{
-			MemoryMiB:  512,
-			MilliCpu:   333,
+			ResourceConfiguration: function.ResourceConfiguration{
+				MemoryMiB: 512,
+				MilliCpu:  333,
+			},
 			Price100Ms: 0.000001295,
 		},
 		{
-			MemoryMiB:  1024,
-			MilliCpu:   583,
+			ResourceConfiguration: function.ResourceConfiguration{
+				MemoryMiB: 1024,
+				MilliCpu:  583,
+			},
 			Price100Ms: 0.000002310,
 		},
 		{
-			MemoryMiB:  2048,
-			MilliCpu:   1000,
+			ResourceConfiguration: function.ResourceConfiguration{
+				MemoryMiB: 2048,
+				MilliCpu:  1000,
+			},
 			Price100Ms: 0.000004060,
 		},
 		{
-			MemoryMiB:  4096,
-			MilliCpu:   2000,
+			ResourceConfiguration: function.ResourceConfiguration{
+				MemoryMiB: 4096,
+				MilliCpu:  2000,
+			},
 			Price100Ms: 0.000008120,
 		},
 		{
-			MemoryMiB:  8192,
-			MilliCpu:   2000,
+			ResourceConfiguration: function.ResourceConfiguration{
+				MemoryMiB: 8192,
+				MilliCpu:  2000,
+			},
 			Price100Ms: 0.000009520,
 		},
 		{
-			MemoryMiB:  16384,
-			MilliCpu:   4000,
+			ResourceConfiguration: function.ResourceConfiguration{
+				MemoryMiB: 16384,
+				MilliCpu:  4000,
+			},
 			Price100Ms: 0.000190400,
 		},
 	}
