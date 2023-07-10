@@ -53,14 +53,18 @@ type FunctionDescriptionReconciler struct {
 	fnOptimizer optimizer.FunctionOptimizer
 }
 
-// ChunkFunc FunctionDescriptions:
+// Permissions on ChunkFunc FunctionDescriptions:
 //+kubebuilder:rbac:groups=chunk-func.polaris-slo-cloud.github.io,resources=functiondescriptions,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=chunk-func.polaris-slo-cloud.github.io,resources=functiondescriptions/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=chunk-func.polaris-slo-cloud.github.io,resources=functiondescriptions/finalizers,verbs=update
 
-// Knative Services:
+// Permissions on Knative Services:
 //+kubebuilder:rbac:groups=serving.knative.dev,resources=services,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=serving.knative.dev,resources=services/status,verbs=get;update;patch
+
+// Permissions on Namespaces:
+//+kubebuilder:rbac:groups=core,resources=namespaces,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=namespaces/status,verbs=get
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

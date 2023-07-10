@@ -31,6 +31,24 @@ rules:
   - patch
   - update
 - apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces/status
+  verbs:
+  - get
+- apiGroups:
   - serving.knative.dev
   resources:
   - services
