@@ -11,36 +11,37 @@ metadata:
     app.kubernetes.io/instance: extract-successes
     app.kubernetes.io/part-of: chunk-func-controller
 spec:
-  functionName: extract-successes
-  functionContainer: user-container
-  maxResponseTimeMs: 4000
-  typicalInputs:
-    - sizeBytes: 2467840 # 2.4 MiB
-      message:
-        url: http://10.152.183.192
-        # This is a demo deployment, we don't care about the password here.
-        user: HYlOGOqiOSpSnBjP
-        password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
-        bucket: logs
-        objectKey: scheduler-scalability-jobs-01.log
-        objectSizeBytes: 2467840
+  functionDescription:
+    functionName: extract-successes
+    functionContainer: user-container
+    maxResponseTimeMs: 4000
+    typicalInputs:
+      - sizeBytes: 2467840 # 2.4 MiB
+        message:
+          url: http://10.152.183.192
+          # This is a demo deployment, we don't care about the password here.
+          user: HYlOGOqiOSpSnBjP
+          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          bucket: logs
+          objectKey: scheduler-scalability-jobs-01.log
+          objectSizeBytes: 2467840
 
-    - sizeBytes: 56909824 # 54.2 MiB
-      message:
-        url: http://10.152.183.192
-        # This is a demo deployment, we don't care about the password here.
-        user: HYlOGOqiOSpSnBjP
-        password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
-        bucket: logs
-        objectKey: scheduler-scalability-jobs-13.log
-        objectSizeBytes: 56909824
+      - sizeBytes: 56909824 # 54.2 MiB
+        message:
+          url: http://10.152.183.192
+          # This is a demo deployment, we don't care about the password here.
+          user: HYlOGOqiOSpSnBjP
+          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          bucket: logs
+          objectKey: scheduler-scalability-jobs-13.log
+          objectSizeBytes: 56909824
 
-    - sizeBytes: 100449280 # 95.8 MiB
-      message:
-        url: http://10.152.183.192
-        # This is a demo deployment, we don't care about the password here.
-        user: HYlOGOqiOSpSnBjP
-        password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
-        bucket: logs
-        objectKey: scheduler-scalability-jobs-15.log
-        objectSizeBytes: 100449280
+      - sizeBytes: 100449280 # 95.8 MiB
+        message:
+          url: http://10.152.183.192
+          # This is a demo deployment, we don't care about the password here.
+          user: HYlOGOqiOSpSnBjP
+          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          bucket: logs
+          objectKey: scheduler-scalability-jobs-15.log
+          objectSizeBytes: 100449280

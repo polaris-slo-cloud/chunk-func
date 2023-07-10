@@ -35,45 +35,53 @@ spec:
           spec:
             description: FunctionDescriptionSpec defines the desired state of FunctionDescription
             properties:
-              functionContainer:
-                description: The name of the container in the pod that hosts the function
-                  code.
-                type: string
-              functionName:
-                description: The name of the function. This must be the name of a
-                  Knative Service object in the same namespace as the FunctionDescription.
-                type: string
-              maxResponseTimeMs:
-                description: The SLO that describes the maximum allowed response time
-                  (in milliseconds) for this function.
-                format: int64
-                type: integer
-              typicalInputs:
-                description: The typical inputs of various sizes.
-                items:
-                  description: Describes an input for a serverless function.
-                  properties:
-                    message:
-                      description: "The message that will be sent to the function's
-                        endpoint to trigger it with the input of the specified size.
-                        \n This must be a complete message for the function's endpoint
-                        and it must reference the input of the specified size."
+              functionDescription:
+                description: Collects information about a serverless function, such
+                  as its typical inputs for profiling or its response time SLO
+                properties:
+                  functionContainer:
+                    description: The name of the container in the pod that hosts the
+                      function code.
+                    type: string
+                  functionName:
+                    description: The name of the function. This must be the name of
+                      a Knative Service object in the same namespace as the FunctionDescription.
+                    type: string
+                  maxResponseTimeMs:
+                    description: The SLO that describes the maximum allowed response
+                      time (in milliseconds) for this function.
+                    format: int64
+                    type: integer
+                  typicalInputs:
+                    description: The typical inputs of various sizes.
+                    items:
+                      description: Describes an input for a serverless function.
+                      properties:
+                        message:
+                          description: "The message that will be sent to the function's
+                            endpoint to trigger it with the input of the specified
+                            size. \n This must be a complete message for the function's
+                            endpoint and it must reference the input of the specified
+                            size."
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                        sizeBytes:
+                          description: The size of the input in bytes.
+                          format: int64
+                          type: integer
+                      required:
+                      - message
+                      - sizeBytes
                       type: object
-                      x-kubernetes-preserve-unknown-fields: true
-                    sizeBytes:
-                      description: The size of the input in bytes.
-                      format: int64
-                      type: integer
-                  required:
-                  - message
-                  - sizeBytes
-                  type: object
-                type: array
+                    type: array
+                required:
+                - functionContainer
+                - functionName
+                - maxResponseTimeMs
+                - typicalInputs
+                type: object
             required:
-            - functionContainer
-            - functionName
-            - maxResponseTimeMs
-            - typicalInputs
+            - functionDescription
             type: object
           status:
             description: FunctionDescriptionStatus defines the observed state of FunctionDescription

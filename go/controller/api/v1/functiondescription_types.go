@@ -28,7 +28,7 @@ type FunctionDescriptionSpec struct {
 
 	// Collects information about a serverless function, such as
 	// its typical inputs for profiling or its response time SLO
-	FunctionDescription function.FunctionDescription `json:",inline"`
+	FunctionDescription function.FunctionDescription `json:"functionDescription"`
 }
 
 // FunctionDescriptionStatus defines the observed state of FunctionDescription
