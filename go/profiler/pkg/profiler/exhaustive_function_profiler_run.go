@@ -116,7 +116,7 @@ func (pr *exhaustiveFunctionProfilerSession) runProfilingWorker(
 //  3. Iterate through all typical inputs and for each input perform N profiled function invocations.
 //  4. Clean up the deployed function (also done in case of an error).
 func (pr *exhaustiveFunctionProfilerSession) evaluateResourceProfile(ctx context.Context, resourceProfile *function.ResourceProfile) (*function.ResourceProfileResults, error) {
-	targetFn, err := pr.CreateAndWaitForService(ctx, pr.fn, pr.profilingConfig.ProfilingNamespace, resourceProfile, pr.deploymentMgr, pr.profilingConfig.FunctionReadyTimeout)
+	targetFn, err := CreateAndWaitForService(ctx, pr.fn, pr.profilingConfig.ProfilingNamespace, resourceProfile, pr.deploymentMgr, pr.profilingConfig.FunctionReadyTimeout)
 	if targetFn != nil {
 		// We use a background context for deleting the function to ensure that it happens, even if the main context is cancelled.
 		defer pr.deploymentMgr.DeleteFunction(context.Background(), targetFn)

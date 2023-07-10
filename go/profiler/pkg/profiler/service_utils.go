@@ -40,8 +40,7 @@ func CreateKnativeServiceWithProfile(
 	if container == nil {
 		return nil, fmt.Errorf("The Knative Service %s does not contain a container %s", fn.Function.Name, fn.Description.FunctionContainer)
 	}
-	container.Resources.Limits[core.ResourceCPU] = *resourceProfile.CpuAsQuantity()
-	container.Resources.Limits[core.ResourceMemory] = *resourceProfile.MemoryAsQuantity()
+	SetResourceLimits(container, &resourceProfile.ResourceConfiguration)
 
 	return ret, nil
 }
@@ -69,7 +68,7 @@ func IsKnativeServiceReady(svc *knServing.Service) bool {
 //
 // Important: If there is an error when waiting for the service to become ready,
 // BOTH a service AND an error are returned. The caller must ensure that the service gets deleted again.
-func (pr *exhaustiveFunctionProfilerSession) CreateAndWaitForService(
+func CreateAndWaitForService(
 	ctx context.Context,
 	fn *function.FunctionWithDescription,
 	targetNamespace string,
@@ -89,4 +88,13 @@ func (pr *exhaustiveFunctionProfilerSession) CreateAndWaitForService(
 
 	err = deploymentMgr.WaitForFunctionToBeReady(ctx, deployedSvc, timeout)
 	return svc, err
+}
+
+// Sets the resource limits on the specified container.
+func SetResourceLimits(container *core.Container, resourceConfig *function.ResourceConfiguration) {
+	if container.Resources.Limits == nil {
+		container.Resources.Limits = core.ResourceList{}
+	}
+	container.Resources.Limits[core.ResourceCPU] = *resourceConfig.CpuAsQuantity()
+	container.Resources.Limits[core.ResourceMemory] = *resourceConfig.MemoryAsQuantity()
 }

@@ -28,6 +28,16 @@ type ResourceProfile struct {
 	Price100Ms float64 `json:"price100Ms" yaml:"price100Ms"`
 }
 
+// Returns the MilliCpu field as a resource.Quantity object.
+func (rp *ResourceConfiguration) CpuAsQuantity() *resource.Quantity {
+	return resource.NewMilliQuantity(rp.MilliCpu, resource.DecimalSI)
+}
+
+// Returns the MemoryMiB field as a resource.Quantity object.
+func (rp *ResourceConfiguration) MemoryAsQuantity() *resource.Quantity {
+	return resource.NewScaledQuantity(rp.MemoryMiB, resource.Mega)
+}
+
 // Returns a unique ID for this resource profile that can be used, e.g., as a map key.
 func (rp *ResourceProfile) ID() string {
 	return rp.StringifyForK8sObj()
@@ -37,14 +47,4 @@ func (rp *ResourceProfile) ID() string {
 // e.g., "1024MiB-1000m".
 func (rp *ResourceProfile) StringifyForK8sObj() string {
 	return fmt.Sprintf("%dMiB-%dm", rp.MemoryMiB, rp.MilliCpu)
-}
-
-// Returns the MilliCpu field as a resource.Quantity object.
-func (rp *ResourceProfile) CpuAsQuantity() *resource.Quantity {
-	return resource.NewMilliQuantity(rp.MilliCpu, resource.DecimalSI)
-}
-
-// Returns the MemoryMiB field as a resource.Quantity object.
-func (rp *ResourceProfile) MemoryAsQuantity() *resource.Quantity {
-	return resource.NewScaledQuantity(rp.MemoryMiB, resource.Mega)
 }
