@@ -6,7 +6,6 @@ import (
 	"time"
 
 	core "k8s.io/api/core/v1"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	knApis "knative.dev/pkg/apis"
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 
@@ -17,7 +16,7 @@ import (
 // Returns nil if the service is completely valid, otherwise an error.
 func CheckKnativeServiceIsValid(fn *function.FunctionWithDescription) error {
 	if kubeutil.FindContainer(fn.Function.Spec.Template.Spec.Containers, fn.Description.FunctionContainer) == nil {
-		return fmt.Errorf("The Knative Service %s does not contain a container %s", fn.Function.Name, fn.Description.FunctionContainer)
+		return fmt.Errorf("the Knative Service %s does not contain a container %s", fn.Function.Name, fn.Description.FunctionContainer)
 	}
 	return nil
 }
@@ -29,16 +28,15 @@ func CreateKnativeServiceWithProfile(
 	resourceProfile *function.ResourceProfile,
 ) (*knServing.Service, error) {
 	ret := &knServing.Service{
-		ObjectMeta: meta.ObjectMeta{
-			Namespace: targetNamespace,
-			Name:      fn.Function.Name + "-" + resourceProfile.StringifyForK8sObj(),
-		},
-		Spec: *fn.Function.Spec.DeepCopy(),
+		ObjectMeta: *fn.Function.ObjectMeta.DeepCopy(),
+		Spec:       *fn.Function.Spec.DeepCopy(),
 	}
+	ret.ObjectMeta.Namespace = targetNamespace
+	ret.ObjectMeta.Name = fn.Function.Name + "-" + resourceProfile.StringifyForK8sObj()
 
 	container := kubeutil.FindContainer(ret.Spec.Template.Spec.Containers, fn.Description.FunctionContainer)
 	if container == nil {
-		return nil, fmt.Errorf("The Knative Service %s does not contain a container %s", fn.Function.Name, fn.Description.FunctionContainer)
+		return nil, fmt.Errorf("the Knative Service %s does not contain a container %s", fn.Function.Name, fn.Description.FunctionContainer)
 	}
 	SetResourceLimits(container, &resourceProfile.ResourceConfiguration)
 

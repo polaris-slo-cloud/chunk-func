@@ -46,5 +46,5 @@ func (rp *ResourceProfile) ID() string {
 // Returns a string with details about this profile, which can be appended to a Kubernetes object name,
 // e.g., "1024MiB-1000m".
 func (rp *ResourceProfile) StringifyForK8sObj() string {
-	return fmt.Sprintf("%dMiB-%dm", rp.MemoryMiB, rp.MilliCpu)
+	return fmt.Sprintf("%dmib-%dm", rp.MemoryMiB, rp.MilliCpu)
 }

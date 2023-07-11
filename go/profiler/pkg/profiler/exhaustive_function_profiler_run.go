@@ -81,7 +81,8 @@ func (pr *exhaustiveFunctionProfilerSession) ExecuteProfilingSession(ctx context
 	wg.Wait()
 
 	if err := cancellableCtx.Err(); err != nil {
-		return nil, err
+		cause := context.Cause(cancellableCtx)
+		return nil, cause
 	}
 
 	return pr.aggregateAllResults(), nil
