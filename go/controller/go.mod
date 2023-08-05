@@ -5,9 +5,9 @@ go 1.20
 require (
 	github.com/onsi/ginkgo/v2 v2.9.7
 	github.com/onsi/gomega v1.27.8
-	k8s.io/api v0.27.3
-	k8s.io/apimachinery v0.27.3
-	k8s.io/client-go v0.27.3
+	k8s.io/api v0.27.4
+	k8s.io/apimachinery v0.27.4
+	k8s.io/client-go v0.27.4
 	knative.dev/serving v0.37.2
 	polaris-slo-cloud.github.io/chunk-func/common v0.0.1
 	polaris-slo-cloud.github.io/chunk-func/profiler v0.0.1

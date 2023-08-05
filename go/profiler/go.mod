@@ -4,9 +4,9 @@ go 1.20
 
 require (
 	github.com/go-logr/logr v1.2.4
-	k8s.io/api v0.27.3
-	k8s.io/apimachinery v0.27.3
-	k8s.io/client-go v0.27.3
+	k8s.io/api v0.27.4
+	k8s.io/apimachinery v0.27.4
+	k8s.io/client-go v0.27.4
 	knative.dev/pkg v0.0.0-20230418073056-dfad48eaa5d0
 	knative.dev/serving v0.37.2
 	polaris-slo-cloud.github.io/chunk-func/common v0.0.1
