@@ -2,6 +2,7 @@ package kubeutil
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"polaris-slo-cloud.github.io/chunk-func/common/pkg/collections"
 )
 
 // GetLabel returns the label with the specified key.
@@ -38,4 +39,15 @@ func SetAnnotation(obj metav1.Object, key, value string) {
 		obj.SetAnnotations(annotations)
 	}
 	annotations[key] = value
+}
+
+// Creates a deep copy of an ObjectMeta that can be used for creating a new object.
+// The copy process omits the namespace and name fields, as well as fields, which are
+// later set by Kubernetes.
+func DeepCopyObjectMetaForNewObject(src *metav1.ObjectMeta) *metav1.ObjectMeta {
+	dest := &metav1.ObjectMeta{
+		Labels:      collections.CopyMap(src.Labels),
+		Annotations: collections.CopyMap(src.Annotations),
+	}
+	return dest
 }

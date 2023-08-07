@@ -28,7 +28,7 @@ func CreateKnativeServiceWithProfile(
 	resourceProfile *function.ResourceProfile,
 ) (*knServing.Service, error) {
 	ret := &knServing.Service{
-		ObjectMeta: *fn.Function.ObjectMeta.DeepCopy(),
+		ObjectMeta: *kubeutil.DeepCopyObjectMetaForNewObject(&fn.Function.ObjectMeta),
 		Spec:       *fn.Function.Spec.DeepCopy(),
 	}
 	ret.ObjectMeta.Namespace = targetNamespace
