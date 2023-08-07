@@ -24,7 +24,6 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/uuid"
-	"k8s.io/client-go/rest"
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -32,7 +31,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
-	"polaris-slo-cloud.github.io/chunk-func/common/pkg/kubeutil"
 	chunkFunc "polaris-slo-cloud.github.io/chunk-func/controller/api/v1"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/optimizer"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/profile"
@@ -48,7 +46,6 @@ type FunctionDescriptionReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	restClient  rest.Interface
 	fnProfiler  profiler.FunctionProfiler
 	fnOptimizer optimizer.FunctionOptimizer
 }
@@ -127,17 +124,8 @@ func (fdr *FunctionDescriptionReconciler) Reconcile(ctx context.Context, req ctr
 // SetupWithManager sets up the controller with the Manager.
 func (fdr *FunctionDescriptionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	k8sConfig := mgr.GetConfig()
-	if err := kubeutil.SetKubernetesConfigDefaults(k8sConfig); err != nil {
-		return err
-	}
-	restClient, err := rest.RESTClientFor(k8sConfig)
-	if err != nil {
-		return err
-	}
-	fdr.restClient = restClient
-
 	profilerLog := mgr.GetLogger().WithName("profiler")
-	fdr.fnProfiler = profiler.NewExhaustiveFunctionProfiler(restClient, &profilerLog)
+	fdr.fnProfiler = profiler.NewExhaustiveFunctionProfiler(k8sConfig, &profilerLog)
 	fdr.fnOptimizer = optimizer.NewResponseTimeSloAndCostOptimizer()
 
 	return ctrl.NewControllerManagedBy(mgr).

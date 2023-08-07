@@ -17,16 +17,19 @@ var (
 
 // FunctionProfiler that tries out all candidate profiles (like an exhaustive search).
 type ExhaustiveFunctionProfiler struct {
-	k8sClient     rest.Interface
 	servingClient knServingClient.ServingV1Interface
 	logger        *logr.Logger
 }
 
-// Creates a new FunctionProfiler.
-func NewExhaustiveFunctionProfiler(k8sClient rest.Interface, logger *logr.Logger) *ExhaustiveFunctionProfiler {
+// Creates a new FunctionProfiler with the specified REST config and logger.
+//
+// This function takes a rest.Config instead of a rest.Interface, because each API group requires a distinct client instance
+// (see https://github.com/kubernetes/client-go/issues/1288#issuecomment-1667886214).
+// Thus, we let knServing handle the adaptation of the config.
+func NewExhaustiveFunctionProfiler(k8sConfig *rest.Config, logger *logr.Logger) *ExhaustiveFunctionProfiler {
+	modifiableConfig := rest.CopyConfig(k8sConfig)
 	efp := &ExhaustiveFunctionProfiler{
-		k8sClient:     k8sClient,
-		servingClient: knServingClient.New(k8sClient),
+		servingClient: knServingClient.NewForConfigOrDie(modifiableConfig),
 		logger:        logger,
 	}
 	return efp

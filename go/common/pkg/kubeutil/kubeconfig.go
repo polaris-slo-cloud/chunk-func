@@ -14,10 +14,11 @@ import (
 
 // setKubernetesDefaults sets default values on the provided client config for accessing the
 // Kubernetes API or returns an error if any of the defaults are impossible or invalid.
-// Copied from https://github.com/kubernetes/kubectl/blob/82a943479841e06efdbb8543d28cfcd0c028c8b6/pkg/cmd/util/kubectl_match_version.go#L112-L129
-func SetKubernetesConfigDefaults(config *rest.Config) error {
-	// TODO remove this hack.  This is allowing the GetOptions to be serialized.
-	config.GroupVersion = &schema.GroupVersion{Group: "", Version: "v1"}
+// Initial version copied from https://github.com/kubernetes/kubectl/blob/82a943479841e06efdbb8543d28cfcd0c028c8b6/pkg/cmd/util/kubectl_match_version.go#L112-L129
+//
+// Each config is scoped to a specific GroupVersion endpoint (see https://github.com/kubernetes/client-go/issues/1288#issuecomment-1667886214)
+func SetKubernetesConfigDefaults(config *rest.Config, groupVersion *schema.GroupVersion) error {
+	config.GroupVersion = groupVersion
 
 	if config.APIPath == "" {
 		config.APIPath = "/api"
