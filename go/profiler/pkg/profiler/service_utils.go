@@ -56,7 +56,7 @@ func CoerceToKnativeServiceOrPanic(obj interface{}) *knServing.Service {
 func IsKnativeServiceReady(svc *knServing.Service) bool {
 	for _, cond := range svc.Status.Conditions {
 		if cond.Type == knApis.ConditionReady {
-			return true
+			return svc.Status.URL != nil && svc.Status.URL.String() != ""
 		}
 	}
 	return false
@@ -84,8 +84,11 @@ func CreateAndWaitForService(
 		return nil, err
 	}
 
-	err = deploymentMgr.WaitForFunctionToBeReady(ctx, deployedSvc, timeout)
-	return svc, err
+	readySvc, err := deploymentMgr.WaitForFunctionToBeReady(ctx, deployedSvc, timeout)
+	if err != nil {
+		return svc, err
+	}
+	return readySvc, nil
 }
 
 // Sets the resource limits on the specified container.
