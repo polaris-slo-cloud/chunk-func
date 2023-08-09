@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -47,13 +48,17 @@ func (rt *RestTrigger) TriggerFunction(ctx context.Context, fn *knServing.Servic
 	stopwatch.Stop()
 
 	if err != nil {
-		return nil, fmt.Errorf(
-			"error while invoking function via REST. URI: %s, statusCode: %d, status: %s, error: %v",
-			reqURI,
-			httpResp.StatusCode,
-			httpResp.Status,
-			err,
-		)
+		if errors.Is(err, context.DeadlineExceeded) {
+			httpResp = &http.Response{
+				StatusCode: function.TimeoutStatusCode,
+			}
+		} else {
+			return nil, fmt.Errorf(
+				"error while invoking function via REST. URI: %s, error: %v",
+				reqURI,
+				err,
+			)
+		}
 	}
 	if httpResp.Body != nil {
 		defer httpResp.Body.Close()

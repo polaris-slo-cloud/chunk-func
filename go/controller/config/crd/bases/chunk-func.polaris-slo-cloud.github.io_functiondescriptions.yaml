@@ -143,13 +143,18 @@ spec:
                     items:
                       description: Collects all profiling results for a ResourceProfile.
                       properties:
+                        deploymentStatus:
+                          description: Indicates if a test function was successfully
+                            deployed with this resource profile.
+                          type: string
                         resourceProfileId:
                           description: The ID of the ResourceProfile that was used
                             for this profiling session.
                           type: string
                         results:
-                          description: The profiling results ordered by increasing
-                            input size.
+                          description: "The profiling results ordered by increasing
+                            input size. \n This is only present if DeploymentStatus
+                            is DeploymentSuccess"
                           items:
                             description: Collects the result of a single profiling
                               session.
@@ -157,7 +162,7 @@ spec:
                               executionTimeMs:
                                 description: "The execution time of the function in
                                   milliseconds. \n If the function execution resulted
-                                  in an error, this value is -1."
+                                  in an error or timed out, this value is -1."
                                 format: int64
                                 type: integer
                               inputSizeBytes:
@@ -178,6 +183,7 @@ spec:
                             type: object
                           type: array
                       required:
+                      - deploymentStatus
                       - resourceProfileId
                       - results
                       type: object

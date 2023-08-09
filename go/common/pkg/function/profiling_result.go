@@ -6,6 +6,18 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// Describes the deployment status of a function under a specific resource profile.
+type FunctionDeploymentStatus string
+
+const (
+	// Pseudo StatusCode to indicate that the function did not respond before the timeout.
+	TimeoutStatusCode = -1
+
+	DeploymentSuccess  FunctionDeploymentStatus = "Success"
+	DeploymentFailed   FunctionDeploymentStatus = "Failed"
+	DeploymentTimedOut FunctionDeploymentStatus = "Timeout"
+)
+
 // Collects the result of a single profiling session.
 //
 // +kubebuilder:object:generate=true
@@ -17,7 +29,7 @@ type ProfilingResult struct {
 
 	// The execution time of the function in milliseconds.
 	//
-	// If the function execution resulted in an error, this value is -1.
+	// If the function execution resulted in an error or timed out, this value is -1.
 	ExecutionTimeMs int64 `json:"executionTimeMs" yaml:"executionTimeMs"`
 
 	// The size of the used input in bytes.
@@ -32,7 +44,12 @@ type ResourceProfileResults struct {
 	// The ID of the ResourceProfile that was used for this profiling session.
 	ResourceProfileId string `json:"resourceProfileId" yaml:"resourceProfileId"`
 
+	// Indicates if a test function was successfully deployed with this resource profile.
+	DeploymentStatus FunctionDeploymentStatus `json:"deploymentStatus" yaml:"deploymentStatus"`
+
 	// The profiling results ordered by increasing input size.
+	//
+	// This is only present if DeploymentStatus is DeploymentSuccess
 	Results []*ProfilingResult `json:"results" yaml:"results"`
 }
 

@@ -2,6 +2,7 @@ package profiler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -117,22 +118,29 @@ func (pr *exhaustiveFunctionProfilerSession) runProfilingWorker(
 //  3. Iterate through all typical inputs and for each input perform N profiled function invocations.
 //  4. Clean up the deployed function (also done in case of an error).
 func (pr *exhaustiveFunctionProfilerSession) evaluateResourceProfile(ctx context.Context, resourceProfile *function.ResourceProfile) (*function.ResourceProfileResults, error) {
+	results := &function.ResourceProfileResults{
+		ResourceProfileId: resourceProfile.ID(),
+	}
+
 	targetFn, err := CreateAndWaitForService(ctx, pr.fn, pr.profilingConfig.ProfilingNamespace, resourceProfile, pr.deploymentMgr, pr.profilingConfig.FunctionReadyTimeout)
 	if targetFn != nil {
 		// We use a background context for deleting the function to ensure that it happens, even if the main context is cancelled.
 		defer pr.deploymentMgr.DeleteFunction(context.Background(), targetFn)
 	}
 	if err != nil {
-		return nil, err
+		if errors.Is(err, context.DeadlineExceeded) {
+			results.DeploymentStatus = function.DeploymentTimedOut
+			return results, nil
+		} else {
+			return nil, err
+		}
 	}
 	targetFnName := targetFn.Namespace + "." + targetFn.Name
 	pr.logger.Info("Created new Knative Service", "service", targetFnName)
 
 	var fnTrigger trigger.TimedFunctionTrigger[any] = trigger.NewRestTrigger()
-	results := &function.ResourceProfileResults{
-		ResourceProfileId: resourceProfile.ID(),
-		Results:           make([]*function.ProfilingResult, len(pr.fn.Description.TypicalInputs)),
-	}
+	results.DeploymentStatus = function.DeploymentSuccess
+	results.Results = make([]*function.ProfilingResult, len(pr.fn.Description.TypicalInputs))
 
 	// Warm the function up.
 	_, err = pr.profileFunctionCall(ctx, fnTrigger, targetFn, pr.fn.Description.TypicalInputs[0])
