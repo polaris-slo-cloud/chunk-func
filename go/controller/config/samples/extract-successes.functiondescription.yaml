@@ -4,7 +4,7 @@
 apiVersion: chunk-func.polaris-slo-cloud.github.io/v1
 kind: FunctionDescription
 metadata:
-  namespace: default
+  namespace: func-test
   name: extract-successes
   labels:
     app.kubernetes.io/name: functiondescription

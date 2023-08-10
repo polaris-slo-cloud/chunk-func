@@ -3,7 +3,7 @@ name: extract-successes
 runtime: typescript
 registry: polarissloc
 image: polarissloc/chunk-func-extract-successes:latest
-imageDigest: sha256:b4c7452ae6038d84df1722600a13ebeef1ff30b13143fdce3d57d93668eeb1c5
+imageDigest: sha256:b11dec71945dc6dc857cdc7bc3a92229d852794d884456e14c5d2583b29c2ee6
 created: 2023-05-31T14:37:36.818205802+02:00
 build:
   builder: pack
@@ -14,4 +14,4 @@ build:
     value: 18.16.0
   pvcSize: 256Mi
 deploy:
-  namespace: default
+  namespace: func-test

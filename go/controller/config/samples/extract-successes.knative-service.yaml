@@ -16,7 +16,7 @@ metadata:
     function.knative.dev/name: extract-successes
     function.knative.dev/runtime: typescript
   name: extract-successes
-  namespace: default
+  namespace: func-test
 spec:
   template:
     metadata:
@@ -38,8 +38,8 @@ spec:
       containers:
       - env:
         - name: BUILT
-          value: 20230627T120303
-        image: polarissloc/chunk-func-extract-successes@sha256:33304d6e84b70243f77fe570cdc2bb21f75ab9378dabd2871bc787d38010c4a3
+          value: 20230810T152005
+        image: polarissloc/chunk-func-extract-successes@sha256:b11dec71945dc6dc857cdc7bc3a92229d852794d884456e14c5d2583b29c2ee6
         livenessProbe:
           httpGet:
             path: /health/liveness
@@ -56,18 +56,17 @@ spec:
   traffic:
   - latestRevision: true
     percent: 100
-## For informational purposes, this is what a typical status of a Knative Service looks like.
 # status:
 #   address:
-#     url: http://extract-successes.default.svc.cluster.local
+#     url: http://extract-successes.func-test.svc.cluster.local
 #   conditions:
-#   - lastTransitionTime: "2023-06-27T10:03:08Z"
+#   - lastTransitionTime: "2023-08-10T13:20:11Z"
 #     status: "True"
 #     type: ConfigurationsReady
-#   - lastTransitionTime: "2023-06-27T10:03:08Z"
+#   - lastTransitionTime: "2023-08-10T13:20:12Z"
 #     status: "True"
 #     type: Ready
-#   - lastTransitionTime: "2023-06-27T10:03:08Z"
+#   - lastTransitionTime: "2023-08-10T13:20:12Z"
 #     status: "True"
 #     type: RoutesReady
 #   latestCreatedRevisionName: extract-successes-00001
@@ -77,4 +76,4 @@ spec:
 #   - latestRevision: true
 #     percent: 100
 #     revisionName: extract-successes-00001
-#   url: http://extract-successes.default.example.com
+#   url: http://extract-successes.func-test.example.com
