@@ -11,6 +11,7 @@ import (
 
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
+	"polaris-slo-cloud.github.io/chunk-func/common/pkg/kubeutil"
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/timing"
 )
 
@@ -30,7 +31,7 @@ func NewRestTrigger() *RestTrigger {
 }
 
 func (rt *RestTrigger) TriggerFunction(ctx context.Context, fn *knServing.Service, input *function.FunctionInput) (*FunctionExecutionResult[any], error) {
-	reqURI := fn.Status.URL.String()
+	reqURI := kubeutil.GetKnativeServiceURL(fn)
 	bodyBuffer, err := input.MessageAsJsonBuffer()
 	if err != nil {
 		return nil, err

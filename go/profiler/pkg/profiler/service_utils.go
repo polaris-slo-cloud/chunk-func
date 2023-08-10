@@ -6,12 +6,14 @@ import (
 	"time"
 
 	core "k8s.io/api/core/v1"
-	knApis "knative.dev/pkg/apis"
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/kubeutil"
 )
+
+// ToDo: Refactor this and the FunctionDeployment manager into a package in common module for reuse
+// when we need to deploy functions that are invoked by the user, based on their input size.
 
 // Returns nil if the service is completely valid, otherwise an error.
 func CheckKnativeServiceIsValid(fn *function.FunctionWithDescription) error {
@@ -50,16 +52,6 @@ func CoerceToKnativeServiceOrPanic(obj interface{}) *knServing.Service {
 		panic("Knative Service watch received a non Service object")
 	}
 	return service
-}
-
-// Returns true if the service is ready.
-func IsKnativeServiceReady(svc *knServing.Service) bool {
-	for _, cond := range svc.Status.Conditions {
-		if cond.Type == knApis.ConditionReady {
-			return svc.Status.URL != nil && svc.Status.URL.String() != ""
-		}
-	}
-	return false
 }
 
 // Creates a new service for the specified resource profile and waits for it to be ready.

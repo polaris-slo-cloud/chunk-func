@@ -7,6 +7,7 @@ import (
 
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	watchPkg "k8s.io/apimachinery/pkg/watch"
+	"polaris-slo-cloud.github.io/chunk-func/common/pkg/kubeutil"
 
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 	knServingClient "knative.dev/serving/pkg/client/clientset/versioned/typed/serving/v1"
@@ -78,7 +79,7 @@ func (mgr *functionDeploymentManagerImpl) WaitForFunctionToBeReady(ctx context.C
 			return nil, fmt.Errorf("unexpected error on watch on Knative Service %s.%s", fn.Namespace, fn.Name)
 		case watchPkg.Modified:
 			modFn := CoerceToKnativeServiceOrPanic(event.Object)
-			if IsKnativeServiceReady(modFn) {
+			if kubeutil.IsKnativeServiceReady(modFn) {
 				return modFn, nil
 			}
 		default:
