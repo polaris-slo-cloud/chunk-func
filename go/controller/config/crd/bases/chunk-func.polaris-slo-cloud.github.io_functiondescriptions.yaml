@@ -95,7 +95,8 @@ spec:
                     optimized for a specific purpose.
                   properties:
                     config:
-                      description: The resource configuration.
+                      description: The resource configuration. If no resources profile
+                        meets the SLO for the input size, this is nil.
                       properties:
                         memoryMiB:
                           description: The amount of memory for a single function
@@ -153,16 +154,18 @@ spec:
                           type: string
                         results:
                           description: "The profiling results ordered by increasing
-                            input size. \n This is only present if DeploymentStatus
-                            is DeploymentSuccess"
+                            input size. \n Only successful results are contained in
+                            this list, i.e., if there was no successful run for a
+                            particular input size, this input size is not present
+                            in this list. \n This is only present if DeploymentStatus
+                            is DeploymentSuccess."
                           items:
                             description: Collects the result of a single profiling
                               session.
                             properties:
                               executionTimeMs:
-                                description: "The execution time of the function in
-                                  milliseconds. \n If the function execution resulted
-                                  in an error or timed out, this value is -1."
+                                description: The execution time of the function in
+                                  milliseconds.
                                 format: int64
                                 type: integer
                               inputSizeBytes:

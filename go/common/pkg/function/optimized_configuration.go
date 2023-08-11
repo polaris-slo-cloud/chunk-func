@@ -11,5 +11,6 @@ type OptimizedFunctionConfig struct {
 	InputSizeBytes int64 `json:"inputSizeBytes" yaml:"inputSizeBytes"`
 
 	// The resource configuration.
+	// If no resources profile meets the SLO for the input size, this is nil.
 	Config *ResourceConfiguration `json:"config" yaml:"config"`
 }

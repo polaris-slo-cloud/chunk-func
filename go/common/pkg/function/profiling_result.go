@@ -28,8 +28,6 @@ type ProfilingResult struct {
 	StatusCode int32 `json:"statusCode" yaml:"statusCode"`
 
 	// The execution time of the function in milliseconds.
-	//
-	// If the function execution resulted in an error or timed out, this value is -1.
 	ExecutionTimeMs int64 `json:"executionTimeMs" yaml:"executionTimeMs"`
 
 	// The size of the used input in bytes.
@@ -49,7 +47,11 @@ type ResourceProfileResults struct {
 
 	// The profiling results ordered by increasing input size.
 	//
-	// This is only present if DeploymentStatus is DeploymentSuccess
+	// Only successful results are contained in this list, i.e., if
+	// there was no successful run for a particular input size, this input size
+	// is not present in this list.
+	//
+	// This is only present if DeploymentStatus is DeploymentSuccess.
 	Results []*ProfilingResult `json:"results" yaml:"results"`
 }
 

@@ -1,8 +1,6 @@
 package optimizer
 
 import (
-	"fmt"
-
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/profile"
 )
@@ -43,32 +41,33 @@ func (opt *ResponseTimeSloAndCostOptimizer) FindOptimizedConfigs(fn *function.Fu
 	optimizedConfigs := make([]*function.OptimizedFunctionConfig, inputsCount)
 
 	for i, input := range fn.Description.TypicalInputs {
-		optConfig, err := opt.findConfigForInput(profilingResults, input.SizeBytes, fn.Description.MaxResponseTimeMs)
-		if err != nil {
-			return nil, err
-		}
+		optConfig := opt.findConfigForInput(profilingResults, input.SizeBytes, fn.Description.MaxResponseTimeMs)
 		optimizedConfigs[i] = optConfig
 	}
 
 	return optimizedConfigs, nil
 }
 
-func (opt *ResponseTimeSloAndCostOptimizer) findConfigForInput(profilingResults *function.ProfilingSessionResults, inputSizeBytes int64, maxResponseTimeMs int64) (*function.OptimizedFunctionConfig, error) {
+// Returns the cheapest resource config that fulfills the response time SLO.
+// If no config fulfills the SLO, the Config field of the returned object is nil.
+func (opt *ResponseTimeSloAndCostOptimizer) findConfigForInput(profilingResults *function.ProfilingSessionResults, inputSizeBytes int64, maxResponseTimeMs int64) *function.OptimizedFunctionConfig {
+	config := &function.OptimizedFunctionConfig{
+		OptimizedFor:   opt.OptimizationObjective(),
+		InputSizeBytes: inputSizeBytes,
+	}
+
 	for _, resProfileResults := range profilingResults.Results {
 		resultForInput := resProfileResults.FindResultForInputSize(inputSizeBytes)
 		if resultForInput == nil {
-			return nil, fmt.Errorf("could not find a profiling result for ResourceProfile %s and input size %d", resProfileResults.ResourceProfileId, inputSizeBytes)
+			// There were no successful profiling runs for the input size with this profile (possibly the resource config is too small for the input).
+			continue
 		}
 
 		if function.IsSuccessStatusCode(resultForInput.StatusCode) && resultForInput.ExecutionTimeMs <= maxResponseTimeMs {
-			config := &function.OptimizedFunctionConfig{
-				OptimizedFor:   opt.OptimizationObjective(),
-				InputSizeBytes: inputSizeBytes,
-				Config:         &opt.availableProfiles[resProfileResults.ResourceProfileId].ResourceConfiguration,
-			}
-			return config, nil
+			config.Config = &opt.availableProfiles[resProfileResults.ResourceProfileId].ResourceConfiguration
+			return config
 		}
 	}
 
-	return nil, fmt.Errorf("no ResourceProfile fulfills the response time SLO %dms for input size %d", maxResponseTimeMs, inputSizeBytes)
+	return config
 }
