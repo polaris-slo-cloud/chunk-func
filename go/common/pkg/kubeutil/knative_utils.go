@@ -1,14 +1,13 @@
 package kubeutil
 
 import (
-	knApis "knative.dev/pkg/apis"
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 // Returns true if the service is ready.
 func IsKnativeServiceReady(svc *knServing.Service) bool {
 	for _, cond := range svc.Status.Conditions {
-		if cond.Type == knApis.ConditionReady {
+		if cond.Type == "RoutesReady" {
 			return GetKnativeServiceURL(svc) != ""
 		}
 	}

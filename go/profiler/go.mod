@@ -7,7 +7,6 @@ require (
 	k8s.io/api v0.27.4
 	k8s.io/apimachinery v0.27.4
 	k8s.io/client-go v0.27.4
-	knative.dev/pkg v0.0.0-20230418073056-dfad48eaa5d0
 	knative.dev/serving v0.37.2
 	polaris-slo-cloud.github.io/chunk-func/common v0.0.1
 )
@@ -50,6 +49,7 @@ require (
 	k8s.io/klog/v2 v2.90.1 // indirect
 	k8s.io/utils v0.0.0-20230209194617-a36077c30491 // indirect
 	knative.dev/networking v0.0.0-20230419144338-e5d04e805e50 // indirect
+	knative.dev/pkg v0.0.0-20230418073056-dfad48eaa5d0 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect

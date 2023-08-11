@@ -80,6 +80,14 @@ func (mgr *functionDeploymentManagerImpl) WaitForFunctionToBeReady(ctx context.C
 		case watchPkg.Modified:
 			modFn := CoerceToKnativeServiceOrPanic(event.Object)
 			if kubeutil.IsKnativeServiceReady(modFn) {
+				// ToDo: There is a race condition with the K8s DNS service.
+				// After the Knative Service is in RoutesReady, DNS needs a short time
+				// to pick it up. Sleeping is so far the only solution I found.
+				sleepDuration, err := time.ParseDuration("2s")
+				if err != nil {
+					panic(err)
+				}
+				time.Sleep(sleepDuration)
 				return modFn, nil
 			}
 		default:
