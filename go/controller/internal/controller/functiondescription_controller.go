@@ -79,6 +79,11 @@ func (fdr *FunctionDescriptionReconciler) Reconcile(ctx context.Context, req ctr
 		return ctrl.Result{}, err
 	}
 
+	if len(fnDesc.Status.OptimizedConfigs) > 0 {
+		log.Info("Function already profiled, skipping.", "name", fnDesc.Spec.FunctionDescription.FunctionName)
+		return ctrl.Result{}, nil
+	}
+
 	knSvc, err := fdr.fetchKnativeService(ctx, &fnDesc)
 	if err != nil {
 		log.Error(err, "Unable to fetch Knative Service", "name", fnDesc.Spec.FunctionDescription.FunctionName)
