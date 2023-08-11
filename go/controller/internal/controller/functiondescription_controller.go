@@ -113,7 +113,7 @@ func (fdr *FunctionDescriptionReconciler) Reconcile(ctx context.Context, req ctr
 
 	fnDesc.Status.ProfilingResults = profilingResults
 	fnDesc.Status.OptimizedConfigs = optimizedConfigs
-	if err := fdr.Client.Update(ctx, &fnDesc); err != nil {
+	if err := fdr.Client.Status().Update(ctx, &fnDesc); err != nil {
 		log.Error(err, "Error updating FunctionDescription")
 		return ctrl.Result{}, err
 	}

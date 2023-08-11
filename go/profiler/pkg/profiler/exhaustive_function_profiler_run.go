@@ -7,10 +7,12 @@ import (
 	"sync"
 
 	"github.com/go-logr/logr"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 	knServingClient "knative.dev/serving/pkg/client/clientset/versioned/typed/serving/v1"
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
+	"polaris-slo-cloud.github.io/chunk-func/common/pkg/timing"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/trigger"
 )
 
@@ -58,6 +60,9 @@ func newExhaustiveFunctionProfilerSession(
 // Executes the complete profiling session for all resource profiles and typical inputs.
 // This operation commonly takes several minutes.
 func (pr *exhaustiveFunctionProfilerSession) ExecuteProfilingSession(ctx context.Context) (*function.ProfilingSessionResults, error) {
+	stopwatch := timing.NewStopwatch()
+	stopwatch.Start()
+
 	cancellableCtx, cancelFn := context.WithCancelCause(ctx)
 	defer cancelFn(nil)
 
@@ -86,7 +91,13 @@ func (pr *exhaustiveFunctionProfilerSession) ExecuteProfilingSession(ctx context
 		return nil, cause
 	}
 
-	return pr.aggregateAllResults(), nil
+	sessionResults := pr.aggregateAllResults()
+
+	stopwatch.Stop()
+	startTime := meta.NewTime(stopwatch.StartTime())
+	sessionResults.ProfilingStarted = &startTime
+	sessionResults.ProfilingDurationSeconds = int32(stopwatch.Duration().Seconds())
+	return sessionResults, nil
 }
 
 // Receives ResourceProfiles to be evaluated from the profiles channel and profiles them.

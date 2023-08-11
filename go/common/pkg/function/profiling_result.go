@@ -52,6 +52,8 @@ type ResourceProfileResults struct {
 	// is not present in this list.
 	//
 	// This is only present if DeploymentStatus is DeploymentSuccess.
+	//
+	// +optional
 	Results []*ProfilingResult `json:"results" yaml:"results"`
 }
 
