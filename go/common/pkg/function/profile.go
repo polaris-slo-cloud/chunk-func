@@ -51,10 +51,11 @@ func (rp *ResourceProfile) StringifyForK8sObj() string {
 
 // Calculates the cost for the specified execution time, rounded up to the nearest 100ms mark.
 func (rp *ResourceProfile) CalculateCost(executionTimeMs int64) float64 {
+	execTimeUnits := executionTimeMs / 100
 	rest := executionTimeMs % 100
 	if rest > 0 {
-		executionTimeMs += 100 - rest
+		execTimeUnits++
 	}
-	cost := float64(executionTimeMs) * rp.Price100Ms
+	cost := float64(execTimeUnits) * rp.Price100Ms
 	return cost
 }

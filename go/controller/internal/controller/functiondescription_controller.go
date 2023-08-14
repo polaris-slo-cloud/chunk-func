@@ -152,7 +152,7 @@ func (fdr *FunctionDescriptionReconciler) fetchKnativeService(ctx context.Contex
 }
 
 func (fdr *FunctionDescriptionReconciler) getProfilingConfig(profilingNamespace string) *profiler.ProfilingConfig {
-	timeout, err := time.ParseDuration("2m")
+	timeout, err := time.ParseDuration("4m")
 	if err != nil {
 		panic("error parsing FunctionReadyTimeout duration")
 	}
