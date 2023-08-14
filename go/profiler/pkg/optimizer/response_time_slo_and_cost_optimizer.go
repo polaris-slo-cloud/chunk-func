@@ -61,18 +61,19 @@ func (opt *ResponseTimeSloAndCostOptimizer) findConfigForInput(profilingResults 
 	var lowestCost float64 = math.Inf(1)
 
 	for _, resProfileResults := range profilingResults.Results {
-		resProfile := opt.availableProfiles[resProfileResults.ResourceProfileId]
 		resultForInput := resProfileResults.FindResultForInputSize(inputSizeBytes)
 		if resultForInput == nil {
 			// There were no successful profiling runs for the input size with this profile (possibly the resource config is too small for the input).
 			continue
 		}
 
+		resProfile := opt.availableProfiles[resProfileResults.ResourceProfileId]
+
 		if function.IsSuccessStatusCode(resultForInput.StatusCode) && resultForInput.ExecutionTimeMs <= maxResponseTimeMs {
 			cost := resProfile.CalculateCost(resultForInput.ExecutionTimeMs)
 			if cost < lowestCost {
 				lowestCost = cost
-				config.Config = &opt.availableProfiles[resProfileResults.ResourceProfileId].ResourceConfiguration
+				config.Config = &resProfile.ResourceConfiguration
 			}
 		}
 	}

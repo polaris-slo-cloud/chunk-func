@@ -32,6 +32,12 @@ type ProfilingResult struct {
 
 	// The size of the used input in bytes.
 	InputSizeBytes int64 `json:"inputSizeBytes" yaml:"inputSizeBytes"`
+
+	// The total cost incurred by a single execution of the function with the used resource profile.
+	// This serves purely informational purposes and is not used by the chunk-func controller.
+	//
+	// +optional
+	ExecutionCost *string `json:"executionCost" yaml:"executionCost"`
 }
 
 // Collects all profiling results for a ResourceProfile.

@@ -172,6 +172,8 @@ func (pr *exhaustiveFunctionProfilerSession) evaluateResourceProfile(ctx context
 		pr.logger.Info("Successfully profiled input size", "service", targetFnName, "inputSize", input.SizeBytes)
 	}
 
+	pr.computeExecutionCosts(results, resourceProfile)
+
 	return results, nil
 }
 
@@ -228,4 +230,12 @@ func (pr *exhaustiveFunctionProfilerSession) aggregateAllResults() *function.Pro
 	}
 
 	return ret
+}
+
+func (pr *exhaustiveFunctionProfilerSession) computeExecutionCosts(results *function.ResourceProfileResults, profile *function.ResourceProfile) {
+	for _, result := range results.Results {
+		cost := profile.CalculateCost(result.ExecutionTimeMs)
+		costStr := fmt.Sprintf("%v", cost)
+		result.ExecutionCost = &costStr
+	}
 }
