@@ -1,6 +1,8 @@
 package optimizer
 
 import (
+	"math"
+
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/profile"
 )
@@ -56,7 +58,10 @@ func (opt *ResponseTimeSloAndCostOptimizer) findConfigForInput(profilingResults 
 		InputSizeBytes: inputSizeBytes,
 	}
 
+	var lowestCost float64 = math.Inf(1)
+
 	for _, resProfileResults := range profilingResults.Results {
+		resProfile := opt.availableProfiles[resProfileResults.ResourceProfileId]
 		resultForInput := resProfileResults.FindResultForInputSize(inputSizeBytes)
 		if resultForInput == nil {
 			// There were no successful profiling runs for the input size with this profile (possibly the resource config is too small for the input).
@@ -64,8 +69,11 @@ func (opt *ResponseTimeSloAndCostOptimizer) findConfigForInput(profilingResults 
 		}
 
 		if function.IsSuccessStatusCode(resultForInput.StatusCode) && resultForInput.ExecutionTimeMs <= maxResponseTimeMs {
-			config.Config = &opt.availableProfiles[resProfileResults.ResourceProfileId].ResourceConfiguration
-			return config
+			cost := resProfile.CalculateCost(resultForInput.ExecutionTimeMs)
+			if cost < lowestCost {
+				lowestCost = cost
+				config.Config = &opt.availableProfiles[resProfileResults.ResourceProfileId].ResourceConfiguration
+			}
 		}
 	}
 

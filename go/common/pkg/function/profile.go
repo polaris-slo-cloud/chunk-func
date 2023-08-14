@@ -48,3 +48,13 @@ func (rp *ResourceProfile) ID() string {
 func (rp *ResourceProfile) StringifyForK8sObj() string {
 	return fmt.Sprintf("%dmib-%dm", rp.MemoryMiB, rp.MilliCpu)
 }
+
+// Calculates the cost for the specified execution time, rounded up to the nearest 100ms mark.
+func (rp *ResourceProfile) CalculateCost(executionTimeMs int64) float64 {
+	rest := executionTimeMs % 100
+	if rest > 0 {
+		executionTimeMs += 100 - rest
+	}
+	cost := float64(executionTimeMs) * rp.Price100Ms
+	return cost
+}
