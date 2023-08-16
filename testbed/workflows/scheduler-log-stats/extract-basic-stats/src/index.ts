@@ -1,44 +1,107 @@
-import { Context, StructuredReturn } from 'faas-js-runtime';
+import { Context, HTTPFunction, HealthCheck, IncomingBody, StructuredReturn } from 'faas-js-runtime';
+import { isValidObjectStoreReference, ObjectReader, ObjectStoreReference } from './object-store';
+import { createS3ObjectStoreClient } from './object-store/impl/factories';
+import { createErrorResponse, reportInvalidS3ObjRef } from './util';
 
-/**
- * Your HTTP handling function, invoked with each request. This is an example
- * function that logs the incoming request and echoes its input to the caller.
- *
- * It can be invoked with `func invoke`
- * It can be tested with `npm test`
- *
- * It can be invoked with `func invoke`
- * It can be tested with `npm test`
- *
- * @param {Context} context a context object.
- * @param {object} context.body the request body if any
- * @param {object} context.query the query string deserialized as an object, if any
- * @param {object} context.log logging object with methods for 'info', 'warn', 'error', etc.
- * @param {object} context.headers the HTTP request headers
- * @param {string} context.method the HTTP request method
- * @param {string} context.httpVersion the HTTP protocol version
- * See: https://github.com/knative/func/blob/main/docs/guides/nodejs.md#the-context-object
- */
-const handle = async (context: Context, body: string): Promise<StructuredReturn> => {
-  // YOUR CODE HERE
-  context.log.info(`
------------------------------------------------------------
-Headers:
-${JSON.stringify(context.headers)}
+interface BasicLogStatistics {
+    schedulingSuccesses: number;
+    schedulingFailuresInclRetries: number;
+    schedulingFailuresFinal: number;
+    schedulingConflicts: number;
+    schedulingConflictsNoMultiBind: number;
+}
 
-Query:
-${JSON.stringify(context.query)}
-
-Body:
-${JSON.stringify(body)}
------------------------------------------------------------
-`);
-  return {
-    body: body,
-    headers: {
-      'content-type': 'application/json'
-    }
-  };
+const liveness: HealthCheck = () => {
+    return {
+        status: 200,
+        statusMessage: 'OK',
+    };
 };
 
-export { handle };
+const readiness: HealthCheck = () => {
+    return {
+        status: 200,
+        statusMessage: 'OK',
+    };
+};
+
+const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Promise<StructuredReturn> => {
+    const start = new Date();
+    if (!isValidObjectStoreReference(body)) {
+        return reportInvalidS3ObjRef();
+    }
+    console.log('Received request');
+
+    let stats: BasicLogStatistics;
+    try {
+        stats = await extractStatistics(body);
+    } catch (err) {
+        return createErrorResponse(err as Error);
+    }
+
+    const end = new Date();
+    const durationMs = end.valueOf() - start.valueOf();
+    console.log('Request completed in (ms):', durationMs);
+
+    return {
+        statusCode: 200,
+        body: {
+            statistics: stats,
+            durationMs: durationMs,
+        },
+        headers: {
+            'content-type': 'application/json',
+        },
+    };
+};
+
+async function extractStatistics(objRef: ObjectStoreReference): Promise<BasicLogStatistics> {
+    const s3Client = createS3ObjectStoreClient(objRef);
+    const reader = await s3Client.createObjectReader(objRef);
+    return extractStatsInternal(reader);
+}
+
+function extractStatsInternal(reader: ObjectReader): Promise<BasicLogStatistics> {
+    const stats: BasicLogStatistics = {
+        schedulingSuccesses: 0,
+        schedulingFailuresInclRetries: 0,
+        schedulingFailuresFinal: 0,
+        schedulingConflicts: 0,
+        schedulingConflictsNoMultiBind: 0,
+    };
+
+    const successesRegex = /"SchedulingSuccess"/;
+    const failuresInclRetriesRegex = /"FailedScheduling".+"reason"=/;
+    const failuresFinalRegex = /"FailedScheduling".+"reason"=.+"retryingScheduling"=false/;
+    const conflictsRegex = /"FailedScheduling".+"reasons"=/;
+    const conflictsNoMultiBindRegex = /"SchedulingSuccess".+"commitRetries"=[1-3]/;
+
+    return new Promise((resolve, reject) => {
+        const rl = reader.readLineByLine();
+        rl.onLineRead(line => {
+            if (line.match(successesRegex)) {
+                ++stats.schedulingSuccesses;
+            }
+            if (line.match(failuresInclRetriesRegex)) {
+                ++stats.schedulingFailuresInclRetries;
+            }
+            if (line.match(failuresFinalRegex)) {
+                ++stats.schedulingFailuresFinal;
+            }
+            if (line.match(conflictsRegex)) {
+                ++stats.schedulingConflicts;
+            }
+            if (line.match(conflictsNoMultiBindRegex)) {
+                ++stats.schedulingConflictsNoMultiBind;
+            }
+            return true;
+        });
+        rl.onError(err => reject(err));
+        rl.onEnd(() => {
+            console.log('Finished reading object.');
+            resolve(stats);
+        });
+    });
+}
+
+export { handle, liveness, readiness };
