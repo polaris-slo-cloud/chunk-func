@@ -1,0 +1,209 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.12.0
+  name: functiondescriptions.chunk-func.polaris-slo-cloud.github.io
+spec:
+  group: chunk-func.polaris-slo-cloud.github.io
+  names:
+    kind: FunctionDescription
+    listKind: FunctionDescriptionList
+    plural: functiondescriptions
+    singular: functiondescription
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: FunctionDescription is the Schema for the functiondescriptions
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FunctionDescriptionSpec defines the desired state of FunctionDescription
+            properties:
+              functionDescription:
+                description: Collects information about a serverless function, such
+                  as its typical inputs for profiling or its response time SLO
+                properties:
+                  functionContainer:
+                    description: The name of the container in the pod that hosts the
+                      function code.
+                    type: string
+                  functionName:
+                    description: The name of the function. This must be the name of
+                      a Knative Service object in the same namespace as the FunctionDescription.
+                    type: string
+                  maxResponseTimeMs:
+                    description: The SLO that describes the maximum allowed response
+                      time (in milliseconds) for this function.
+                    format: int64
+                    type: integer
+                  typicalInputs:
+                    description: The typical inputs of various sizes.
+                    items:
+                      description: Describes an input for a serverless function.
+                      properties:
+                        message:
+                          description: "The message that will be sent to the function's
+                            endpoint to trigger it with the input of the specified
+                            size. \n This must be a complete message for the function's
+                            endpoint and it must reference the input of the specified
+                            size."
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                        sizeBytes:
+                          description: The size of the input in bytes.
+                          format: int64
+                          type: integer
+                      required:
+                      - message
+                      - sizeBytes
+                      type: object
+                    type: array
+                required:
+                - functionContainer
+                - functionName
+                - maxResponseTimeMs
+                - typicalInputs
+                type: object
+            required:
+            - functionDescription
+            type: object
+          status:
+            description: FunctionDescriptionStatus defines the observed state of FunctionDescription
+            properties:
+              optimizedConfigs:
+                description: The function configurations optimized using the profiling
+                  results. This array, if set, contains one entry for each function
+                  input size.
+                items:
+                  description: A function configuration for a specific input size,
+                    optimized for a specific purpose.
+                  properties:
+                    config:
+                      description: The resource configuration. If no resources profile
+                        meets the SLO for the input size, this is nil.
+                      properties:
+                        memoryMiB:
+                          description: The amount of memory for a single function
+                            instance in MiB.
+                          format: int64
+                          type: integer
+                        milliCpu:
+                          description: The amount of milli CPU cores for a single
+                            function instance.
+                          format: int64
+                          type: integer
+                      required:
+                      - memoryMiB
+                      - milliCpu
+                      type: object
+                    inputSizeBytes:
+                      description: The size of the input, for which this configuration
+                        is intended.
+                      format: int64
+                      type: integer
+                    optimizedFor:
+                      description: Describes the objective of the optimization.
+                      type: string
+                  required:
+                  - config
+                  - inputSizeBytes
+                  - optimizedFor
+                  type: object
+                type: array
+              profilingResults:
+                description: The results of the profiling session.
+                properties:
+                  profilingDurationSeconds:
+                    description: The number of seconds that the profiling session
+                      lasted.
+                    format: int32
+                    type: integer
+                  profilingStarted:
+                    description: The time when the profiling session started.
+                    format: date-time
+                    type: string
+                  results:
+                    description: The list of results grouped by ResourceProfiles,
+                      ordered by increasing cost.
+                    items:
+                      description: Collects all profiling results for a ResourceProfile.
+                      properties:
+                        deploymentStatus:
+                          description: Indicates if a test function was successfully
+                            deployed with this resource profile.
+                          type: string
+                        resourceProfileId:
+                          description: The ID of the ResourceProfile that was used
+                            for this profiling session.
+                          type: string
+                        results:
+                          description: "The profiling results ordered by increasing
+                            input size. \n Only successful results are contained in
+                            this list, i.e., if there was no successful run for a
+                            particular input size, this input size is not present
+                            in this list. \n This is only present if DeploymentStatus
+                            is DeploymentSuccess."
+                          items:
+                            description: Collects the result of a single profiling
+                              session.
+                            properties:
+                              executionCost:
+                                description: The total cost incurred by a single execution
+                                  of the function with the used resource profile.
+                                  This serves purely informational purposes and is
+                                  not used by the chunk-func controller.
+                                type: string
+                              executionTimeMs:
+                                description: The execution time of the function in
+                                  milliseconds.
+                                format: int64
+                                type: integer
+                              inputSizeBytes:
+                                description: The size of the used input in bytes.
+                                format: int64
+                                type: integer
+                              statusCode:
+                                description: The HTTP status code returned by the
+                                  function execution. If the function is not triggered
+                                  via REST, this contains the exit code of the function
+                                  converted into an HTTP status code.
+                                format: int32
+                                type: integer
+                            required:
+                            - executionTimeMs
+                            - inputSizeBytes
+                            - statusCode
+                            type: object
+                          type: array
+                      required:
+                      - deploymentStatus
+                      - resourceProfileId
+                      type: object
+                    type: array
+                required:
+                - profilingDurationSeconds
+                - profilingStarted
+                - results
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

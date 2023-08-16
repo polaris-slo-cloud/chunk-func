@@ -9,6 +9,14 @@ export interface ObjectStoreCredentials {
 export interface ObjectStoreReference extends ObjectStoreCredentials {
     bucket: string;
     objectKey: string;
+
+    /**
+     * The size of the object in bytes.
+     *
+     * We added this for convenience to allow the ChunkFunc controller to easily identify
+     * the object size without needing to query to ObjectStore itself.
+     */
+    objectSizeBytes: number;
 }
 
 export function isValidObjectStoreReference(obj: IncomingBody | undefined): obj is ObjectStoreReference {

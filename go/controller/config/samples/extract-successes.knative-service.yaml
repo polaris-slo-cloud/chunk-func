@@ -1,0 +1,79 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations:
+    dapr.io/app-id: extract-successes
+    dapr.io/app-port: "8080"
+    dapr.io/enable-api-logging: "true"
+    dapr.io/enabled: "true"
+    dapr.io/metrics-port: "9092"
+    serving.knative.dev/creator: admin
+    serving.knative.dev/lastModifier: admin
+  labels:
+    boson.dev/function: "true"
+    boson.dev/runtime: typescript
+    function.knative.dev: "true"
+    function.knative.dev/name: extract-successes
+    function.knative.dev/runtime: typescript
+  name: extract-successes
+  namespace: func-test
+spec:
+  template:
+    metadata:
+      annotations:
+        dapr.io/app-id: extract-successes
+        dapr.io/app-port: "8080"
+        dapr.io/enable-api-logging: "true"
+        dapr.io/enabled: "true"
+        dapr.io/metrics-port: "9092"
+      creationTimestamp: null
+      labels:
+        boson.dev/function: "true"
+        boson.dev/runtime: typescript
+        function.knative.dev: "true"
+        function.knative.dev/name: extract-successes
+        function.knative.dev/runtime: typescript
+    spec:
+      containerConcurrency: 0
+      containers:
+      - env:
+        - name: BUILT
+          value: 20230810T152005
+        image: polarissloc/chunk-func-extract-successes@sha256:b11dec71945dc6dc857cdc7bc3a92229d852794d884456e14c5d2583b29c2ee6
+        livenessProbe:
+          httpGet:
+            path: /health/liveness
+            port: 0
+        name: user-container
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: 0
+          successThreshold: 1
+        resources: {}
+      enableServiceLinks: false
+      timeoutSeconds: 300
+  traffic:
+  - latestRevision: true
+    percent: 100
+# status:
+#   address:
+#     url: http://extract-successes.func-test.svc.cluster.local
+#   conditions:
+#   - lastTransitionTime: "2023-08-10T13:20:11Z"
+#     status: "True"
+#     type: ConfigurationsReady
+#   - lastTransitionTime: "2023-08-10T13:20:12Z"
+#     status: "True"
+#     type: Ready
+#   - lastTransitionTime: "2023-08-10T13:20:12Z"
+#     status: "True"
+#     type: RoutesReady
+#   latestCreatedRevisionName: extract-successes-00001
+#   latestReadyRevisionName: extract-successes-00001
+#   observedGeneration: 1
+#   traffic:
+#   - latestRevision: true
+#     percent: 100
+#     revisionName: extract-successes-00001
+#   url: http://extract-successes.func-test.example.com
