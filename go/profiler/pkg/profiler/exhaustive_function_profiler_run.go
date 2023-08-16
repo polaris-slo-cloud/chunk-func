@@ -235,7 +235,7 @@ func (pr *exhaustiveFunctionProfilerSession) aggregateAllResults() *function.Pro
 func (pr *exhaustiveFunctionProfilerSession) computeExecutionCosts(results *function.ResourceProfileResults, profile *function.ResourceProfile) {
 	for _, result := range results.Results {
 		cost := profile.CalculateCost(result.ExecutionTimeMs)
-		costStr := fmt.Sprintf("%v", cost)
+		costStr := fmt.Sprintf("%f", cost)
 		result.ExecutionCost = &costStr
 	}
 }
