@@ -3,12 +3,12 @@ import { isValidObjectStoreReference, ObjectReader, ObjectStoreReference } from 
 import { createS3ObjectStoreClient } from './object-store/impl/factories';
 import { createErrorResponse, reportInvalidS3ObjRef } from './util';
 
-interface BasicLogStatistics {
+interface SuccessLogStatistics {
     schedulingSuccesses: number;
-    schedulingFailuresInclRetries: number;
-    schedulingFailuresFinal: number;
-    schedulingConflicts: number;
-    schedulingConflictsNoMultiBind: number;
+    avgQueuingTimeSuccesses: number;
+    avgSamplingDurationSuccesses: number;
+    avgCommitDuration: number;
+    avgE2EDuration: number;
 }
 
 const liveness: HealthCheck = () => {
@@ -32,7 +32,7 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
     }
     console.log('Received request');
 
-    let stats: BasicLogStatistics;
+    let stats: SuccessLogStatistics;
     try {
         stats = await extractStatistics(body);
     } catch (err) {
@@ -55,53 +55,65 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
     };
 };
 
-async function extractStatistics(objRef: ObjectStoreReference): Promise<BasicLogStatistics> {
+async function extractStatistics(objRef: ObjectStoreReference): Promise<SuccessLogStatistics> {
     const s3Client = createS3ObjectStoreClient(objRef);
     const reader = await s3Client.createObjectReader(objRef);
     return extractStatsInternal(reader);
 }
 
-function extractStatsInternal(reader: ObjectReader): Promise<BasicLogStatistics> {
-    const stats: BasicLogStatistics = {
+function extractStatsInternal(reader: ObjectReader): Promise<SuccessLogStatistics> {
+    const stats: SuccessLogStatistics = {
         schedulingSuccesses: 0,
-        schedulingFailuresInclRetries: 0,
-        schedulingFailuresFinal: 0,
-        schedulingConflicts: 0,
-        schedulingConflictsNoMultiBind: 0,
+        avgQueuingTimeSuccesses: 0,
+        avgSamplingDurationSuccesses: 0,
+        avgCommitDuration: 0,
+        avgE2EDuration: 0,
     };
 
     const successesRegex = /"SchedulingSuccess"/;
-    const failuresInclRetriesRegex = /"FailedScheduling".+"reason"=/;
-    const failuresFinalRegex = /"FailedScheduling".+"reason"=.+"retryingScheduling"=false/;
-    const conflictsRegex = /"FailedScheduling".+"reasons"=/;
-    const conflictsNoMultiBindRegex = /"SchedulingSuccess".+"commitRetries"=[1-3]/;
+    const queuingTimeRegex = /^.+queueTimeMs"=([0-9]+)\s.+/;
+    const samplingDurationRegex = /^.+samplingDurationMs"=([0-9]+)\s.+/;
+    const commitDurationRegex = /^.+commitDurationMs"=([0-9]+)\s.+/;
+    const e2eDurationRegex = /^.+e2eDurationMs"=([0-9]+)\s.+/;
 
     return new Promise((resolve, reject) => {
         const rl = reader.readLineByLine();
+
         rl.onLineRead(line => {
             if (line.match(successesRegex)) {
                 ++stats.schedulingSuccesses;
-            }
-            if (line.match(failuresInclRetriesRegex)) {
-                ++stats.schedulingFailuresInclRetries;
-            }
-            if (line.match(failuresFinalRegex)) {
-                ++stats.schedulingFailuresFinal;
-            }
-            if (line.match(conflictsRegex)) {
-                ++stats.schedulingConflicts;
-            }
-            if (line.match(conflictsNoMultiBindRegex)) {
-                ++stats.schedulingConflictsNoMultiBind;
+                stats.avgQueuingTimeSuccesses += extractNumber(line, queuingTimeRegex);
+                stats.avgSamplingDurationSuccesses += extractNumber(line, samplingDurationRegex);
+                stats.avgCommitDuration += extractNumber(line, commitDurationRegex);
+                stats.avgE2EDuration += extractNumber(line, e2eDurationRegex);
             }
             return true;
         });
+
         rl.onError(err => reject(err));
+
         rl.onEnd(() => {
             console.log('Finished reading object.');
+
+            if (stats.schedulingSuccesses > 0) {
+                stats.avgQueuingTimeSuccesses /= stats.schedulingSuccesses;
+                stats.avgSamplingDurationSuccesses /= stats.schedulingSuccesses;
+                stats.avgCommitDuration /= stats.schedulingSuccesses;
+                stats.avgE2EDuration /= stats.schedulingSuccesses;
+            }
+
             resolve(stats);
         });
     });
+}
+
+function extractNumber(line: string, regex: RegExp): number {
+    const result = regex.exec(line);
+    if (result && result.length > 0) {
+        const value = +result[1];
+        return value;
+    }
+    return 0;
 }
 
 export { handle, liveness, readiness };

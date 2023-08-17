@@ -1,0 +1,47 @@
+# This FunctionDescription example refers to the extract-success-stats function located in the repository folder
+# testbed/workflows/scheduler-log-stats/extract-success-stats
+
+apiVersion: chunk-func.polaris-slo-cloud.github.io/v1
+kind: FunctionDescription
+metadata:
+  namespace: func-test
+  name: extract-success-stats
+  labels:
+    app.kubernetes.io/name: functiondescription
+    app.kubernetes.io/instance: extract-success-stats
+    app.kubernetes.io/part-of: chunk-func-controller
+spec:
+  functionDescription:
+    functionName: extract-success-stats
+    functionContainer: user-container
+    maxResponseTimeMs: 4000
+    typicalInputs:
+      - sizeBytes: 2070369 # 2 MiB
+        message:
+          url: http://10.152.183.192
+          # This is a demo deployment, we don't care about the password here.
+          user: HYlOGOqiOSpSnBjP
+          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          bucket: logs
+          objectKey: scheduler-scalability-jobs-01-successes.log
+          objectSizeBytes: 2070369
+
+      - sizeBytes: 21569326 # 21 MiB
+        message:
+          url: http://10.152.183.192
+          # This is a demo deployment, we don't care about the password here.
+          user: HYlOGOqiOSpSnBjP
+          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          bucket: logs
+          objectKey: scheduler-scalability-jobs-13-successes.log
+          objectSizeBytes: 21569326
+
+      - sizeBytes: 21511278 # 21 MiB
+        message:
+          url: http://10.152.183.192
+          # This is a demo deployment, we don't care about the password here.
+          user: HYlOGOqiOSpSnBjP
+          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          bucket: logs
+          objectKey: scheduler-scalability-jobs-15-successes.log
+          objectSizeBytes: 21511278
