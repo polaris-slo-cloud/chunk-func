@@ -3,30 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { isValidObjectStoreReference, ObjectReader, ObjectStoreReference } from './object-store';
 import { createS3ObjectStoreClient } from './object-store/impl/factories';
 import { LineByLineTransformer } from './object-store/transformer';
-
-function reportInvalidS3ObjRef(): StructuredReturn {
-    return {
-        statusCode: 400,
-        body: {
-            message: 'Incoming body is not a valid S3ObjectReference.',
-        },
-        headers: {
-            'content-type': 'application/json',
-        },
-    };
-}
-
-function createErrorResponse(err: Error): StructuredReturn {
-    return {
-        statusCode: 500,
-        body: {
-            message: err.toString(),
-        },
-        headers: {
-            'content-type': 'application/json',
-        },
-    };
-}
+import { createErrorResponse, reportInvalidS3ObjRef } from './util';
 
 const liveness: HealthCheck = () => {
     return {

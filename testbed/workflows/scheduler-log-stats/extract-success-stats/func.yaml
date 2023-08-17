@@ -1,0 +1,16 @@
+specVersion: 0.35.0
+name: extract-success-stats
+runtime: typescript
+registry: polarissloc
+image: polarissloc/chunk-func-extract-success-stats:latest
+imageDigest: sha256:daea792d5323865de884ea6d7466bbe420d8f6b14a663bbea40e851543beda11
+created: 2023-08-16T13:51:12.634285619+02:00
+build:
+  builder: pack
+  buildEnvs:
+  - name: BP_NODE_RUN_SCRIPTS
+    value: build
+  - name: BP_NODE_VERSION
+    value: 18.16.0
+deploy:
+  namespace: func-test
