@@ -121,7 +121,6 @@ spec:
                       description: Describes the objective of the optimization.
                       type: string
                   required:
-                  - config
                   - inputSizeBytes
                   - optimizedFor
                   type: object
