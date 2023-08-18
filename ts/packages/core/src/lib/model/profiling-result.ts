@@ -1,3 +1,4 @@
+import { ResourceProfile, getResourceProfileId } from "./resource-profile";
 
 /** Pseudo StatusCode to indicate that the function did not respond before the timeout. */
 export const timeoutStatusCode = -1;
@@ -91,4 +92,27 @@ export interface ProfilingSessionResults {
      */
     results: ResourceProfileResults[];
 
+}
+
+/**
+ * Finds the profiling results for the specified resource profile.
+ */
+export function findResourceProfileResults(profile: ResourceProfile, profilingSessionResults: ProfilingSessionResults): ResourceProfileResults | undefined {
+    const profileId = getResourceProfileId(profile);
+    return profilingSessionResults.results.find(results => results.resourceProfileId === profileId);
+}
+
+/**
+ * Finds the ProfilingResult for the specified inputSize, assuming the the profileResults are ordered by increasing input size.
+ */
+export function findResultForInput(inputSizeBytes: number, profileResults: ProfilingResult[]): ProfilingResult {
+    let profilingResult = profileResults.find(result => inputSizeBytes <= result.inputSizeBytes && isSuccessStatusCode(result.statusCode));
+    if (!profilingResult) {
+        profilingResult = profileResults[profileResults.length - 1];
+    }
+    return profilingResult;
+}
+
+export function isSuccessStatusCode(statusCode: number): boolean {
+    return statusCode >= 200 && statusCode <= 299;
 }

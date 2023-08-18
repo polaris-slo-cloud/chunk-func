@@ -22,3 +22,7 @@ export interface ResourceProfile {
     price100Ms: number;
 
 }
+
+export function getResourceProfileId(profile: ResourceProfile): string {
+    return `${profile.memoryMiB}mib-${profile.milliCpu}m`;
+}
