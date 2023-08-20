@@ -1,4 +1,5 @@
-import { ProfilingSessionResults } from "./profiling-result";
+import { ProfilingSessionResults } from './profiling-result';
+import { ResourceProfile } from './resource-profile';
 
 /**
  * Used for describing a workflow in JSON or YAML.
@@ -30,6 +31,11 @@ export interface WorkflowDescription {
      */
     endStep: string;
 
+    /**
+     * The list of available profiles.
+     */
+    availableResourceProfiles: ResourceProfile[]
+
 }
 
 /**
@@ -37,6 +43,9 @@ export interface WorkflowDescription {
  */
 export enum WorkflowStepType {
     Function = 'function',
+    Fork = 'fork',
+    Join = 'join',
+    Nop = 'nop',
 }
 
 /**
@@ -84,6 +93,11 @@ export interface StepExecutionDescription {
  * Describes one single execution of a workflow including its inputs and outputs.
  */
 export interface WorkflowExecutionDescription {
+
+    /**
+     * The name of this scenario.
+     */
+    scenarioName: string;
 
     /**
      * The size of the workflow input in bytes.

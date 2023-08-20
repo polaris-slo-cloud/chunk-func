@@ -1,7 +1,7 @@
-import { ResourceProfile } from '../../model';
+import { ResourceProfile, WorkflowExecutionDescription, WorkflowStepType } from '../../model';
 import { InputOutputData } from '../data';
 import { StepState, WorkflowState } from '../state';
-import { AccumulatedStepInput, StepInput, StepOutput, WorkflowStep } from '../step';
+import { AccumulatedStepInput, StepInput, StepOutput, WorkflowFunctionStep, WorkflowStep } from '../step';
 import { WorkflowThread } from '../thread';
 import { ResourceConfigurationStrategy, Workflow, WorkflowInput, WorkflowOutput } from '../workflow';
 import { WorkflowStateImpl } from './state.impl';
@@ -14,6 +14,7 @@ export class WorkflowExecution {
 
     workflow: Workflow;
 
+    private executionDescription?: WorkflowExecutionDescription;
     private state: WorkflowState;
     private resourceConfigStrat: ResourceConfigurationStrategy;
 
@@ -24,6 +25,7 @@ export class WorkflowExecution {
     }
 
     run<I, O>(input: WorkflowInput<I>): WorkflowOutput<O> {
+        this.executionDescription = input.executionDescription;
         const mainThread = WorkflowThreadImpl.createWorkflowThread();
         this.addThread(mainThread);
         this.triggerStep(this.workflow.graph.start, { data: input.data, thread: mainThread });
@@ -90,9 +92,13 @@ export class WorkflowExecution {
         const stepState = this.state.steps[step.name];
         const accumulatedInput = this.joinThreadsAndAccumulateInput(stepState.receivedInputs);
         const thread = accumulatedInput.thread;
-        stepState.selectedConfig = this.resourceConfigStrat.chooseConfiguration(this.state, step, accumulatedInput);
+        stepState.selectedConfig = undefined;
 
-        const stepOutput = step.execute(accumulatedInput, stepState.selectedConfig);
+        if (step.type === WorkflowStepType.Function) {
+            this.resourceConfigStrat.chooseConfiguration(this.state, step as WorkflowFunctionStep, accumulatedInput);
+        }
+
+        const stepOutput = step.execute(accumulatedInput, stepState.selectedConfig, this.executionDescription!);
         stepState.executionTimeMs = stepOutput.executionTimeMs;
         stepState.executionCost = stepOutput.cost;
         thread.advance(stepOutput.executionTimeMs);
@@ -165,7 +171,10 @@ export class WorkflowExecution {
         const keys = Object.keys(this.state.steps);
         const allConfigs: Record<string, ResourceProfile> = {};
         keys.forEach(stepName => {
-            allConfigs[stepName] = this.state.steps[stepName].selectedConfig!;
+            const step = this.workflow.graph.steps[stepName];
+            if (step.type === WorkflowStepType.Function) {
+                allConfigs[stepName] = this.state.steps[stepName].selectedConfig!;
+            }
         });
         return allConfigs;
     }

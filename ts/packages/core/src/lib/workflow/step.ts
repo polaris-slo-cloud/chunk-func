@@ -1,4 +1,4 @@
-import { ProfilingSessionResults, ResourceProfile, WorkflowExecutionDescription } from '../model';
+import { ProfilingSessionResults, ResourceProfile, WorkflowExecutionDescription, WorkflowStepType } from '../model';
 import { InputOutputData } from './data';
 import { WorkflowThread } from './thread';
 
@@ -6,6 +6,11 @@ import { WorkflowThread } from './thread';
  * Describes a single step in a workflow.
  */
 export interface WorkflowStep {
+
+    /**
+     * The type of step.
+     */
+    readonly type: WorkflowStepType;
 
     /**
      * The unique name of this step.
@@ -30,24 +35,37 @@ export interface WorkflowStep {
     possibleSuccessors?: string[];
 
     /**
+     * Executes this step.
+     *
+     * The resourceProfile may only be `undefined` if the step is not of type Function.
+     *
+     * The output contains the list of successor steps to be executed.
+     */
+    execute(input: AccumulatedStepInput, resourceProfile: ResourceProfile | undefined, executionDescription: WorkflowExecutionDescription): StepOutput;
+
+}
+
+// Normally, there should be an interface and impl class for each WorkflowStep type,
+// but since only the function step has a distinct implementation and properties,
+// we only define a distinct type for function steps.
+
+/**
+ * A workflow step that encapsulates a function.
+ */
+export interface WorkflowFunctionStep extends WorkflowStep {
+
+    type: WorkflowStepType.Function;
+
+    /**
      * The results of the profiling of the serverless function that
      * is executed in this step.
-     *
-     * If no function needs to be executed, this is `null`.
      */
-    profilingResults?: ProfilingSessionResults;
+    profilingResults: ProfilingSessionResults;
 
     /**
      * The maximum execution time SLO for this step.
      */
     maxExecutionTimeMs?: number;
-
-    /**
-     * Executes this step.
-     *
-     * The output contains the list of successor steps to be executed.
-     */
-    execute(input: AccumulatedStepInput, resourceProfile: ResourceProfile, executionDescription: WorkflowExecutionDescription): StepOutput;
 
 }
 

@@ -1,22 +1,26 @@
-import { ProfilingSessionResults, ResourceProfile, WorkflowExecutionDescription, WorkflowStepDescription, findResourceProfileResults, findResultForInput, getResourceProfileId } from '../../model';
-import { AccumulatedStepInput, StepOutput, WorkflowStep } from '../step';
+import { ProfilingSessionResults, ResourceProfile, WorkflowExecutionDescription, WorkflowStepDescription, WorkflowStepType, findResourceProfileResults, findResultForInput, getResourceProfileId } from '../../model';
+import { AccumulatedStepInput, StepOutput, WorkflowFunctionStep, WorkflowStep } from '../step';
 
-export class WorkflowStepImpl implements WorkflowStep {
+/**
+ * Abstract base class for WorkflowStep implementations.
+ *
+ * execute() simply returns the output size defined in the executionDescription and all possibleSuccessors,
+ * with zero execution time and cost.
+ */
+export abstract class WorkflowStepBase implements WorkflowStep {
 
+    readonly type: WorkflowStepType;
     name: string;
     requiredInputs?: string[];
     possibleSuccessors?: string[];
-    profilingResults?: ProfilingSessionResults;
-    maxExecutionTimeMs?: number;
 
     constructor(config: WorkflowStepDescription) {
+        this.type = config.type;
         this.name = config.name;
         this.possibleSuccessors = config.successors;
-        this.profilingResults = config.profilingResults;
-        this.maxExecutionTimeMs = config.maxExecutionTimeMs;
     }
 
-    execute(input: AccumulatedStepInput, resourceProfile: ResourceProfile, executionDescription: WorkflowExecutionDescription): StepOutput {
+    execute(input: AccumulatedStepInput, resourceProfile: ResourceProfile | undefined, executionDescription: WorkflowExecutionDescription): StepOutput {
         const stepExecDesc = executionDescription.stepExecutions[this.name];
         const output: StepOutput = {
             cost: 0,
@@ -28,9 +32,36 @@ export class WorkflowStepImpl implements WorkflowStep {
         if (this.possibleSuccessors) {
             output.nextSteps = [ ...this.possibleSuccessors ];
         }
+        return output;
+    }
 
-        if (!this.profilingResults) {
-            return output;
+}
+
+/**
+ * Implementation for WorkflowFunctionStep.
+ */
+export class WorkflowFunctionStepImpl extends WorkflowStepBase implements WorkflowFunctionStep {
+
+    override readonly type: WorkflowStepType.Function = WorkflowStepType.Function;
+    profilingResults: ProfilingSessionResults;
+    maxExecutionTimeMs?: number;
+
+    constructor(config: WorkflowStepDescription) {
+        super(config);
+        if (config.type !== WorkflowStepType.Function) {
+            throw new Error(`Incorrect WorkflowStepType: ${this.type}`);
+        }
+        if (!config.profilingResults) {
+            throw new Error('A WorkflowFunctionStep must have profilingResults set.');
+        }
+        this.profilingResults = config.profilingResults;
+        this.maxExecutionTimeMs = config.maxExecutionTimeMs;
+    }
+
+    override execute(input: AccumulatedStepInput, resourceProfile: ResourceProfile | undefined, executionDescription: WorkflowExecutionDescription): StepOutput {
+        const output = super.execute(input, resourceProfile, executionDescription);
+        if (!resourceProfile) {
+            throw new Error('resourceProfile must not be undefined for WorkflowSteps of type Function.')
         }
 
         const profileResults = findResourceProfileResults(resourceProfile, this.profilingResults);
@@ -45,6 +76,20 @@ export class WorkflowStepImpl implements WorkflowStep {
         }
         output.cost = +result.executionCost;
         return output;
+    }
+
+}
+
+/**
+ * Implementation for WorkflowSteps other than functions.
+ */
+export class GenericWorkflowStepImpl extends WorkflowStepBase {
+
+    constructor(config: WorkflowStepDescription) {
+        super(config);
+        if (config.type === WorkflowStepType.Function) {
+            throw new Error('GenericWorkflowStepImpl must not be used for WorkflowStepType.Function.');
+        }
     }
 
 }

@@ -1,9 +1,9 @@
 import { DirectedGraph } from 'graphology';
-import { WorkflowDescription } from '../model';
+import { ResourceProfile, WorkflowDescription, WorkflowStepType, getResourceProfileId } from '../model';
 import { Workflow } from './workflow';
 import { WorkflowGraph, WorkflowNodeAttributes } from './workflow-graph';
 import { WorkflowStep } from './step';
-import { WorkflowStepImpl } from './impl/step.impl';
+import { GenericWorkflowStepImpl, WorkflowFunctionStepImpl } from './impl/step.impl';
 import { WorkflowImpl } from './impl';
 
 export class WorkflowBuilder {
@@ -14,7 +14,8 @@ export class WorkflowBuilder {
     buildWorkflow(description: WorkflowDescription): Workflow {
         const steps = this.buildSteps(description);
         const graph = this.buildGraph(description, steps);
-        return new WorkflowImpl(description, graph);
+        const availableProfiles = this.buildResourceProfilesMap(description);
+        return new WorkflowImpl(description, graph, availableProfiles);
     }
 
     /**
@@ -23,7 +24,12 @@ export class WorkflowBuilder {
     private buildSteps(description: WorkflowDescription): Record<string, WorkflowStep> {
         const steps: Record<string, WorkflowStep> = {};
         description.steps.forEach(stepDesc => {
-            const step = new WorkflowStepImpl(stepDesc);
+            let step: WorkflowStep;
+            if (stepDesc.type === WorkflowStepType.Function) {
+                step = new WorkflowFunctionStepImpl(stepDesc);
+            } else {
+                step = new GenericWorkflowStepImpl(stepDesc);
+            }
             steps[step.name] = step;
         });
         return steps;
@@ -66,6 +72,15 @@ export class WorkflowBuilder {
             step.requiredInputs = [];
         }
         step.requiredInputs.push(inputStepName);
+    }
+
+    private buildResourceProfilesMap(description: WorkflowDescription): Record<string, ResourceProfile> {
+        const profiles: Record<string, ResourceProfile> = {};
+        description.availableResourceProfiles.forEach(profile => {
+            const id = getResourceProfileId(profile);
+            profiles[id] = profile;
+        });
+        return profiles;
     }
 
 }
