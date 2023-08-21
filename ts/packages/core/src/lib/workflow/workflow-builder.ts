@@ -12,17 +12,19 @@ export class WorkflowBuilder {
      * Builds a new workflow from a description.
      */
     buildWorkflow(description: WorkflowDescription): Workflow {
-        const steps = this.buildSteps(description);
-        const graph = this.buildGraph(description, steps);
+        const graph = this.buildGraph(description);
         const availableProfiles = this.buildResourceProfilesMap(description);
         return new WorkflowImpl(description, graph, availableProfiles);
     }
 
     /**
-     * Builds an array of workflow steps, but does not set the required inputs yet.
+     * Builds an array of workflow steps and the nodes of the graph,
+     * but does not set the required inputs or edges yet.
      */
-    private buildSteps(description: WorkflowDescription): Record<string, WorkflowStep> {
+    private buildSteps(description: WorkflowDescription): Pick<WorkflowGraph, 'steps' | 'graph'> {
         const steps: Record<string, WorkflowStep> = {};
+        const graph = new DirectedGraph<WorkflowNodeAttributes>({ allowSelfLoops: false, multi: false, type: 'directed' });
+
         description.steps.forEach(stepDesc => {
             let step: WorkflowStep;
             if (stepDesc.type === WorkflowStepType.Function) {
@@ -30,14 +32,36 @@ export class WorkflowBuilder {
             } else {
                 step = new GenericWorkflowStepImpl(stepDesc);
             }
+
             steps[step.name] = step;
+            graph.addNode(step.name, { step });
         });
-        return steps;
+
+        return { steps, graph };
     }
 
-    private buildGraph(description: WorkflowDescription, steps: Record<string, WorkflowStep>): WorkflowGraph {
-        const start = steps[description.startStep];
-        const end = steps[description.endStep];
+    /**
+     * Sets the requiredInputs on the steps and creates edges in the graph.
+     */
+    private connectGraph(description: WorkflowDescription, graph: WorkflowGraph): void {
+        description.steps.forEach(stepDesc => {
+            const currStep = graph.steps[stepDesc.name];
+            if (!currStep.possibleSuccessors) {
+                return;
+            }
+
+            currStep.possibleSuccessors.forEach(successorName => {
+                const successorStep = graph.steps[successorName];
+                this.addRequiredInput(successorStep, currStep.name);
+                graph.graph.addDirectedEdge(currStep.name, successorName);
+            });
+        });
+    }
+
+    private buildGraph(description: WorkflowDescription): WorkflowGraph {
+        const stepsAndGraph = this.buildSteps(description);
+        const start = stepsAndGraph.steps[description.startStep];
+        const end = stepsAndGraph.steps[description.endStep];
         if (!start || !end) {
             throw new Error('Cannot find start or end step.');
         }
@@ -45,24 +69,11 @@ export class WorkflowBuilder {
         const graph: WorkflowGraph = {
             start,
             end,
-            steps,
-            graph: new DirectedGraph<WorkflowNodeAttributes>({ allowSelfLoops: false, multi: false, type: 'directed' }),
+            steps: stepsAndGraph.steps,
+            graph: stepsAndGraph.graph,
         };
 
-        description.steps.forEach(stepDesc => {
-            const currStep = steps[stepDesc.name];
-            graph.graph.addNode(currStep.name, { step: currStep });
-
-            if (!currStep.possibleSuccessors) {
-                return;
-            }
-
-            currStep.possibleSuccessors.forEach(successorName => {
-                const successorStep = steps[successorName];
-                this.addRequiredInput(successorStep, currStep.name);
-                graph.graph.addDirectedEdge(currStep.name, successorName);
-            });
-        });
+        this.connectGraph(description, graph);
 
         return graph;
     }
