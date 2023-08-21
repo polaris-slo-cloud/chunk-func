@@ -37,10 +37,8 @@ export interface ProfilingResult {
 
     /**
      * The total cost incurred by a single execution of the function with the used resource profile.
-     *
-     * This serves purely informational purposes and is not used by the chunk-func controller.
      */
-    executionCost?: string;
+    executionCost: number;
 
 }
 

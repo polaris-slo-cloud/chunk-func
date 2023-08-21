@@ -71,10 +71,7 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
 
         const result = findResultForInput(input.totalDataSizeBytes, profileResults.results);
         output.executionTimeMs = result.executionTimeMs;
-        if (!result.executionCost) {
-            throw new Error('Execution cost is missing from ProfileResults');
-        }
-        output.cost = +result.executionCost;
+        output.cost = result.executionCost;
         return output;
     }
 
