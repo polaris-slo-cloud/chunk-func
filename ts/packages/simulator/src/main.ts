@@ -2,16 +2,19 @@ import * as fs from 'node:fs';
 import * as Yaml from 'js-yaml';
 import {
     ChooseConfigurationStrategyFactory,
+    PickCheapestConfigStrategy,
     PickFastestConfigStrategy,
     WorkflowBuilder,
     WorkflowDescription,
     WorkflowExecutionDescription,
     WorkflowInput,
+    createPickCheapestConfigStrategy,
     createPickFastestConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
     [PickFastestConfigStrategy.strategyName]: createPickFastestConfigStrategy,
+    [PickCheapestConfigStrategy.strategyName]: createPickCheapestConfigStrategy,
 };
 
 if (process.argv.length < 5) {

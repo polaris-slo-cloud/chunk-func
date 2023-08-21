@@ -1,7 +1,10 @@
 # This is a WorkflowExecutionDescription
 scenarioName: scenario-01-input-95-Mib
 inputSizeBytes: 100449280 # 95.8 MiB
-maxResponseTimeMsOverride: 16000
+
+# 9852 is the fastest possible time.
+# 14449 is the time for the cheapest possible config.
+maxResponseTimeMsOverride: 11000
 stepExecutions:
   validate-log:
     outputSizeBytes: 100449280
