@@ -1,4 +1,4 @@
-import { ResourceProfile, findResultForInput } from '../model';
+import { ResourceProfile, getResultsForInput } from '../model';
 import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, ResourceConfigurationStrategy, WorkflowGraph, WorkflowState, WorkflowFunctionStep } from '../workflow';
 
 export const createPickFastestConfigStrategy: ChooseConfigurationStrategyFactory =
@@ -24,16 +24,12 @@ export class PickFastestConfigStrategy implements ResourceConfigurationStrategy 
         let fastestTime = Number.POSITIVE_INFINITY;
         let fastestProfileId: string | undefined;
 
-        step.profilingResults.results.forEach(profileResults => {
-            if (!profileResults.results) {
-                throw new Error(`ResourceProfileResults for ${profileResults.resourceProfileId} does not contain any results.`);
+        for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
+            if (resultForInput.result.executionTimeMs < fastestTime) {
+                fastestTime = resultForInput.result.executionTimeMs;
+                fastestProfileId = resultForInput.resourceProfileId;
             }
-            const resultForInput = findResultForInput(input.totalDataSizeBytes, profileResults.results);
-            if (resultForInput.executionTimeMs < fastestTime) {
-                fastestTime = resultForInput.executionTimeMs;
-                fastestProfileId = profileResults.resourceProfileId;
-            }
-        });
+        }
 
         if (!fastestProfileId) {
             throw new Error('ProfilingResults did not contain any results.');

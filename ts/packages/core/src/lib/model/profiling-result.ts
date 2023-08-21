@@ -95,6 +95,22 @@ export interface ProfilingSessionResults {
 }
 
 /**
+ * Helper interface used for iterating over ProfilingSessionResults.
+ */
+export interface ProfilingResultWithProfileId {
+
+    /**
+     * The profiling result.
+     */
+    result: ProfilingResult;
+
+    /**
+     * The ID of the ResourceProfile that was used for this profiling session.
+     */
+    resourceProfileId: string;
+}
+
+/**
  * Finds the profiling results for the specified resource profile.
  */
 export function findResourceProfileResults(profile: ResourceProfile, profilingSessionResults: ProfilingSessionResults): ResourceProfileResults | undefined {
@@ -115,4 +131,20 @@ export function findResultForInput(inputSizeBytes: number, profileResults: Profi
 
 export function isSuccessStatusCode(statusCode: number): boolean {
     return statusCode >= 200 && statusCode <= 299;
+}
+
+/**
+ * Allows iterating over the ProfilingResults for a particular input size.
+ */
+export function* getResultsForInput(profilingSessionResults: ProfilingSessionResults, inputSizeBytes: number): Generator<ProfilingResultWithProfileId> {
+    for (const profileResult of profilingSessionResults.results) {
+        if (!profileResult.results) {
+            throw new Error(`ResourceProfileResults for ${profileResult.resourceProfileId} does not contain any results.`);
+        }
+        const resultForInput = findResultForInput(inputSizeBytes, profileResult.results);
+        yield {
+            resourceProfileId: profileResult.resourceProfileId,
+            result: resultForInput,
+        }
+    }
 }
