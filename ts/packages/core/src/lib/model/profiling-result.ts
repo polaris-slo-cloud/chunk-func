@@ -146,3 +146,21 @@ export function* getResultsForInput(profilingSessionResults: ProfilingSessionRes
         }
     }
 }
+
+/**
+ * Allows iterating over all ProfilingResults.
+ */
+export function* getAllResults(profilingSessionResults: ProfilingSessionResults): Generator<ProfilingResultWithProfileId> {
+    for (const profileResult of profilingSessionResults.results) {
+        if (!profileResult.results) {
+            throw new Error(`ResourceProfileResults for ${profileResult.resourceProfileId} does not contain any results.`);
+        }
+
+        for (const result of profileResult.results) {
+            yield {
+                resourceProfileId: profileResult.resourceProfileId,
+                result: result,
+            }
+        }
+    }
+}

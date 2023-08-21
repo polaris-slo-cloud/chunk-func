@@ -1,5 +1,6 @@
 import { DirectedGraph } from 'graphology';
-import { WorkflowStep } from './step';
+import { WorkflowFunctionStep, WorkflowStep } from './step';
+import { ProfilingResult } from '../model';
 
 /**
  * A DAG of a workflow in two forms: using WorkflowSteps and using a graphology graph.
@@ -28,6 +29,11 @@ export interface WorkflowGraph {
      */
     graph: DirectedGraph<WorkflowNodeAttributes>;
 
+    /**
+     * Finds the critical path from the source step to the target step using the specified weight function.
+     */
+    findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn): WorkflowPath;
+
 }
 
 /**
@@ -39,5 +45,49 @@ export interface WorkflowNodeAttributes {
      * The step encapsulated by this node.
      */
     step: WorkflowStep;
+
+}
+
+/**
+ * The weight of a WorkflowStep as returned by GetStepWeightFn.
+ */
+export interface WorkflowStepWeight {
+
+    /**
+     * The weight that should be used for computing the critical path.
+     */
+    weight: number;
+
+    /**
+     * The ID of the resource profile that was used to compute the weight.
+     */
+    resourceProfileId: string;
+
+    /**
+     * The ProfilingResult that was used to compute the weight.
+     */
+    profilingResult: ProfilingResult;
+
+}
+
+/**
+ * Function to get the weight of a WorkflowFunctionStep for finding a critical path.
+ */
+export type GetStepWeightFn = (step: WorkflowFunctionStep) => WorkflowStepWeight;
+
+/**
+ * Describes a path between two workflow steps.
+ */
+export interface WorkflowPath {
+
+    /**
+     * The steps of the path, from the source to the target.
+     */
+    steps: WorkflowStep[];
+
+    /**
+     * The expected execution time of the path.
+     */
+    executionTimeMs: number;
 
 }

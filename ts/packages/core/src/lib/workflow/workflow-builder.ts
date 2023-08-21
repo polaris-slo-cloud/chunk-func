@@ -5,6 +5,9 @@ import { WorkflowGraph, WorkflowNodeAttributes } from './workflow-graph';
 import { WorkflowStep } from './step';
 import { GenericWorkflowStepImpl, WorkflowFunctionStepImpl } from './impl/step.impl';
 import { WorkflowImpl } from './impl';
+import { WorkflowGraphImpl } from './impl/workflow-graph.impl';
+
+type StepsAndGraphPair = Pick<WorkflowGraph, 'steps' | 'graph'>
 
 export class WorkflowBuilder {
 
@@ -21,7 +24,7 @@ export class WorkflowBuilder {
      * Builds an array of workflow steps and the nodes of the graph,
      * but does not set the required inputs or edges yet.
      */
-    private buildSteps(description: WorkflowDescription): Pick<WorkflowGraph, 'steps' | 'graph'> {
+    private buildSteps(description: WorkflowDescription): StepsAndGraphPair {
         const steps: Record<string, WorkflowStep> = {};
         const graph = new DirectedGraph<WorkflowNodeAttributes>({ allowSelfLoops: false, multi: false, type: 'directed' });
 
@@ -43,7 +46,7 @@ export class WorkflowBuilder {
     /**
      * Sets the requiredInputs on the steps and creates edges in the graph.
      */
-    private connectGraph(description: WorkflowDescription, graph: WorkflowGraph): void {
+    private connectGraph(description: WorkflowDescription, graph: StepsAndGraphPair): void {
         description.steps.forEach(stepDesc => {
             const currStep = graph.steps[stepDesc.name];
             if (!currStep.possibleSuccessors) {
@@ -60,22 +63,8 @@ export class WorkflowBuilder {
 
     private buildGraph(description: WorkflowDescription): WorkflowGraph {
         const stepsAndGraph = this.buildSteps(description);
-        const start = stepsAndGraph.steps[description.startStep];
-        const end = stepsAndGraph.steps[description.endStep];
-        if (!start || !end) {
-            throw new Error('Cannot find start or end step.');
-        }
-
-        const graph: WorkflowGraph = {
-            start,
-            end,
-            steps: stepsAndGraph.steps,
-            graph: stepsAndGraph.graph,
-        };
-
-        this.connectGraph(description, graph);
-
-        return graph;
+        this.connectGraph(description, stepsAndGraph);
+        return new WorkflowGraphImpl(stepsAndGraph.steps, stepsAndGraph.graph, description);
     }
 
     private addRequiredInput(step: WorkflowStep, inputStepName: string): void {

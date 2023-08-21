@@ -1,0 +1,55 @@
+import { ProfilingResultWithProfileId, getAllResults, getResultsForInput } from '../model';
+import { WorkflowFunctionStep } from './step';
+import { GetStepWeightFn } from './workflow-graph';
+
+/**
+ * Returns the longest possible execution time of the WorkflowStep.
+ */
+export const getLongestExecutionTime: GetStepWeightFn = (step: WorkflowFunctionStep) => {
+    let longestExecTime = 0;
+    let selectedResult: ProfilingResultWithProfileId | undefined;
+
+    for (const result of getAllResults(step.profilingResults)) {
+        if (result.result.executionTimeMs > longestExecTime) {
+            longestExecTime = result.result.executionTimeMs;
+            selectedResult = result;
+        }
+    }
+
+    if (!selectedResult) {
+        throw new Error(`Step ${step.name} does not contain any profiling results.`)
+    }
+
+    return {
+        weight: longestExecTime,
+        resourceProfileId: selectedResult.resourceProfileId,
+        profilingResult: selectedResult.result,
+    };
+};
+
+/**
+ * Creates a GetStepWeightFn that returns the longest possible execution time for the specified input size.
+ */
+export function getLongestExecutionTimeForInput(inputSizeBytes: number): GetStepWeightFn {
+    return (step: WorkflowFunctionStep) => {
+        let longestExecTime = 0;
+        let selectedResult: ProfilingResultWithProfileId | undefined;
+
+        for (const result of getResultsForInput(step.profilingResults, inputSizeBytes)) {
+            if (result.result.executionTimeMs > longestExecTime) {
+                longestExecTime = result.result.executionTimeMs;
+                selectedResult = result;
+            }
+        }
+
+        if (!selectedResult) {
+            throw new Error(`Step ${step.name} does not contain any profiling results.`)
+        }
+
+        return {
+            weight: longestExecTime,
+            resourceProfileId: selectedResult.resourceProfileId,
+            profilingResult: selectedResult.result,
+        };
+    }
+}

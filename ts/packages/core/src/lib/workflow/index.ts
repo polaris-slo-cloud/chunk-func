@@ -4,4 +4,5 @@ export * from './step';
 export * from './thread';
 export * from './workflow-builder';
 export * from './workflow-graph';
+export * from './workflow-path.util';
 export * from './workflow';
