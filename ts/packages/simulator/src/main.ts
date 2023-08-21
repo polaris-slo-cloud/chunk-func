@@ -4,16 +4,19 @@ import {
     ChooseConfigurationStrategyFactory,
     PickCheapestConfigStrategy,
     PickFastestConfigStrategy,
+    PickSlowestConfigStrategy,
     WorkflowBuilder,
     WorkflowDescription,
     WorkflowExecutionDescription,
     WorkflowInput,
     createPickCheapestConfigStrategy,
     createPickFastestConfigStrategy,
+    createPickSlowestConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
     [PickFastestConfigStrategy.strategyName]: createPickFastestConfigStrategy,
+    [PickSlowestConfigStrategy.strategyName]: createPickSlowestConfigStrategy,
     [PickCheapestConfigStrategy.strategyName]: createPickCheapestConfigStrategy,
 };
 
