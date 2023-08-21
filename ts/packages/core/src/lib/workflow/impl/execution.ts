@@ -76,7 +76,7 @@ export class WorkflowExecution {
         for (let i = 0; i < nextSteps.length; ++i) {
             const nextStep = this.workflow.graph.steps[nextSteps[i]];
             const nextStepThread = i === 0 ? srcThread : srcThread.fork();
-            const nextStepInput: StepInput = { srcStep: srcStep.name, thread: nextStepThread, data: inputData.data };
+            const nextStepInput: StepInput = { srcStep: srcStep.name, thread: nextStepThread, data: inputData };
             this.triggerStep(nextStep, nextStepInput);
         }
     }
@@ -95,7 +95,7 @@ export class WorkflowExecution {
         stepState.selectedConfig = undefined;
 
         if (step.type === WorkflowStepType.Function) {
-            this.resourceConfigStrat.chooseConfiguration(this.state, step as WorkflowFunctionStep, accumulatedInput);
+            stepState.selectedConfig = this.resourceConfigStrat.chooseConfiguration(this.state, step as WorkflowFunctionStep, accumulatedInput);
         }
 
         const stepOutput = step.execute(accumulatedInput, stepState.selectedConfig, this.executionDescription!);
