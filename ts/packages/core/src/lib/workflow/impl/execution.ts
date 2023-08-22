@@ -1,7 +1,7 @@
 import { ResourceProfile, WorkflowExecutionDescription, WorkflowStepType } from '../../model';
 import { InputOutputData } from '../data';
 import { StepState, WorkflowState } from '../state';
-import { AccumulatedStepInput, StepInput, StepOutput, WorkflowFunctionStep, WorkflowStep } from '../step';
+import { AccumulatedStepInput, StepInput, StepOutput, WorkflowFunctionStep, WorkflowStep, WorkflowStepExecutionLog } from '../step';
 import { WorkflowThread } from '../thread';
 import { ResourceConfigurationStrategy, Workflow, WorkflowInput, WorkflowOutput } from '../workflow';
 import { WorkflowStateImpl } from './state.impl';
@@ -49,7 +49,7 @@ export class WorkflowExecution {
             executionTimeMs: mainThread.executionTimeMs,
             totalCost: this.state.totalCost,
             data: stepOutput.data,
-            config: this.aggregateConfigs(),
+            stepLogs: this.collectStepLogs(),
         }
         return workflowOutput;
     }
@@ -171,13 +171,18 @@ export class WorkflowExecution {
         return accumulated;
     }
 
-    protected aggregateConfigs(): Record<string, ResourceProfile> {
+    protected collectStepLogs(): Record<string, WorkflowStepExecutionLog> {
         const keys = Object.keys(this.state.steps);
-        const allConfigs: Record<string, ResourceProfile> = {};
+        const allConfigs: Record<string, WorkflowStepExecutionLog> = {};
         keys.forEach(stepName => {
             const step = this.workflow.graph.steps[stepName];
             if (step.type === WorkflowStepType.Function) {
-                allConfigs[stepName] = this.state.steps[stepName].selectedConfig!;
+                const stepState = this.state.steps[stepName];
+                allConfigs[stepName] = {
+                    resourceProfile: stepState.selectedConfig!,
+                    executionTimeMs: stepState.executionTimeMs,
+                    executionCost: stepState.executionCost,
+                };
             }
         });
         return allConfigs;

@@ -60,4 +60,4 @@ const input: WorkflowInput<any> = {
 };
 const resConfigStrat = resConfigStratFactory(workflow.graph, workflow.availableResourceProfiles);
 const output = workflow.execute(input, resConfigStrat);
-console.log(output);
+console.log(JSON.stringify(output, null, 2));

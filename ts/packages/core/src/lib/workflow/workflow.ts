@@ -1,7 +1,7 @@
 import { ResourceProfile, WorkflowExecutionDescription } from '../model';
 import { InputOutputData } from './data';
 import { WorkflowState } from './state';
-import { AccumulatedStepInput, WorkflowFunctionStep } from './step';
+import { AccumulatedStepInput, WorkflowFunctionStep, WorkflowStepExecutionLog } from './step';
 import { WorkflowGraph } from './workflow-graph';
 
 /**
@@ -53,9 +53,9 @@ export interface WorkflowInput<T> {
 export interface WorkflowOutput<T> {
 
     /**
-     * The computed configuration for all serverless functions, identified by their WorkflowStep names.
+     * The execution logs of the individual workflow steps.
      */
-    config: Record<string, ResourceProfile>;
+    stepLogs: Record<string, WorkflowStepExecutionLog>;
 
     /**
      * The total execution time of the workflow;

@@ -146,3 +146,20 @@ export interface StepOutput {
     cost: number;
 
 }
+
+/**
+ * Stores information about the execution of a WorkflowStep.
+ */
+export interface WorkflowStepExecutionLog {
+
+    /** The ResourceProfile that was used. */
+    resourceProfile: ResourceProfile;
+
+    /** The execution time of this step in milliseconds. */
+    executionTimeMs: number;
+
+    /**
+     * The cost of executing this step.
+     */
+    executionCost: number;
+}
