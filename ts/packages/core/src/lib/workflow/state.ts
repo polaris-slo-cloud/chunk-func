@@ -1,5 +1,5 @@
 import { Queue } from '../collections/queue';
-import { ResourceProfile } from '../model';
+import { ResourceProfile, WorkflowExecutionDescription } from '../model';
 import { StepInput, WorkflowStep } from './step';
 import { WorkflowThread } from './thread';
 
@@ -32,6 +32,11 @@ export interface WorkflowState {
      * The accumulated cost of the workflow steps up to this point.
      */
     totalCost: number;
+
+    /**
+     * Description of the scenario that the workflow is executing.
+     */
+    executionDescription: WorkflowExecutionDescription;
 
 }
 

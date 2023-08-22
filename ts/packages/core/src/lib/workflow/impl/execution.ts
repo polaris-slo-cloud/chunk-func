@@ -15,17 +15,21 @@ export class WorkflowExecution {
     workflow: Workflow;
 
     private executionDescription?: WorkflowExecutionDescription;
-    private state: WorkflowState;
+    private state: WorkflowState = {} as WorkflowState;
     private resourceConfigStrat: ResourceConfigurationStrategy;
 
     constructor(workflow: Workflow, resourceConfigStrat: ResourceConfigurationStrategy) {
         this.workflow = workflow;
-        this.state = new WorkflowStateImpl({ maxExecutionTimeMs: this.workflow.maxExecutionTimeMs });
         this.resourceConfigStrat = resourceConfigStrat;
     }
 
     run<I, O>(input: WorkflowInput<I>): WorkflowOutput<O> {
         this.executionDescription = input.executionDescription;
+        this.state = new WorkflowStateImpl({
+            maxExecutionTimeMs: this.workflow.maxExecutionTimeMs,
+            executionDescription: input.executionDescription,
+        });
+
         const mainThread = WorkflowThreadImpl.createWorkflowThread();
         this.addThread(mainThread);
         this.triggerStep(this.workflow.graph.start, { data: input.data, thread: mainThread });
