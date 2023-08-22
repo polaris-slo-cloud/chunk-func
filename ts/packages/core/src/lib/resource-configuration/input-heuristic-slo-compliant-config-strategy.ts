@@ -7,6 +7,7 @@ import {
     WorkflowFunctionStep,
     GetStepWeightFn,
     getLongestExecutionTimeForInput,
+    getCheapestExecutionTimeForInput,
 } from '../workflow';
 import { SloCompliantConfigStrategyBase } from './slo-compliant-config-strategy.base';
 
@@ -26,7 +27,11 @@ export class InputHeuristicSloCompliantConfigStrategy extends SloCompliantConfig
     }
 
     protected override getCriticalPathWeightFn(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): GetStepWeightFn {
-        return getLongestExecutionTimeForInput(input.totalDataSizeBytes);
+        // Using the longest time yields a critical path exec time that is much too long for any reasonable SLO.
+        // But using the cheapest exec time for the input size, works quite well.
+        return getCheapestExecutionTimeForInput(input.totalDataSizeBytes);
+
+        // return getLongestExecutionTimeForInput(input.totalDataSizeBytes);
     }
 
 }

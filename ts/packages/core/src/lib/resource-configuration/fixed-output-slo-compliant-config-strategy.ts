@@ -6,7 +6,7 @@ import {
     WorkflowState,
     WorkflowFunctionStep,
     GetStepWeightFn,
-    getLongestExecutionTimeForInput,
+    getCheapestExecutionTimeForInput,
 } from '../workflow';
 import { SloCompliantConfigStrategyBase } from './slo-compliant-config-strategy.base';
 
@@ -28,7 +28,7 @@ export class FixedOutputSloCompliantConfigStrategy extends SloCompliantConfigStr
     protected override getCriticalPathWeightFn(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): GetStepWeightFn {
         return (currStep: WorkflowFunctionStep) => {
             const inputSize = this.computeStepInputSize(step, workflowState.executionDescription);
-            const currStepWeightFn = getLongestExecutionTimeForInput(inputSize);
+            const currStepWeightFn = getCheapestExecutionTimeForInput(inputSize);
             return currStepWeightFn(currStep);
         };
     }
