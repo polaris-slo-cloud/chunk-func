@@ -2,27 +2,27 @@ import { ResourceProfile, getResultsForInput } from '../model';
 import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
-export const createPickFastestConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new PickFastestConfigStrategy(graph, availableResProfiles);
+export const createSlowestConfigStrategy: ChooseConfigurationStrategyFactory =
+    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new SlowestConfigStrategy(graph, availableResProfiles);
 
 /**
- * ResourceConfigurationStrategy that always picks the fastest resource configuration, irrespective of the SLO.
+ * ResourceConfigurationStrategy that always picks the slowest resource configuration, irrespective of the SLO.
  */
-export class PickFastestConfigStrategy extends ResourceConfigurationStrategyBase {
+export class SlowestConfigStrategy extends ResourceConfigurationStrategyBase {
 
-    static readonly strategyName = 'PickFastestConfigStrategy';
+    static readonly strategyName = 'SlowestConfigStrategy';
 
     constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
-        super(PickFastestConfigStrategy.strategyName, graph, availableResProfiles);
+        super(SlowestConfigStrategy.strategyName, graph, availableResProfiles);
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        let fastestTime = Number.POSITIVE_INFINITY;
+        let slowestTime = 0;
         let selectedProfileId: string | undefined;
 
         for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            if (resultForInput.result.executionTimeMs < fastestTime) {
-                fastestTime = resultForInput.result.executionTimeMs;
+            if (resultForInput.result.executionTimeMs > slowestTime) {
+                slowestTime = resultForInput.result.executionTimeMs;
                 selectedProfileId = resultForInput.resourceProfileId;
             }
         }

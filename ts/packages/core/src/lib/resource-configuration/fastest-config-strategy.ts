@@ -2,27 +2,27 @@ import { ResourceProfile, getResultsForInput } from '../model';
 import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
-export const createPickCheapestConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new PickCheapestConfigStrategy(graph, availableResProfiles);
+export const createFastestConfigStrategy: ChooseConfigurationStrategyFactory =
+    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new FastestConfigStrategy(graph, availableResProfiles);
 
 /**
- * ResourceConfigurationStrategy that always picks the cheapest resource configuration, irrespective of the SLO.
+ * ResourceConfigurationStrategy that always picks the fastest resource configuration, irrespective of the SLO.
  */
-export class PickCheapestConfigStrategy extends ResourceConfigurationStrategyBase {
+export class FastestConfigStrategy extends ResourceConfigurationStrategyBase {
 
-    static readonly strategyName = 'PickCheapestConfigStrategy';
+    static readonly strategyName = 'FastestConfigStrategy';
 
     constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
-        super(PickCheapestConfigStrategy.strategyName, graph, availableResProfiles);
+        super(FastestConfigStrategy.strategyName, graph, availableResProfiles);
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        let lowestCost = Number.POSITIVE_INFINITY;
+        let fastestTime = Number.POSITIVE_INFINITY;
         let selectedProfileId: string | undefined;
 
         for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            if (resultForInput.result.executionCost < lowestCost) {
-                lowestCost = resultForInput.result.executionCost;
+            if (resultForInput.result.executionTimeMs < fastestTime) {
+                fastestTime = resultForInput.result.executionTimeMs;
                 selectedProfileId = resultForInput.resourceProfileId;
             }
         }
