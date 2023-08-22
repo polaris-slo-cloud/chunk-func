@@ -16,7 +16,7 @@ export abstract class SloCompliantConfigStrategyBase extends ResourceConfigurati
         let selectedProfileId: string | undefined;
 
         for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            const expectedTotalExecTime = resultForInput.result.executionTimeMs + criticalPath.executionTimeMs;
+            const expectedTotalExecTime = input.thread.executionTimeMs + resultForInput.result.executionTimeMs + criticalPath.executionTimeMs;
             if (expectedTotalExecTime <= workflowState.maxExecutionTimeMs) {
                 if (resultForInput.result.executionCost < selectedProfileCost) {
                     selectedProfileCost = resultForInput.result.executionCost;
@@ -26,7 +26,7 @@ export abstract class SloCompliantConfigStrategyBase extends ResourceConfigurati
         }
 
         if (!selectedProfileId) {
-            throw new Error('Could not find a profile that allows meeting the SLO.');
+            throw new Error(`${step.name}: Could not find a profile that allows meeting the SLO.`);
         }
         const profile = this.availableResourceProfiles[selectedProfileId];
         return profile;
