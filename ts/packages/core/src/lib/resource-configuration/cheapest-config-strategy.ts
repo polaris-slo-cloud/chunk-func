@@ -18,11 +18,13 @@ export class CheapestConfigStrategy extends ResourceConfigurationStrategyBase {
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
         let lowestCost = Number.POSITIVE_INFINITY;
+        let selectedProfileExecTime = Number.POSITIVE_INFINITY;
         let selectedProfileId: string | undefined;
 
         for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            if (resultForInput.result.executionCost < lowestCost) {
+            if (resultForInput.result.executionCost <= lowestCost && resultForInput.result.executionTimeMs < selectedProfileExecTime) {
                 lowestCost = resultForInput.result.executionCost;
+                selectedProfileExecTime = resultForInput.result.executionTimeMs;
                 selectedProfileId = resultForInput.resourceProfileId;
             }
         }
