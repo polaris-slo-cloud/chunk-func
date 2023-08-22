@@ -16,6 +16,8 @@ import {
     createSloCompliantConfigStrategy,
     InputHeuristicSloCompliantConfigStrategy,
     createInputHeuristicSloCompliantConfigStrategy,
+    FixedOutputSloCompliantConfigStrategy,
+    createFixedOutputSloCompliantConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -24,6 +26,7 @@ const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactor
     [CheapestConfigStrategy.strategyName]: createCheapestConfigStrategy,
     [SloCompliantConfigStrategy.strategyName]: createSloCompliantConfigStrategy,
     [InputHeuristicSloCompliantConfigStrategy.strategyName]: createInputHeuristicSloCompliantConfigStrategy,
+    [FixedOutputSloCompliantConfigStrategy.strategyName]: createFixedOutputSloCompliantConfigStrategy,
 };
 
 if (process.argv.length < 5) {
