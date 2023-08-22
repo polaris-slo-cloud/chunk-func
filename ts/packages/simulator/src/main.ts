@@ -12,12 +12,18 @@ import {
     createCheapestConfigStrategy,
     createFastestConfigStrategy,
     createSlowestConfigStrategy,
+    SloCompliantConfigStrategy,
+    createSloCompliantConfigStrategy,
+    InputHeuristicSloCompliantConfigStrategy,
+    createInputHeuristicSloCompliantConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
     [FastestConfigStrategy.strategyName]: createFastestConfigStrategy,
     [SlowestConfigStrategy.strategyName]: createSlowestConfigStrategy,
     [CheapestConfigStrategy.strategyName]: createCheapestConfigStrategy,
+    [SloCompliantConfigStrategy.strategyName]: createSloCompliantConfigStrategy,
+    [InputHeuristicSloCompliantConfigStrategy.strategyName]: createInputHeuristicSloCompliantConfigStrategy,
 };
 
 if (process.argv.length < 5) {

@@ -31,6 +31,8 @@ export interface WorkflowGraph {
 
     /**
      * Finds the critical path from the source step to the target step using the specified weight function.
+     *
+     * The critical path computation assumes that the source step has already executed, i.e., its weight is disregarded.
      */
     findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn): WorkflowPath;
 
