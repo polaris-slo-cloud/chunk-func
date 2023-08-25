@@ -1,6 +1,6 @@
 import { DirectedGraph } from 'graphology';
-import { ResourceProfile, WorkflowDescription, WorkflowStepType, getResourceProfileId } from '../model';
-import { Workflow } from './workflow';
+import { ResourceProfile, WorkflowDescription, WorkflowExecutionDescription, WorkflowStepType, getResourceProfileId } from '../model';
+import { Workflow, WorkflowInput } from './workflow';
 import { WorkflowGraph, WorkflowNodeAttributes } from './workflow-graph';
 import { WorkflowStep } from './step';
 import { GenericWorkflowStepImpl, WorkflowFunctionStepImpl } from './impl/step.impl';
@@ -83,4 +83,13 @@ export class WorkflowBuilder {
         return profiles;
     }
 
+}
+
+export function buildWorkflowInput(execDesc: WorkflowExecutionDescription): WorkflowInput<any> {
+    return {
+        data: {
+            sizeBytes: execDesc.inputSizeBytes,
+        },
+        executionDescription: execDesc,
+    };
 }

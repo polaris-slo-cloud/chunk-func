@@ -8,7 +8,6 @@ import {
     WorkflowBuilder,
     WorkflowDescription,
     WorkflowExecutionDescription,
-    WorkflowInput,
     createCheapestConfigStrategy,
     createFastestConfigStrategy,
     createSlowestConfigStrategy,
@@ -18,6 +17,7 @@ import {
     createInputHeuristicSloCompliantConfigStrategy,
     FixedOutputSloCompliantConfigStrategy,
     createFixedOutputSloCompliantConfigStrategy,
+    buildWorkflowInput,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -52,12 +52,7 @@ const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
 
 console.log('Simulating scenario', execDesc.scenarioName);
-const input: WorkflowInput<any> = {
-    data: {
-        sizeBytes: execDesc.inputSizeBytes,
-    },
-    executionDescription: execDesc,
-};
+const input = buildWorkflowInput(execDesc);
 const resConfigStrat = resConfigStratFactory(workflow.graph, workflow.availableResourceProfiles);
 const output = workflow.execute(input, resConfigStrat);
 console.log(JSON.stringify(output, null, 2));

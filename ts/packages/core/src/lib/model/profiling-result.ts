@@ -86,7 +86,7 @@ export interface ProfilingSessionResults {
     profilingDurationSeconds: number;
 
     /**
-     * The list of results grouped by ResourceProfiles, ordered by increasing cost.
+     * The list of results grouped by ResourceProfiles, ordered by increasing cost (per 100ms).
      */
     results: ResourceProfileResults[];
 
