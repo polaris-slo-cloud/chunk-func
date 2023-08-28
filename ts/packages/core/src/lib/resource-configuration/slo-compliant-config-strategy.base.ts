@@ -13,13 +13,18 @@ export abstract class SloCompliantConfigStrategyBase extends ResourceConfigurati
         const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, weightFn);
 
         let selectedProfileCost = Number.POSITIVE_INFINITY;
+        let selectedProfileExecTime = Number.POSITIVE_INFINITY;
         let selectedProfileId: string | undefined;
 
         for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            const expectedTotalExecTime = input.thread.executionTimeMs + resultForInput.result.executionTimeMs + criticalPath.executionTimeMs;
+            const stepExecTime = resultForInput.result.executionTimeMs;
+            const expectedTotalExecTime = input.thread.executionTimeMs + stepExecTime + criticalPath.executionTimeMs;
+
             if (expectedTotalExecTime <= workflowState.maxExecutionTimeMs) {
-                if (resultForInput.result.executionCost < selectedProfileCost) {
-                    selectedProfileCost = resultForInput.result.executionCost;
+                const stepExecCost = resultForInput.result.executionCost;
+                if (stepExecCost < selectedProfileCost || (stepExecCost === selectedProfileCost && stepExecTime < selectedProfileExecTime)) {
+                    selectedProfileCost = stepExecCost;
+                    selectedProfileExecTime = stepExecTime;
                     selectedProfileId = resultForInput.resourceProfileId;
                 }
             }
