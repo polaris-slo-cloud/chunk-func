@@ -22,9 +22,11 @@ export class CheapestConfigStrategy extends ResourceConfigurationStrategyBase {
         let selectedProfileId: string | undefined;
 
         for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            if (resultForInput.result.executionCost <= lowestCost && resultForInput.result.executionTimeMs < selectedProfileExecTime) {
-                lowestCost = resultForInput.result.executionCost;
-                selectedProfileExecTime = resultForInput.result.executionTimeMs;
+            const execCost = resultForInput.result.executionCost;
+            const execTime = resultForInput.result.executionTimeMs;
+            if (execCost < lowestCost || (execCost === lowestCost && execTime < selectedProfileExecTime)) {
+                lowestCost = execCost;
+                selectedProfileExecTime = execTime;
                 selectedProfileId = resultForInput.resourceProfileId;
             }
         }
