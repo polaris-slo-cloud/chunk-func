@@ -1,11 +1,19 @@
 import { ResourceProfile, getResultsForInput } from '../model';
-import { AccumulatedStepInput, WorkflowState, WorkflowFunctionStep, GetStepWeightFn } from '../workflow';
+import { AccumulatedStepInput, WorkflowState, WorkflowFunctionStep, GetStepWeightFn, ResourceConfigurationStrategy, WorkflowGraph } from '../workflow';
+import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 /**
  * Base class for a ResourceConfigurationStrategy that always picks the cheapest profile that allows fulfilling the SLO.
  */
 export abstract class SloCompliantConfigStrategyBase extends ResourceConfigurationStrategyBase {
+
+    private fallbackStrategy: ResourceConfigurationStrategy;
+
+    constructor(name: string, graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
+        super(name, graph, availableResProfiles);
+        this.fallbackStrategy = new FastestConfigStrategy(graph, availableResProfiles);
+    }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
         // Get the critical path from this step to the end.
@@ -31,7 +39,7 @@ export abstract class SloCompliantConfigStrategyBase extends ResourceConfigurati
         }
 
         if (!selectedProfileId) {
-            throw new Error(`${step.name}: Could not find a profile that allows meeting the SLO.`);
+            return this.fallbackStrategy.chooseConfiguration(workflowState, step, input);
         }
         const profile = this.availableResourceProfiles[selectedProfileId];
         return profile;
