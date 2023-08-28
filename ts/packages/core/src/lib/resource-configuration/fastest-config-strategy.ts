@@ -18,11 +18,16 @@ export class FastestConfigStrategy extends ResourceConfigurationStrategyBase {
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
         let fastestTime = Number.POSITIVE_INFINITY;
+        let fastestCost = Number.POSITIVE_INFINITY;
         let selectedProfileId: string | undefined;
 
         for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            if (resultForInput.result.executionTimeMs < fastestTime) {
-                fastestTime = resultForInput.result.executionTimeMs;
+            const execTime = resultForInput.result.executionTimeMs;
+            const execCost = resultForInput.result.executionCost;
+            // We pick the fastest or, if two are equally fast, the cheaper of the two.
+            if (execTime < fastestTime || (execTime === fastestTime && execCost < fastestCost)) {
+                fastestTime = execTime;
+                fastestCost = execCost;
                 selectedProfileId = resultForInput.resourceProfileId;
             }
         }
