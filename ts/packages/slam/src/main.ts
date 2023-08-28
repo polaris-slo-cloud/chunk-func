@@ -34,9 +34,10 @@ const slamResult = configFinder.optimizeForSloAndCost(slamExecDesc.maxResponseTi
 console.log('SLAM output:', JSON.stringify(slamResult, null, 2));
 console.log('');
 
-console.log('Simulating scenario:', evalExecDesc.scenarioName);
+const evalSlo = evalExecDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs;
+console.log(`Simulating scenario ${evalExecDesc.scenarioName} with SLO ${evalSlo} ms.`);
 const evalInput = buildWorkflowInput(evalExecDesc);
 const configStrat = new PreconfiguredConfigStrategy(workflow.graph, workflow.availableResourceProfiles, slamResult.stepConfigs);
 const output = workflow.execute(evalInput, configStrat);
 console.log(JSON.stringify(output, null, 2));
-console.log('SLO fulfilled:', output.executionTimeMs <= (evalExecDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs));
+console.log('SLO fulfilled:', output.executionTimeMs <= evalSlo);

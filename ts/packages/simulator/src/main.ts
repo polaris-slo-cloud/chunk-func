@@ -50,8 +50,9 @@ if (!resConfigStratFactory) {
 
 const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
+const slo = execDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs;
 
-console.log('Simulating scenario', execDesc.scenarioName);
+console.log(`Simulating scenario ${execDesc.scenarioName} with SLO ${slo} ms.`);
 const input = buildWorkflowInput(execDesc);
 const resConfigStrat = resConfigStratFactory(workflow.graph, workflow.availableResourceProfiles);
 const output = workflow.execute(input, resConfigStrat);
