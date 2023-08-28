@@ -3,9 +3,9 @@ maxResponseTimeMs: 16000
 startStep: validate-log
 endStep: extract-success-stats
 availableResourceProfiles:
-  - memoryMiB: 128
-    milliCpu: 83
-    price100Ms: 0.000000324
+  # - memoryMiB: 128
+  #   milliCpu: 83
+  #   price100Ms: 0.000000324
   - memoryMiB: 256
     milliCpu: 167
     price100Ms: 0.000000648
