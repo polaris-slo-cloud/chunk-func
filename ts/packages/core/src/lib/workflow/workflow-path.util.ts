@@ -59,6 +59,37 @@ export function getLongestExecutionTimeForInput(inputSizeBytes: number): GetStep
 }
 
 /**
+ * Creates a GetStepWeightFn that returns the fastest possible execution time for the specified input size.
+ */
+export function getFastestExecutionTimeForInput(inputSizeBytes: number): GetStepWeightFn {
+    return (step: WorkflowFunctionStep) => {
+        let fastestExecTime = Number.POSITIVE_INFINITY;
+        let fastestExecTimeCost = Number.POSITIVE_INFINITY;
+        let selectedResult: ProfilingResultWithProfileId | undefined;
+
+        for (const result of getResultsForInput(step.profilingResults, inputSizeBytes)) {
+            const execCost = result.result.executionCost;
+            const execTime = result.result.executionTimeMs;
+            if (execTime < fastestExecTime || (execTime === fastestExecTime && execCost < fastestExecTimeCost)) {
+                fastestExecTime = execTime;
+                fastestExecTimeCost = execCost;
+                selectedResult = result;
+            }
+        }
+
+        if (!selectedResult) {
+            throw new Error(`Step ${step.name} does not contain any profiling results.`)
+        }
+
+        return {
+            weight: fastestExecTime,
+            resourceProfileId: selectedResult.resourceProfileId,
+            profilingResult: selectedResult.result,
+        };
+    }
+}
+
+/**
  * Creates a GetStepWeightFn that returns the cheapest possible execution time for the specified input size.
  */
 export function getCheapestExecutionTimeForInput(inputSizeBytes: number): GetStepWeightFn {

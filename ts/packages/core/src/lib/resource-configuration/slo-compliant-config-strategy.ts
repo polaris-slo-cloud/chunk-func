@@ -7,6 +7,7 @@ import {
     WorkflowFunctionStep,
     GetStepWeightFn,
     getCheapestExecutionTimeForInput,
+    getFastestExecutionTimeForInput,
 } from '../workflow';
 import { SloCompliantConfigStrategyBase } from './slo-compliant-config-strategy.base';
 
@@ -28,6 +29,11 @@ export class SloCompliantConfigStrategy extends SloCompliantConfigStrategyBase {
         // Using the longest time yields a critical path exec time that is much too long for any reasonable SLO.
         // But using the cheapest exec time, works quite well.
         return getCheapestExecutionTimeForInput(Number.POSITIVE_INFINITY);
+
+        // Using the fastest exec time also works. This allows functions earlier in the workflow to
+        // take longer, while getCheapest path allows later functions in the workflow to take longer.
+        // Which one is better depends on the composition and the functions of the workflow.
+        // return getFastestExecutionTimeForInput(Number.POSITIVE_INFINITY);
 
         // return getLongestExecutionTime;
     }
