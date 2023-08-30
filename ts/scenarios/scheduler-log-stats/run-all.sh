@@ -13,6 +13,10 @@ node ../../dist/packages/simulator/main.js workflow.yaml scenario-01.yaml SloCom
 node ../../dist/packages/simulator/main.js workflow.yaml scenario-02.yaml SloCompliantConfigStrategy > ./simulation-logs/scenario-02-slo-compliant.log
 node ../../dist/packages/simulator/main.js workflow.yaml scenario-03.yaml SloCompliantConfigStrategy > ./simulation-logs/scenario-03-slo-compliant.log
 
+node ../../dist/packages/simulator/main.js workflow.yaml scenario-01.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-01-proportional-slo.log
+node ../../dist/packages/simulator/main.js workflow.yaml scenario-02.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-02-proportional-slo.log
+node ../../dist/packages/simulator/main.js workflow.yaml scenario-03.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-03-proportional-slo.log
+
 node ../../dist/packages/simulator/main.js workflow.yaml scenario-01.yaml InputHeuristicSloCompliantConfigStrategy > ./simulation-logs/scenario-01-input-heuristic.log
 node ../../dist/packages/simulator/main.js workflow.yaml scenario-02.yaml InputHeuristicSloCompliantConfigStrategy > ./simulation-logs/scenario-02-input-heuristic.log
 node ../../dist/packages/simulator/main.js workflow.yaml scenario-03.yaml InputHeuristicSloCompliantConfigStrategy > ./simulation-logs/scenario-03-input-heuristic.log
