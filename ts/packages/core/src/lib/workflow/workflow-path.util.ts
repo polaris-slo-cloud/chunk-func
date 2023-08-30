@@ -64,9 +64,11 @@ export function getCheapestExecutionTimeForInput(inputSizeBytes: number): GetSte
         let selectedResult: ProfilingResultWithProfileId | undefined;
 
         for (const result of getResultsForInput(step.profilingResults, inputSizeBytes)) {
-            if (result.result.executionCost <= lowestCost && result.result.executionTimeMs < selectedResultExecTime) {
-                lowestCost = result.result.executionCost;
-                selectedResultExecTime = result.result.executionTimeMs;
+            const execCost = result.result.executionCost;
+            const execTime = result.result.executionTimeMs;
+            if (execCost < lowestCost || (execCost === lowestCost && execTime < selectedResultExecTime)) {
+                lowestCost = execCost;
+                selectedResultExecTime = execTime;
                 selectedResult = result;
             }
         }
