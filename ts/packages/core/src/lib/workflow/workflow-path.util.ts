@@ -33,11 +33,15 @@ export const getLongestExecutionTime: GetStepWeightFn = (step: WorkflowFunctionS
 export function getLongestExecutionTimeForInput(inputSizeBytes: number): GetStepWeightFn {
     return (step: WorkflowFunctionStep) => {
         let longestExecTime = 0;
+        let longestExecTimeCost = Number.POSITIVE_INFINITY;
         let selectedResult: ProfilingResultWithProfileId | undefined;
 
         for (const result of getResultsForInput(step.profilingResults, inputSizeBytes)) {
-            if (result.result.executionTimeMs > longestExecTime) {
-                longestExecTime = result.result.executionTimeMs;
+            const execCost = result.result.executionCost;
+            const execTime = result.result.executionTimeMs;
+            if (execTime > longestExecTime || (execTime === longestExecTime && execCost < longestExecTimeCost)) {
+                longestExecTime = execTime;
+                longestExecTimeCost = execCost;
                 selectedResult = result;
             }
         }
