@@ -20,6 +20,8 @@ import {
     buildWorkflowInput,
     ProportionalSloConfigStrategy,
     createProportionalSloConfigStrategy,
+    StepConfConfigStrategy,
+    createStepConfConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -30,6 +32,7 @@ const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactor
     [ProportionalSloConfigStrategy.strategyName]: createProportionalSloConfigStrategy,
     [InputHeuristicSloCompliantConfigStrategy.strategyName]: createInputHeuristicSloCompliantConfigStrategy,
     [FixedOutputSloCompliantConfigStrategy.strategyName]: createFixedOutputSloCompliantConfigStrategy,
+    [StepConfConfigStrategy.strategyName]: createStepConfConfigStrategy,
 };
 
 if (process.argv.length < 5) {

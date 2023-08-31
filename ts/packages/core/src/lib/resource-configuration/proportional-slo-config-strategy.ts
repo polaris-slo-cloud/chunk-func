@@ -9,6 +9,12 @@ export const createProportionalSloConfigStrategy: ChooseConfigurationStrategyFac
  * ResourceConfigurationStrategy that divides the SLO into parts according to the distribution of the execution times of the profiled functions.
  *
  * IMPORTANT: This currently only works for simple workflows with a single path of execution (i.e., no forks or joins).
+ * ToDo: consider using the critical path from the current point, like StepConf, then forks and joins might work as well.
+ *
+ * The two big differences to StepConf are:
+ *   1. We are input size aware for the current step.
+ *   2. We use the average execution times for calculating the step execution time contributions and SLO
+ *      (StepConf uses the most cost eff resource config for the middle input sizes).
  */
 export class ProportionalSloConfigStrategy extends ResourceConfigurationStrategyBase {
 

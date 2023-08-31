@@ -25,6 +25,10 @@ node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01.yaml F
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02.yaml FixedOutputSloCompliantConfigStrategy > ./simulation-logs/scenario-02-fixed-input.log
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03.yaml FixedOutputSloCompliantConfigStrategy > ./simulation-logs/scenario-03-fixed-input.log
 
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01.yaml StepConfConfigStrategy > ./simulation-logs/scenario-01-step-conf.log
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02.yaml StepConfConfigStrategy > ./simulation-logs/scenario-02-step-conf.log
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03.yaml StepConfConfigStrategy > ./simulation-logs/scenario-03-step-conf.log
+
 node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-01.yaml > ./simulation-logs/scenario-01-slam.log
 node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-02.yaml > ./simulation-logs/scenario-02-slam.log
 node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-03.yaml > ./simulation-logs/scenario-03-slam.log

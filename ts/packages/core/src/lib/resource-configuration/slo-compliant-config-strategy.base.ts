@@ -5,6 +5,8 @@ import { ResourceConfigurationStrategyBase } from './resource-configuration-stra
 
 /**
  * Base class for a ResourceConfigurationStrategy that always picks the cheapest profile that allows fulfilling the SLO.
+ *
+ * If for a particular step no profile can be found that would fulfill the SLO, the fastest config is used as a fallback.
  */
 export abstract class SloCompliantConfigStrategyBase extends ResourceConfigurationStrategyBase {
 

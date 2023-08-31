@@ -8,3 +8,4 @@ export * from './resource-configuration-strategy.base';
 export * from './slo-compliant-config-strategy.base';
 export * from './slo-compliant-config-strategy';
 export * from './slowest-config-strategy';
+export * from './step-conf-config.strategy';
