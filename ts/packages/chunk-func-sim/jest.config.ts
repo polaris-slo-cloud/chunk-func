@@ -1,11 +1,11 @@
 /* eslint-disable */
 export default {
-    displayName: 'simulator',
+    displayName: 'chunk-func-sim',
     preset: '../../jest.preset.js',
     testEnvironment: 'node',
     transform: {
         '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
     },
     moduleFileExtensions: ['ts', 'js', 'html'],
-    coverageDirectory: '../../coverage/packages/simulator',
+    coverageDirectory: '../../coverage/packages/chunk-func-sim',
 };
