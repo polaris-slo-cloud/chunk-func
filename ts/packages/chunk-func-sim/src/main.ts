@@ -22,6 +22,8 @@ import {
     createProportionalSloConfigStrategy,
     StepConfConfigStrategy,
     createStepConfConfigStrategy,
+    ProportionalCriticalPathSloConfigStrategy,
+    createProportionalCriticalPathSloConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -30,6 +32,7 @@ const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactor
     [CheapestConfigStrategy.strategyName]: createCheapestConfigStrategy,
     [SloCompliantConfigStrategy.strategyName]: createSloCompliantConfigStrategy,
     [ProportionalSloConfigStrategy.strategyName]: createProportionalSloConfigStrategy,
+    [ProportionalCriticalPathSloConfigStrategy.strategyName]: createProportionalCriticalPathSloConfigStrategy,
     [InputHeuristicSloCompliantConfigStrategy.strategyName]: createInputHeuristicSloCompliantConfigStrategy,
     [FixedOutputSloCompliantConfigStrategy.strategyName]: createFixedOutputSloCompliantConfigStrategy,
     [StepConfConfigStrategy.strategyName]: createStepConfConfigStrategy,

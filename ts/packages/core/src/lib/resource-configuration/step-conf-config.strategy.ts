@@ -25,7 +25,7 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
         const remainingTimeMs = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
-        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, step => this.getMostCostEffStepWeight(step));
+        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getMostCostEffStepWeight(currStep));
         const stepSloMs = this.computeStepSlo(step, criticalPath, remainingTimeMs);
 
         let selectedProfileCost = Number.POSITIVE_INFINITY;

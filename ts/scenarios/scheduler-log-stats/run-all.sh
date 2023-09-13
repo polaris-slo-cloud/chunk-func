@@ -17,6 +17,10 @@ node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01.yaml P
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-02-proportional-slo.log
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-03-proportional-slo.log
 
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01.yaml ProportionalCriticalPathSloConfigStrategy > ./simulation-logs/scenario-01-proportional-critical-path-slo.log
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02.yaml ProportionalCriticalPathSloConfigStrategy > ./simulation-logs/scenario-02-proportional-critical-path-slo.log
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03.yaml ProportionalCriticalPathSloConfigStrategy > ./simulation-logs/scenario-03-proportional-critical-path-slo.log
+
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01.yaml InputHeuristicSloCompliantConfigStrategy > ./simulation-logs/scenario-01-input-heuristic.log
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02.yaml InputHeuristicSloCompliantConfigStrategy > ./simulation-logs/scenario-02-input-heuristic.log
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03.yaml InputHeuristicSloCompliantConfigStrategy > ./simulation-logs/scenario-03-input-heuristic.log
