@@ -34,7 +34,7 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
 
         for (const profilingResult of getResultsForMiddleInput(step.profilingResults)) {
             const stepExecTime = profilingResult.result.executionTimeMs;
-            if (stepExecTime <= stepSloMs || !selectedProfileId) {
+            if (stepExecTime <= stepSloMs) {
                 const stepExecCost = profilingResult.result.executionCost;
                 if (stepExecCost < selectedProfileCost || (stepExecCost === selectedProfileCost && stepExecTime < selectedProfileExecTime)) {
                     selectedProfileCost = stepExecCost;
@@ -45,7 +45,7 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
         }
 
         if (!selectedProfileId) {
-            throw new Error('ProfilingResults did not contain any results.');
+            selectedProfileId = this.pickFastestProfile(step);
         }
         const profile = this.availableResourceProfiles[selectedProfileId];
         return profile;
@@ -67,6 +67,28 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
         const costEffStepWeight = this.getMostCostEffStepWeight(step);
         const percentage = costEffStepWeight.weight / criticalPath.executionTimeMs;
         return remainingTimeMs * percentage;
+    }
+
+    private pickFastestProfile(step: WorkflowFunctionStep): string {
+        let fastestTime = Number.POSITIVE_INFINITY;
+        let fastestCost = Number.POSITIVE_INFINITY;
+        let selectedProfileId: string | undefined;
+
+        for (const resultForInput of getResultsForMiddleInput(step.profilingResults)) {
+            const execTime = resultForInput.result.executionTimeMs;
+            const execCost = resultForInput.result.executionCost;
+            // We pick the fastest or, if two are equally fast, the cheaper of the two.
+            if (execTime < fastestTime || (execTime === fastestTime && execCost < fastestCost)) {
+                fastestTime = execTime;
+                fastestCost = execCost;
+                selectedProfileId = resultForInput.resourceProfileId;
+            }
+        }
+
+        if (!selectedProfileId) {
+            throw new Error('ProfilingResults did not contain any results.');
+        }
+        return selectedProfileId;
     }
 
     private findMostCostEffConfigs(graph: WorkflowGraph): Record<string, ProfilingResultWithProfileId> {
