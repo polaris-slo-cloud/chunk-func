@@ -81,10 +81,10 @@ export class ConfigFinder {
         const costOptimizedResult = this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, returnToHeapIfCostEfficient);
 
         if (costOptimizedResult.workflowOutput.totalCost < baseResult.workflowOutput.totalCost) {
-            console.log(`Returning cost optimized result (${costOptimizedResult.workflowOutput.totalCost}) instead of base result (${baseResult.workflowOutput.totalCost}).`)
+            // console.log(`Returning cost optimized result (${costOptimizedResult.workflowOutput.totalCost}) instead of base result (${baseResult.workflowOutput.totalCost}).`)
             return costOptimizedResult;
         } else {
-            console.log(`Returning base result (${baseResult.workflowOutput.totalCost}) instead of cost optimized result (${costOptimizedResult.workflowOutput.totalCost}).`)
+            // console.log(`Returning base result (${baseResult.workflowOutput.totalCost}) instead of cost optimized result (${costOptimizedResult.workflowOutput.totalCost}).`)
             return baseResult;
         }
     }

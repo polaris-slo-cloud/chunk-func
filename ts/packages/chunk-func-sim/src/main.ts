@@ -24,6 +24,7 @@ import {
     createStepConfConfigStrategy,
     ProportionalCriticalPathSloConfigStrategy,
     createProportionalCriticalPathSloConfigStrategy,
+    SimulatorOutput,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -61,8 +62,16 @@ const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
 const slo = execDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs;
 
-console.log(`Simulating scenario ${execDesc.scenarioName} with SLO ${slo} ms.`);
 const input = buildWorkflowInput(execDesc);
 const resConfigStrat = resConfigStratFactory(workflow.graph, workflow.availableResourceProfiles);
 const output = workflow.execute(input, resConfigStrat);
-console.log(JSON.stringify(output, null, 2));
+
+const simOutput: SimulatorOutput = {
+    scenarioName: execDesc.scenarioName,
+    inputDataSizeMib: execDesc.inputSizeBytes / 1024 / 1024,
+    sloMs: slo,
+    workflowOutput: output,
+    sloFulfilled: output.executionTimeMs <= slo,
+};
+
+console.log(JSON.stringify(simOutput, null, 2));
