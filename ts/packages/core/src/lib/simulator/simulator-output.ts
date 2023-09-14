@@ -18,6 +18,11 @@ export interface SimulatorOutput {
     sloMs: number;
 
     /**
+     * The name of the resource configuration strategy that was used.
+     */
+    resourceConfigStrategy: string;
+
+    /**
      * The output produced by the simulation of the scenario using the specified input size.
      */
     workflowOutput: WorkflowOutput<unknown>;

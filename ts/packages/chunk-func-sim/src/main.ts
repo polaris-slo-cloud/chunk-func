@@ -51,9 +51,10 @@ const scenarioStr = fs.readFileSync(process.argv[3], { encoding: 'utf8' });
 const workflowDesc = Yaml.load(workflowStr) as WorkflowDescription;
 const execDesc = Yaml.load(scenarioStr) as WorkflowExecutionDescription;
 
-const resConfigStratFactory = resourceConfigStrategies[process.argv[4]];
+const resourceConfigStratName = process.argv[4];
+const resConfigStratFactory = resourceConfigStrategies[resourceConfigStratName];
 if (!resConfigStratFactory) {
-    console.error('Invalid ResourceConfigurationStrategy:', process.argv[4]);
+    console.error('Invalid ResourceConfigurationStrategy:', resourceConfigStratName);
     console.error('Available ResourceConfigurationStrategies:', Object.keys(resourceConfigStrategies));
     process.exit(1);
 }
@@ -68,6 +69,7 @@ const output = workflow.execute(input, resConfigStrat);
 
 const simOutput: SimulatorOutput = {
     scenarioName: execDesc.scenarioName,
+    resourceConfigStrategy: resourceConfigStratName,
     inputDataSizeMib: execDesc.inputSizeBytes / 1024 / 1024,
     sloMs: slo,
     workflowOutput: output,

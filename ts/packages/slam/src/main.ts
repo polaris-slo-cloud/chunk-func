@@ -46,6 +46,7 @@ const output = workflow.execute(evalInput, configStrat);
 const simOutput: SlamSimulatorOutput = {
     slamScenario: slamExecDesc.scenarioName,
     slamResult,
+    resourceConfigStrategy: 'SLAM',
     scenarioName: evalExecDesc.scenarioName,
     inputDataSizeMib: evalExecDesc.inputSizeBytes / 1024 / 1024,
     sloMs: evalSlo,
