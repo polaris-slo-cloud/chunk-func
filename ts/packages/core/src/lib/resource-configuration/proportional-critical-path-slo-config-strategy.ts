@@ -29,8 +29,7 @@ export class ProportionalCriticalPathSloConfigStrategy extends ResourceConfigura
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
         const remainingTime = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
-        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getAvgStepWeight(currStep));
-        const stepSloMs = this.computeStepSlo(step, criticalPath, remainingTime);
+        const stepSloMs = this.computeStepSlo(step, remainingTime);
 
         let selectedProfileCost = Number.POSITIVE_INFINITY;
         let selectedProfileExecTime = Number.POSITIVE_INFINITY;
@@ -58,9 +57,15 @@ export class ProportionalCriticalPathSloConfigStrategy extends ResourceConfigura
     /**
      * Computes the SLO for the current step, given the critical path starting from it and based on the remaining time, not the original workflow SLO.
      */
-    private computeStepSlo(step: WorkflowFunctionStep, criticalPath: WorkflowPath, remainingTimeMs: number): number {
+    private computeStepSlo(step: WorkflowFunctionStep, remainingTimeMs: number): number {
+        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getAvgStepWeight(currStep));
         const avgStepWeight = this.getAvgStepWeight(step);
-        const percentage = avgStepWeight.weight / criticalPath.executionTimeMs;
+        const criticalPathExecTimeWithSrc = criticalPath.executionTimeMs + avgStepWeight.weight;
+
+        const percentage = avgStepWeight.weight / criticalPathExecTimeWithSrc;
+        if (percentage > 1) {
+            throw new Error(`Current step percentage is ${percentage}`)
+        }
         return remainingTimeMs * percentage;
     }
 

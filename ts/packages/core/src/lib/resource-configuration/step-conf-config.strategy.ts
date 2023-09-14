@@ -25,8 +25,7 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
         const remainingTimeMs = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
-        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getMostCostEffStepWeight(currStep));
-        const stepSloMs = this.computeStepSlo(step, criticalPath, remainingTimeMs);
+        const stepSloMs = this.computeStepSlo(step, remainingTimeMs);
 
         let selectedProfileCost = Number.POSITIVE_INFINITY;
         let selectedProfileExecTime = Number.POSITIVE_INFINITY;
@@ -63,9 +62,15 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
     /**
      * Computes the SLO for the current step, given the critical path starting from it and based on the remaining time, not the original workflow SLO.
      */
-    private computeStepSlo(step: WorkflowFunctionStep, criticalPath: WorkflowPath, remainingTimeMs: number): number {
+    private computeStepSlo(step: WorkflowFunctionStep, remainingTimeMs: number): number {
+        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getMostCostEffStepWeight(currStep));
         const costEffStepWeight = this.getMostCostEffStepWeight(step);
-        const percentage = costEffStepWeight.weight / criticalPath.executionTimeMs;
+        const criticalPathExecTimeWithSrc = criticalPath.executionTimeMs + costEffStepWeight.weight;
+
+        const percentage = costEffStepWeight.weight / criticalPathExecTimeWithSrc;
+        if (percentage > 1) {
+            throw new Error(`Current step percentage is ${percentage}`)
+        }
         return remainingTimeMs * percentage;
     }
 

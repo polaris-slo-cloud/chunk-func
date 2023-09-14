@@ -1,19 +1,19 @@
 Simulating scenario scenario-01-input-95-Mib with SLO 13000 ms.
 {
-  "executionTimeMs": 12682,
-  "totalCost": 0.000251,
+  "executionTimeMs": 11380,
+  "totalCost": 0.000266,
   "data": {
     "sizeBytes": 21512192
   },
   "stepLogs": {
     "validate-log": {
       "resourceProfile": {
-        "memoryMiB": 512,
-        "milliCpu": 333,
-        "price100Ms": 0.000001295
+        "memoryMiB": 1024,
+        "milliCpu": 583,
+        "price100Ms": 0.00000231
       },
-      "executionTimeMs": 4322,
-      "executionCost": 0.000057
+      "executionTimeMs": 3020,
+      "executionCost": 0.000072
     },
     "extract-basic-stats": {
       "resourceProfile": {
