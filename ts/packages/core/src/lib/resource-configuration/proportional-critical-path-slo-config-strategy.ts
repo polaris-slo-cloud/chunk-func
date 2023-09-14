@@ -1,5 +1,14 @@
 import { ResourceProfile, WorkflowStepType, getResultsForInput } from '../model';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, WorkflowPath, WorkflowStepWeight } from '../workflow';
+import {
+    AccumulatedStepInput,
+    ChooseConfigurationStrategyFactory,
+    ResourceConfigurationStrategy,
+    WorkflowFunctionStep,
+    WorkflowGraph,
+    WorkflowState,
+    WorkflowStepWeight,
+} from '../workflow';
+import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 export const createProportionalCriticalPathSloConfigStrategy: ChooseConfigurationStrategyFactory =
@@ -7,6 +16,7 @@ export const createProportionalCriticalPathSloConfigStrategy: ChooseConfiguratio
 
 /**
  * ResourceConfigurationStrategy that divides the SLO into parts according to the distribution of the execution times of the profiled functions.
+ * This strategy falls back to the FastestConfigStrategy if a particular step cannot find a profile that fulfills the SLO.
  *
  * The two big differences to StepConf are:
  *   1. We are input size aware for the current step.
@@ -22,9 +32,12 @@ export class ProportionalCriticalPathSloConfigStrategy extends ResourceConfigura
      */
     private avgStepExecTimes: Record<string, number>;
 
+    private fallbackStrategy: ResourceConfigurationStrategy;
+
     constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
         super(ProportionalCriticalPathSloConfigStrategy.strategyName, graph, availableResProfiles);
         this.avgStepExecTimes = this.computeAvgExecTimes();
+        this.fallbackStrategy = new FastestConfigStrategy(graph, availableResProfiles);
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
@@ -48,7 +61,7 @@ export class ProportionalCriticalPathSloConfigStrategy extends ResourceConfigura
         }
 
         if (!selectedProfileId) {
-            throw new Error(`Could not find a resource profile that matches the SLO chunk of ${stepSloMs}ms for ${step.name}.`);
+            return this.fallbackStrategy.chooseConfiguration(workflowState, step, input);
         }
         const profile = this.availableResourceProfiles[selectedProfileId];
         return profile;
