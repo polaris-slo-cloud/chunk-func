@@ -80,3 +80,6 @@ node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-
 node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-03-1.5s.yaml > ./simulation-logs/scenario-03-1.5s-slam.json
 node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-03-1.0s.yaml > ./simulation-logs/scenario-03-1.0s-slam.json
 node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-03-0.75s.yaml > ./simulation-logs/scenario-03-0.75s-slam.json
+
+# Convert the results to CSV
+node ../../dist/packages/results-converter/main.js ./simulation-logs ./simulation-results.csv
