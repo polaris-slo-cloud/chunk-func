@@ -1,7 +1,7 @@
 Simulating scenario scenario-03-input-2-Mib with SLO 750 ms.
 {
-  "executionTimeMs": 399,
-  "totalCost": 0.000218,
+  "executionTimeMs": 420,
+  "totalCost": 0.000212,
   "data": {
     "sizeBytes": 2070369
   },
@@ -35,12 +35,12 @@ Simulating scenario scenario-03-input-2-Mib with SLO 750 ms.
     },
     "extract-success-stats": {
       "resourceProfile": {
-        "memoryMiB": 8192,
-        "milliCpu": 2000,
-        "price100Ms": 0.00000952
+        "memoryMiB": 2048,
+        "milliCpu": 1000,
+        "price100Ms": 0.00000406
       },
-      "executionTimeMs": 74,
-      "executionCost": 0.00001
+      "executionTimeMs": 95,
+      "executionCost": 0.000004
     }
   }
 }
