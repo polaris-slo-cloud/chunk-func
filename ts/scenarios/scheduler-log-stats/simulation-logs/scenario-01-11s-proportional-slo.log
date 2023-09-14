@@ -1,7 +1,7 @@
 Simulating scenario scenario-01-input-95-Mib with SLO 11000 ms.
 {
-  "executionTimeMs": 9852,
-  "totalCost": 0.011198,
+  "executionTimeMs": 10210,
+  "totalCost": 0.005328,
   "data": {
     "sizeBytes": 21512192
   },
@@ -17,12 +17,12 @@ Simulating scenario scenario-01-input-95-Mib with SLO 11000 ms.
     },
     "extract-basic-stats": {
       "resourceProfile": {
-        "memoryMiB": 16384,
-        "milliCpu": 4000,
-        "price100Ms": 0.0001904
+        "memoryMiB": 4096,
+        "milliCpu": 2000,
+        "price100Ms": 0.00000812
       },
-      "executionTimeMs": 3185,
-      "executionCost": 0.006093
+      "executionTimeMs": 3316,
+      "executionCost": 0.000276
     },
     "extract-successes": {
       "resourceProfile": {
@@ -35,12 +35,12 @@ Simulating scenario scenario-01-input-95-Mib with SLO 11000 ms.
     },
     "extract-success-stats": {
       "resourceProfile": {
-        "memoryMiB": 8192,
-        "milliCpu": 2000,
-        "price100Ms": 0.00000952
+        "memoryMiB": 1024,
+        "milliCpu": 583,
+        "price100Ms": 0.00000231
       },
-      "executionTimeMs": 760,
-      "executionCost": 0.000076
+      "executionTimeMs": 987,
+      "executionCost": 0.000023
     }
   }
 }

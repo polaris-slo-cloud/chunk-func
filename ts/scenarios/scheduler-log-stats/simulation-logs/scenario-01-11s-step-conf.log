@@ -1,28 +1,28 @@
 Simulating scenario scenario-01-input-95-Mib with SLO 11000 ms.
 {
-  "executionTimeMs": 9852,
-  "totalCost": 0.011198,
+  "executionTimeMs": 11224,
+  "totalCost": 0.001957,
   "data": {
     "sizeBytes": 21512192
   },
   "stepLogs": {
     "validate-log": {
       "resourceProfile": {
-        "memoryMiB": 16384,
-        "milliCpu": 4000,
-        "price100Ms": 0.0001904
+        "memoryMiB": 1024,
+        "milliCpu": 583,
+        "price100Ms": 0.00000231
       },
-      "executionTimeMs": 2521,
-      "executionCost": 0.00495
+      "executionTimeMs": 3020,
+      "executionCost": 0.000072
     },
     "extract-basic-stats": {
       "resourceProfile": {
-        "memoryMiB": 16384,
-        "milliCpu": 4000,
-        "price100Ms": 0.0001904
+        "memoryMiB": 1024,
+        "milliCpu": 583,
+        "price100Ms": 0.00000231
       },
-      "executionTimeMs": 3185,
-      "executionCost": 0.006093
+      "executionTimeMs": 3987,
+      "executionCost": 0.000092
     },
     "extract-successes": {
       "resourceProfile": {
@@ -35,12 +35,12 @@ Simulating scenario scenario-01-input-95-Mib with SLO 11000 ms.
     },
     "extract-success-stats": {
       "resourceProfile": {
-        "memoryMiB": 8192,
-        "milliCpu": 2000,
-        "price100Ms": 0.00000952
+        "memoryMiB": 16384,
+        "milliCpu": 4000,
+        "price100Ms": 0.0001904
       },
-      "executionTimeMs": 760,
-      "executionCost": 0.000076
+      "executionTimeMs": 831,
+      "executionCost": 0.001714
     }
   }
 }
