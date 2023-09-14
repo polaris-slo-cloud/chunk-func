@@ -1,5 +1,13 @@
 import { ResourceProfile, WorkflowStepType, getResultsForInput } from '../model';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep } from '../workflow';
+import {
+    AccumulatedStepInput,
+    ChooseConfigurationStrategyFactory,
+    ResourceConfigurationStrategy,
+    WorkflowFunctionStep,
+    WorkflowGraph,
+    WorkflowState,
+} from '../workflow';
+import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 export const createProportionalSloConfigStrategy: ChooseConfigurationStrategyFactory =
@@ -7,6 +15,7 @@ export const createProportionalSloConfigStrategy: ChooseConfigurationStrategyFac
 
 /**
  * ResourceConfigurationStrategy that divides the SLO into parts according to the distribution of the execution times of the profiled functions.
+ * This strategy falls back to the FastestConfigStrategy if a particular step cannot find a profile that fulfills the SLO.
  *
  * IMPORTANT: This currently only works for simple workflows with a single path of execution (i.e., no forks or joins).
  * ToDo: consider using the critical path from the current point, like StepConf, then forks and joins might work as well.
@@ -25,9 +34,12 @@ export class ProportionalSloConfigStrategy extends ResourceConfigurationStrategy
      */
     private stepExecTimeContribs: Record<string, number>;
 
+    private fallbackStrategy: ResourceConfigurationStrategy;
+
     constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
         super(ProportionalSloConfigStrategy.strategyName, graph, availableResProfiles);
         this.stepExecTimeContribs = this.computeExecTimeDistribution();
+        this.fallbackStrategy = new FastestConfigStrategy(graph, availableResProfiles);
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
@@ -49,7 +61,7 @@ export class ProportionalSloConfigStrategy extends ResourceConfigurationStrategy
         }
 
         if (!selectedProfileId) {
-            throw new Error(`Could not find a resource profile that matches the SLO chunk of ${stepSloMs}ms for ${step.name}.`);
+            return this.fallbackStrategy.chooseConfiguration(workflowState, step, input);
         }
         const profile = this.availableResourceProfiles[selectedProfileId];
         return profile;
