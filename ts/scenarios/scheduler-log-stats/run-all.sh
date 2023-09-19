@@ -51,6 +51,16 @@ node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-1.5s.y
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-1.0s.yaml InputHeuristicProportionalCPSloConfigStrategy > ./simulation-logs/scenario-03-1.0s-input-heuristic-proportional-cp-slo.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-0.75s.yaml InputHeuristicProportionalCPSloConfigStrategy > ./simulation-logs/scenario-03-0.75s-input-heuristic-proportional-cp-slo.json
 
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-11s.yaml FixedOutputProportionalCPSloConfigStrategy > ./simulation-logs/scenario-01-11s-fixed-output-proportional-cp-slo.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-12s.yaml FixedOutputProportionalCPSloConfigStrategy > ./simulation-logs/scenario-01-12s-fixed-output-proportional-cp-slo.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-13s.yaml FixedOutputProportionalCPSloConfigStrategy > ./simulation-logs/scenario-01-13s-fixed-output-proportional-cp-slo.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-7.0s.yaml FixedOutputProportionalCPSloConfigStrategy > ./simulation-logs/scenario-02-7.0s-fixed-output-proportional-cp-slo.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-7.5s.yaml FixedOutputProportionalCPSloConfigStrategy > ./simulation-logs/scenario-02-7.5s-fixed-output-proportional-cp-slo.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-8s.yaml FixedOutputProportionalCPSloConfigStrategy > ./simulation-logs/scenario-02-8s-fixed-output-proportional-cp-slo.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-1.5s.yaml FixedOutputProportionalCPSloConfigStrategy > ./simulation-logs/scenario-03-1.5s-fixed-output-proportional-cp-slo.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-1.0s.yaml FixedOutputProportionalCPSloConfigStrategy > ./simulation-logs/scenario-03-1.0s-fixed-output-proportional-cp-slo.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-0.75s.yaml FixedOutputProportionalCPSloConfigStrategy > ./simulation-logs/scenario-03-0.75s-fixed-output-proportional-cp-slo.json
+
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-11s.yaml InputHeuristicSloCompliantConfigStrategy > ./simulation-logs/scenario-01-11s-input-heuristic.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-12s.yaml InputHeuristicSloCompliantConfigStrategy > ./simulation-logs/scenario-01-12s-input-heuristic.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-13s.yaml InputHeuristicSloCompliantConfigStrategy > ./simulation-logs/scenario-01-13s-input-heuristic.json

@@ -1,5 +1,6 @@
 export * from './cheapest-config-strategy';
 export * from './fastest-config-strategy';
+export * from './fixed-output-proportional-cp-slo-config-strategy';
 export * from './fixed-output-slo-compliant-config-strategy';
 export * from './input-heuristic-proportional-cp-slo-config-strategy';
 export * from './input-heuristic-slo-compliant-config-strategy';

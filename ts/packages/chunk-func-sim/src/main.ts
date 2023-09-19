@@ -27,6 +27,8 @@ import {
     SimulatorOutput,
     InputHeuristicProportionalCPSloConfigStrategy,
     createInputHeuristicProportionalCPSloConfigStrategy,
+    FixedOutputProportionalCPSloConfigStrategy,
+    createFixedOutputProportionalCPSloConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -37,6 +39,7 @@ const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactor
     [ProportionalSloConfigStrategy.strategyName]: createProportionalSloConfigStrategy,
     [ProportionalCriticalPathSloConfigStrategy.strategyName]: createProportionalCriticalPathSloConfigStrategy,
     [InputHeuristicProportionalCPSloConfigStrategy.strategyName]: createInputHeuristicProportionalCPSloConfigStrategy,
+    [FixedOutputProportionalCPSloConfigStrategy.strategyName]: createFixedOutputProportionalCPSloConfigStrategy,
     [InputHeuristicSloCompliantConfigStrategy.strategyName]: createInputHeuristicSloCompliantConfigStrategy,
     [FixedOutputSloCompliantConfigStrategy.strategyName]: createFixedOutputSloCompliantConfigStrategy,
     [StepConfConfigStrategy.strategyName]: createStepConfConfigStrategy,
