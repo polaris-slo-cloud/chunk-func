@@ -1,4 +1,4 @@
-import { ResourceProfile, WorkflowStepType } from '../model';
+import { ResourceProfile, WorkflowStepType, getResultsForInput } from '../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -12,7 +12,7 @@ export const createInputHeuristicProportionalCPSloConfigStrategy: ChooseConfigur
     (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new InputHeuristicProportionalCPSloConfigStrategy(graph, availableResProfiles);
 
 /**
- * ProportionalCriticalPathSlo ResourceConfigStrategy that recomputes the average step weights every time using the current step's input size as the maximum expected size,
+ * ProportionalCriticalPathSlo ResourceConfigStrategy that recomputes the average step weights every time using only profiling results for the current step's input size,
  * i.e., we assume that the input size stays the same or decreases and take the average exec time of this size and the smaller ones.
  */
 export class InputHeuristicProportionalCPSloConfigStrategy extends ProportionalCriticalPathSloConfigStrategyBase {
@@ -45,21 +45,14 @@ export class InputHeuristicProportionalCPSloConfigStrategy extends ProportionalC
     }
 
     /**
-     * Computes the average exec time of all profiles with input sizes up to `maxInputSize`.
+     * Computes the average exec time of all profiles for the specified input size.
      */
-    private computeAvgExecTime(step: WorkflowFunctionStep, maxInputSize: number): number {
+    private computeAvgExecTime(step: WorkflowFunctionStep, inputSize: number): number {
         let totalExecTime = 0;
         let measurementsCount = 0;
-        for (const results of step.profilingResults.results) {
-            if (!results.results) {
-                continue;
-            }
-            for (const profileResult of results.results) {
-                if (profileResult.inputSizeBytes <= maxInputSize) {
-                    totalExecTime += profileResult.executionTimeMs;
-                    ++measurementsCount;
-                }
-            }
+        for (const resultForInput of getResultsForInput(step.profilingResults, inputSize)) {
+            totalExecTime += resultForInput.result.executionTimeMs;
+            ++measurementsCount;
         }
 
         return totalExecTime / measurementsCount;

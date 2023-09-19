@@ -4,20 +4,20 @@
   "inputDataSizeMib": 2.353515625,
   "sloMs": 1000,
   "workflowOutput": {
-    "executionTimeMs": 540,
-    "totalCost": 0.000018999999999999998,
+    "executionTimeMs": 435,
+    "totalCost": 0.000026,
     "data": {
       "sizeBytes": 2070369
     },
     "stepLogs": {
       "validate-log": {
         "resourceProfile": {
-          "memoryMiB": 2048,
-          "milliCpu": 1000,
-          "price100Ms": 0.00000406
+          "memoryMiB": 8192,
+          "milliCpu": 2000,
+          "price100Ms": 0.00000952
         },
-        "executionTimeMs": 89,
-        "executionCost": 0.000004
+        "executionTimeMs": 78,
+        "executionCost": 0.00001
       },
       "extract-basic-stats": {
         "resourceProfile": {
@@ -30,12 +30,12 @@
       },
       "extract-successes": {
         "resourceProfile": {
-          "memoryMiB": 1024,
-          "milliCpu": 583,
-          "price100Ms": 0.00000231
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "price100Ms": 0.00000406
         },
-        "executionTimeMs": 257,
-        "executionCost": 0.000007
+        "executionTimeMs": 163,
+        "executionCost": 0.000008
       },
       "extract-success-stats": {
         "resourceProfile": {

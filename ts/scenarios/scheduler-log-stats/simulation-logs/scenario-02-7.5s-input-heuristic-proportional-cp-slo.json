@@ -4,8 +4,8 @@
   "inputDataSizeMib": 54.2734375,
   "sloMs": 7500,
   "workflowOutput": {
-    "executionTimeMs": 6994,
-    "totalCost": 0.000305,
+    "executionTimeMs": 7071,
+    "totalCost": 0.000267,
     "data": {
       "sizeBytes": 21569326
     },
@@ -21,12 +21,12 @@
       },
       "extract-basic-stats": {
         "resourceProfile": {
-          "memoryMiB": 2048,
-          "milliCpu": 1000,
-          "price100Ms": 0.00000406
+          "memoryMiB": 1024,
+          "milliCpu": 583,
+          "price100Ms": 0.00000231
         },
-        "executionTimeMs": 2241,
-        "executionCost": 0.000093
+        "executionTimeMs": 2318,
+        "executionCost": 0.000055
       },
       "extract-successes": {
         "resourceProfile": {
