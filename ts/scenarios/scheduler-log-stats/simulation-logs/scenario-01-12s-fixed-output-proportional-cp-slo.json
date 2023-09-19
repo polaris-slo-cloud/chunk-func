@@ -4,20 +4,20 @@
   "inputDataSizeMib": 95.7958984375,
   "sloMs": 12000,
   "workflowOutput": {
-    "executionTimeMs": 10881,
-    "totalCost": 0.005144,
+    "executionTimeMs": 11111,
+    "totalCost": 0.000308,
     "data": {
       "sizeBytes": 21512192
     },
     "stepLogs": {
       "validate-log": {
         "resourceProfile": {
-          "memoryMiB": 16384,
-          "milliCpu": 4000,
-          "price100Ms": 0.0001904
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "price100Ms": 0.00000406
         },
-        "executionTimeMs": 2521,
-        "executionCost": 0.00495
+        "executionTimeMs": 2751,
+        "executionCost": 0.000114
       },
       "extract-basic-stats": {
         "resourceProfile": {

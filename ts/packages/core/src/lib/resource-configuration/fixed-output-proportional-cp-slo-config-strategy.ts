@@ -76,7 +76,8 @@ export class FixedOutputProportionalCPSloConfigStrategy extends ProportionalCrit
 
     private computeStepInputSize(step: WorkflowFunctionStep, executionDescription: WorkflowExecutionDescription): number {
         if (!step.requiredInputs) {
-            return 0;
+            // If there are no required inputs, this is the first step of the workflow.
+            return executionDescription.inputSizeBytes;
         }
 
         let inputSize = 0;
