@@ -3,6 +3,7 @@ export * from './fastest-config-strategy';
 export * from './fixed-output-slo-compliant-config-strategy';
 export * from './input-heuristic-slo-compliant-config-strategy';
 export * from './preconfigured-config-strategy';
+export * from './proportional-critical-path-slo-config-strategy.base';
 export * from './proportional-critical-path-slo-config-strategy';
 export * from './proportional-slo-config-strategy';
 export * from './resource-configuration-strategy.base';

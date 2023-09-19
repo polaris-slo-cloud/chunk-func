@@ -1,7 +1,6 @@
-import { ResourceProfile, WorkflowStepType, getResultsForInput } from '../model';
+import { ResourceProfile, getResultsForInput } from '../model';
 import {
     AccumulatedStepInput,
-    ChooseConfigurationStrategyFactory,
     ResourceConfigurationStrategy,
     WorkflowFunctionStep,
     WorkflowGraph,
@@ -10,9 +9,6 @@ import {
 } from '../workflow';
 import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
-
-export const createProportionalCriticalPathSloConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new ProportionalCriticalPathSloConfigStrategy(graph, availableResProfiles);
 
 /**
  * ResourceConfigurationStrategy that divides the SLO into parts according to the distribution of the execution times of the profiled functions.
@@ -23,26 +19,28 @@ export const createProportionalCriticalPathSloConfigStrategy: ChooseConfiguratio
  *   2. We use the average execution times for calculating the step execution time contributions and SLO
  *      (StepConf uses the most cost eff resource config for the middle input sizes).
  */
-export class ProportionalCriticalPathSloConfigStrategy extends ResourceConfigurationStrategyBase {
+export abstract class ProportionalCriticalPathSloConfigStrategyBase extends ResourceConfigurationStrategyBase {
 
-    static readonly strategyName = 'ProportionalCriticalPathSloConfigStrategy';
+    protected fallbackStrategy: ResourceConfigurationStrategy;
 
-    /**
-     * A map that maps each function step name to its average execution time.
-     */
-    private avgStepExecTimes: Record<string, number>;
-
-    private fallbackStrategy: ResourceConfigurationStrategy;
-
-    constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
-        super(ProportionalCriticalPathSloConfigStrategy.strategyName, graph, availableResProfiles);
-        this.avgStepExecTimes = this.computeAvgExecTimes();
+    constructor(name: string, graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
+        super(name, graph, availableResProfiles);
         this.fallbackStrategy = new FastestConfigStrategy(graph, availableResProfiles);
     }
 
+    /**
+     * Computes the average execution times for all steps starting from `currStep` until the end of the workflow.
+     *
+     * The values may be precomputed for all steps, if they do not change as more information is available about the execution of the workflow.
+     *
+     * @returns A map that maps each function step name to its average execution time.
+     */
+    protected abstract computeAvgExecTimesUntilEnd(workflowState: WorkflowState, currStep: WorkflowFunctionStep, currStepInput: AccumulatedStepInput): Record<string, number>;
+
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
         const remainingTime = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
-        const stepSloMs = this.computeStepSlo(step, remainingTime);
+        const avgExecTimes = this.computeAvgExecTimesUntilEnd(workflowState, step, input);
+        const stepSloMs = this.computeStepSlo(step, remainingTime, avgExecTimes);
 
         let selectedProfileCost = Number.POSITIVE_INFINITY;
         let selectedProfileExecTime = Number.POSITIVE_INFINITY;
@@ -70,9 +68,9 @@ export class ProportionalCriticalPathSloConfigStrategy extends ResourceConfigura
     /**
      * Computes the SLO for the current step, given the critical path starting from it and based on the remaining time, not the original workflow SLO.
      */
-    private computeStepSlo(step: WorkflowFunctionStep, remainingTimeMs: number): number {
-        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getAvgStepWeight(currStep));
-        const avgStepWeight = this.getAvgStepWeight(step);
+    private computeStepSlo(step: WorkflowFunctionStep, remainingTimeMs: number, avgStepExecTimes: Record<string, number>): number {
+        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getAvgStepWeight(avgStepExecTimes, currStep));
+        const avgStepWeight = this.getAvgStepWeight(avgStepExecTimes, step);
         const criticalPathExecTimeWithSrc = criticalPath.executionTimeMs + avgStepWeight.weight;
 
         const percentage = avgStepWeight.weight / criticalPathExecTimeWithSrc;
@@ -82,8 +80,8 @@ export class ProportionalCriticalPathSloConfigStrategy extends ResourceConfigura
         return remainingTimeMs * percentage;
     }
 
-    private getAvgStepWeight(step: WorkflowFunctionStep): WorkflowStepWeight {
-        const avgExecTime = this.avgStepExecTimes[step.name];
+    private getAvgStepWeight(avgStepExecTimes: Record<string, number>, step: WorkflowFunctionStep): WorkflowStepWeight {
+        const avgExecTime = avgStepExecTimes[step.name];
         return {
             // Ugly hack, but we have no profiling result, since this is the average of all profiling results.
             profilingResult: {
@@ -95,39 +93,6 @@ export class ProportionalCriticalPathSloConfigStrategy extends ResourceConfigura
             resourceProfileId: '',
             weight: avgExecTime,
         };
-    }
-
-    /**
-     * @returns A map that maps each function step name to its average execution time.
-     */
-    private computeAvgExecTimes(): Record<string, number> {
-        const avgExecTimes: Record<string, number> = {};
-
-        for (const stepName in this.workflowGraph.steps) {
-            const step = this.workflowGraph.steps[stepName];
-            if (step.type === WorkflowStepType.Function) {
-                const stepExecTime = this.computeAvgExecTime(step as WorkflowFunctionStep);
-                avgExecTimes[stepName] = stepExecTime;
-            }
-        }
-
-        return avgExecTimes;
-    }
-
-    private computeAvgExecTime(step: WorkflowFunctionStep): number {
-        let totalExecTime = 0;
-        let measurementsCount = 0;
-        for (const results of step.profilingResults.results) {
-            if (!results.results) {
-                continue;
-            }
-            for (const profileResult of results.results) {
-                totalExecTime += profileResult.executionTimeMs;
-                ++measurementsCount;
-            }
-        }
-
-        return totalExecTime / measurementsCount;
     }
 
 }
