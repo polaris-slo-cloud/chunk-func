@@ -11,13 +11,8 @@ import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 /**
- * ResourceConfigurationStrategy that divides the SLO into parts according to the distribution of the execution times of the profiled functions.
+ * Base class for a ResourceConfigurationStrategy that divides the SLO into parts according to the distribution of the execution times of the profiled functions.
  * This strategy falls back to the FastestConfigStrategy if a particular step cannot find a profile that fulfills the SLO.
- *
- * The two big differences to StepConf are:
- *   1. We are input size aware for the current step.
- *   2. We use the average execution times for calculating the step execution time contributions and SLO
- *      (StepConf uses the most cost eff resource config for the middle input sizes).
  */
 export abstract class ProportionalCriticalPathSloConfigStrategyBase extends ResourceConfigurationStrategyBase {
 
