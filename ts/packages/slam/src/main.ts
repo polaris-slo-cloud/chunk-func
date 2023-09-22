@@ -5,9 +5,10 @@ import {
     WorkflowBuilder,
     WorkflowDescription,
     WorkflowExecutionDescription,
+    WorkflowOutput,
     buildWorkflowInput,
 } from '@chunk-func/core';
-import { ConfigFinder } from './slam/config-finder';
+import { ConfigFinder, SlamOutput } from './slam/config-finder';
 import { SlamSimulatorOutput } from './slam/slam-simulator-output';
 
 
@@ -27,21 +28,29 @@ const evalExecDesc = Yaml.load(evalScenarioStr) as WorkflowExecutionDescription;
 
 const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
+const evalSlo = evalExecDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs;
 
-// console.log('Finding configs using SLAM scenario', slamExecDesc.scenarioName);
 const slamInput = buildWorkflowInput(slamExecDesc);
 const configFinder = new ConfigFinder(workflow);
-const slamResult = configFinder.optimizeForSloAndCost(slamExecDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs, slamInput);
-// console.log('SLAM output:', JSON.stringify(slamResult, null, 2));
-// console.log('');
 
-const evalSlo = evalExecDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs;
-// console.log(`Simulating scenario ${evalExecDesc.scenarioName} with SLO ${evalSlo} ms.`);
-const evalInput = buildWorkflowInput(evalExecDesc);
-const configStrat = new PreconfiguredConfigStrategy(workflow.graph, workflow.availableResourceProfiles, slamResult.stepConfigs);
-const output = workflow.execute(evalInput, configStrat);
-// console.log(JSON.stringify(output, null, 2));
-// console.log('SLO fulfilled:', output.executionTimeMs <= evalSlo);
+let slamResult: SlamOutput;
+let output: WorkflowOutput<unknown>;
+let error: Error;
+
+try {
+    // To realistically compare to the other approaches we need to use the eval SLO with the SLAM profiling data.
+    slamResult = configFinder.optimizeForSloAndCost(evalSlo, slamInput);
+
+    const evalInput = buildWorkflowInput(evalExecDesc);
+    const configStrat = new PreconfiguredConfigStrategy(workflow.graph, workflow.availableResourceProfiles, slamResult.stepConfigs);
+    output = workflow.execute(evalInput, configStrat);
+} catch (err) {
+    output = {
+        executionTimeMs: -1,
+        totalCost: -1,
+    } as any;
+    error = err;
+}
 
 const simOutput: SlamSimulatorOutput = {
     slamScenario: slamExecDesc.scenarioName,
@@ -51,7 +60,10 @@ const simOutput: SlamSimulatorOutput = {
     inputDataSizeMib: evalExecDesc.inputSizeBytes / 1024 / 1024,
     sloMs: evalSlo,
     workflowOutput: output,
-    sloFulfilled: output.executionTimeMs <= evalSlo,
+    sloFulfilled: output.executionTimeMs > 0 && output.executionTimeMs <= evalSlo,
+};
+if (error) {
+    simOutput.error = error;
 }
 
 console.log(JSON.stringify(simOutput, null, 2));
