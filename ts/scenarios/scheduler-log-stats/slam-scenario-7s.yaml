@@ -1,0 +1,13 @@
+# This is a WorkflowExecutionDescription that uses the median input sizes for the SLAM algorithm.
+scenarioName: slam-scenario
+inputSizeBytes: 56909824 # 54.2 MiB
+maxResponseTimeMsOverride: 7000
+stepExecutions:
+  validate-log:
+    outputSizeBytes: 56909824
+  extract-basic-stats:
+    outputSizeBytes: 56909824
+  extract-successes:
+    outputSizeBytes: 21512192
+  extract-success-stats:
+    outputSizeBytes: 21512192

@@ -2,8 +2,8 @@
   "slamScenario": "slam-scenario",
   "slamResult": {
     "workflowOutput": {
-      "executionTimeMs": 6821,
-      "totalCost": 0.000235,
+      "executionTimeMs": 7916,
+      "totalCost": 0.000239,
       "data": {
         "sizeBytes": 21512192
       },
@@ -37,12 +37,12 @@
         },
         "extract-success-stats": {
           "resourceProfile": {
-            "memoryMiB": 1024,
-            "milliCpu": 583,
-            "price100Ms": 0.00000231
+            "memoryMiB": 512,
+            "milliCpu": 333,
+            "price100Ms": 0.000001295
           },
-          "executionTimeMs": 987,
-          "executionCost": 0.000023
+          "executionTimeMs": 2082,
+          "executionCost": 0.000027
         }
       }
     },
@@ -63,9 +63,9 @@
         "price100Ms": 0.00000406
       },
       "extract-success-stats": {
-        "memoryMiB": 1024,
-        "milliCpu": 583,
-        "price100Ms": 0.00000231
+        "memoryMiB": 512,
+        "milliCpu": 333,
+        "price100Ms": 0.000001295
       }
     }
   },
@@ -74,8 +74,8 @@
   "inputDataSizeMib": 95.7958984375,
   "sloMs": 13000,
   "workflowOutput": {
-    "executionTimeMs": 11712,
-    "totalCost": 0.000411,
+    "executionTimeMs": 12807,
+    "totalCost": 0.000415,
     "data": {
       "sizeBytes": 21512192
     },
@@ -109,12 +109,12 @@
       },
       "extract-success-stats": {
         "resourceProfile": {
-          "memoryMiB": 1024,
-          "milliCpu": 583,
-          "price100Ms": 0.00000231
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
         },
-        "executionTimeMs": 987,
-        "executionCost": 0.000023
+        "executionTimeMs": 2082,
+        "executionCost": 0.000027
       }
     }
   },
