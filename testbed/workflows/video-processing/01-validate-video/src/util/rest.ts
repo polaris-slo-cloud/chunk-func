@@ -12,6 +12,18 @@ export function reportInvalidS3ObjRef(): StructuredReturn {
     };
 }
 
+export function reportInvalidVideoCutRequest(): StructuredReturn {
+    return {
+        statusCode: 400,
+        body: {
+            message: 'Incoming body is not a valid VideoCutRequest.',
+        },
+        headers: {
+            'content-type': 'application/json',
+        },
+    };
+}
+
 export function createErrorResponse(err: Error): StructuredReturn {
     return {
         statusCode: 500,

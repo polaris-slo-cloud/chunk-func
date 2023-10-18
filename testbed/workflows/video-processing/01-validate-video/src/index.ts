@@ -1,44 +1,75 @@
-import { Context, StructuredReturn } from 'faas-js-runtime';
+import { Context, HTTPFunction, HealthCheck, IncomingBody, StructuredReturn } from 'faas-js-runtime';
+import ffmpegPath from 'ffmpeg-static';
+import { exec } from 'node:child_process';
+import { createS3ObjectStoreClient } from './object-store/impl/factories';
+import { createErrorResponse, reportInvalidVideoCutRequest } from './util';
+import { VideoCutRequest, isValidVideoCutRequest } from './video';
 
-/**
- * Your HTTP handling function, invoked with each request. This is an example
- * function that logs the incoming request and echoes its input to the caller.
- *
- * It can be invoked with `func invoke`
- * It can be tested with `npm test`
- *
- * It can be invoked with `func invoke`
- * It can be tested with `npm test`
- *
- * @param {Context} context a context object.
- * @param {object} context.body the request body if any
- * @param {object} context.query the query string deserialized as an object, if any
- * @param {object} context.log logging object with methods for 'info', 'warn', 'error', etc.
- * @param {object} context.headers the HTTP request headers
- * @param {string} context.method the HTTP request method
- * @param {string} context.httpVersion the HTTP protocol version
- * See: https://github.com/knative/func/blob/main/docs/guides/nodejs.md#the-context-object
- */
-const handle = async (context: Context, body: string): Promise<StructuredReturn> => {
-  // YOUR CODE HERE
-  context.log.info(`
------------------------------------------------------------
-Headers:
-${JSON.stringify(context.headers)}
+interface FFmpegLog {
+    statusCode: number;
+    log: string;
+}
 
-Query:
-${JSON.stringify(context.query)}
-
-Body:
-${JSON.stringify(body)}
------------------------------------------------------------
-`);
-  return {
-    body: body,
-    headers: {
-      'content-type': 'application/json'
-    }
-  };
+const liveness: HealthCheck = () => {
+    return {
+        status: 200,
+        statusMessage: 'OK',
+    };
 };
 
-export { handle };
+const readiness: HealthCheck = () => {
+    return {
+        status: 200,
+        statusMessage: 'OK',
+    };
+};
+
+const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Promise<StructuredReturn> => {
+    const start = new Date();
+    if (!isValidVideoCutRequest(body)) {
+        return reportInvalidVideoCutRequest();
+    }
+
+    let log: FFmpegLog;
+    try {
+        log = await processVideoFile(body);
+    } catch (err) {
+        console.error(err);
+        return createErrorResponse(err as Error);
+    }
+
+    const end = new Date();
+    const durationMs = end.valueOf() - start.valueOf();
+    console.log('Request completed in (ms):', durationMs);
+
+    return {
+        statusCode: 200,
+        body: {
+            ffmpegLog: log,
+            durationMs: durationMs,
+        },
+        headers: {
+            'content-type': 'application/json',
+        },
+    };
+};
+
+async function processVideoFile(req: VideoCutRequest): Promise<FFmpegLog> {
+    const s3Client = createS3ObjectStoreClient(req.input);
+    const readUrl = await s3Client.createPresignedReadUrl(req.input);
+    return extractVideoStats(req, readUrl);
+}
+
+function extractVideoStats(req: VideoCutRequest, readUrl: string): Promise<FFmpegLog> {
+    return new Promise((resolve, reject) => {
+        const proc = exec(`"${ffmpegPath}" -i "${readUrl}" /dev/null`, (error, stdout, stderr) => {
+            // we only want to get file information here. ffmpeg will always exit with an error in this setup.
+            resolve({
+                statusCode: 0,
+                log: stderr,
+            });
+        });
+    });
+}
+
+export { handle, liveness, readiness };
