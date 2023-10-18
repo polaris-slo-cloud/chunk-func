@@ -1,0 +1,13 @@
+# This is a WorkflowExecutionDescription
+scenarioName: scenario-02-input-54-Mib
+inputSizeBytes: 56909824 # 54.2 MiB
+maxResponseTimeMsOverride: 7500
+stepExecutions:
+  validate-log:
+    outputSizeBytes: 56909824
+  extract-basic-stats:
+    outputSizeBytes: 56909824
+  extract-successes:
+    outputSizeBytes: 21569326
+  extract-success-stats:
+    outputSizeBytes: 21569326

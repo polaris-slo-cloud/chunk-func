@@ -1,0 +1,16 @@
+specVersion: 0.35.0
+name: validate-log
+runtime: typescript
+registry: polarissloc
+image: polarissloc/chunk-func-validate-log:latest
+imageDigest: sha256:06ab574577a92f5d3b45600925c9583756201be801b236c923cda86b47a357e8
+created: 2023-08-16T13:51:12.634285619+02:00
+build:
+  builder: pack
+  buildEnvs:
+  - name: BP_NODE_RUN_SCRIPTS
+    value: build
+  - name: BP_NODE_VERSION
+    value: 18.16.0
+deploy:
+  namespace: func-test

@@ -1,0 +1,52 @@
+{
+  "scenarioName": "scenario-02-input-54-Mib",
+  "resourceConfigStrategy": "FixedOutputProportionalCPSloConfigStrategy",
+  "inputDataSizeMib": 54.2734375,
+  "sloMs": 7000,
+  "workflowOutput": {
+    "executionTimeMs": 6726,
+    "totalCost": 0.000331,
+    "data": {
+      "sizeBytes": 21569326
+    },
+    "stepLogs": {
+      "validate-log": {
+        "resourceProfile": {
+          "memoryMiB": 4096,
+          "milliCpu": 2000,
+          "price100Ms": 0.00000812
+        },
+        "executionTimeMs": 1652,
+        "executionCost": 0.000138
+      },
+      "extract-basic-stats": {
+        "resourceProfile": {
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "price100Ms": 0.00000406
+        },
+        "executionTimeMs": 2241,
+        "executionCost": 0.000093
+      },
+      "extract-successes": {
+        "resourceProfile": {
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "price100Ms": 0.00000406
+        },
+        "executionTimeMs": 1846,
+        "executionCost": 0.000077
+      },
+      "extract-success-stats": {
+        "resourceProfile": {
+          "memoryMiB": 1024,
+          "milliCpu": 583,
+          "price100Ms": 0.00000231
+        },
+        "executionTimeMs": 987,
+        "executionCost": 0.000023
+      }
+    }
+  },
+  "sloFulfilled": true
+}
