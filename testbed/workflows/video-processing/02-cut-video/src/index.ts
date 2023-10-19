@@ -2,8 +2,13 @@ import { Context, HTTPFunction, HealthCheck, IncomingBody, StructuredReturn } fr
 import ffmpegPath from 'ffmpeg-static';
 import { exec } from 'node:child_process';
 import { createS3ObjectStoreClient } from './object-store/impl/factories';
-import { createErrorResponse, reportInvalidVideoCutRequest } from './util';
-import { VideoCutRequest, isValidVideoCutRequest } from './video';
+import { createErrorResponse, reportInvalidVideoRequest } from './util';
+import { VideoCutRequest, VideoProcessingResponse, isValidVideoCutRequest } from './video';
+import { ObjectStoreReference } from './object-store';
+import { randomUUID } from 'node:crypto';
+
+const FFMPEG_VIDEO_PRESET = '-vf scale=640:-1 -c:v libx264 -preset veryfast -crf 35';
+const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 128k';
 
 interface FFmpegLog {
     statusCode: number;
@@ -27,12 +32,12 @@ const readiness: HealthCheck = () => {
 const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Promise<StructuredReturn> => {
     const start = new Date();
     if (!isValidVideoCutRequest(body)) {
-        return reportInvalidVideoCutRequest();
+        return reportInvalidVideoRequest('VideoCutRequest');
     }
 
-    let log: FFmpegLog;
+    let result: VideoProcessingResponse;
     try {
-        log = await processVideoFile(body);
+        result = await processVideoFile(body);
     } catch (err) {
         console.error(err);
         return createErrorResponse(err as Error);
@@ -45,7 +50,7 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
     return {
         statusCode: 200,
         body: {
-            ffmpegLog: log,
+            result,
             durationMs: durationMs,
         },
         headers: {
@@ -54,22 +59,40 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
     };
 };
 
-async function processVideoFile(req: VideoCutRequest): Promise<FFmpegLog> {
+async function processVideoFile(req: VideoCutRequest): Promise<VideoProcessingResponse> {
     const s3Client = createS3ObjectStoreClient(req.input);
     const readUrl = await s3Client.createPresignedReadUrl(req.input);
-    return extractVideoStats(req, readUrl);
+    const targetObjRef = createTargetObjRef(req.input);
+    const writeUrl = await s3Client.createPresignedWriteUrl(targetObjRef);
+    return cutVideo(req, readUrl, writeUrl, targetObjRef);
 }
 
-function extractVideoStats(req: VideoCutRequest, readUrl: string): Promise<FFmpegLog> {
+function cutVideo(req: VideoCutRequest, readUrl: string, writeUrl: string, targetObjRef: ObjectStoreReference): Promise<VideoProcessingResponse> {
+    const ffmpegArgs = `-i "${readUrl}" -ss ${req.segment.start} -to ${req.segment.end} ${FFMPEG_VIDEO_PRESET} ${FFMPEG_AUDIO_PRESET} -f mp4 "${writeUrl}"`;
     return new Promise((resolve, reject) => {
-        const proc = exec(`"${ffmpegPath}" -i "${readUrl}" /dev/null`, (error, stdout, stderr) => {
-            // we only want to get file information here. ffmpeg will always exit with an error in this setup.
+        const proc = exec(`"${ffmpegPath}" ${ffmpegArgs}`, (error, stdout, stderr) => {
+            if (error) {
+                reject(error);
+            }
+
             resolve({
-                statusCode: 0,
-                log: stderr,
+                ffmpegLog: {
+                    statusCode: 0,
+                    log: stdout,
+                },
+                output: targetObjRef,
             });
         });
     });
+}
+
+function createTargetObjRef(baseObjRef: ObjectStoreReference): ObjectStoreReference {
+    const targetFileName = randomUUID();
+    const targetObjRef: ObjectStoreReference = {
+        ...baseObjRef,
+        objectKey: `${targetFileName}.mp4`,
+    };
+    return targetObjRef;
 }
 
 export { handle, liveness, readiness };
