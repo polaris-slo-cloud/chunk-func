@@ -195,7 +195,7 @@ func (pr *exhaustiveFunctionProfilerSession) profileWithInput(
 		results[i] = result
 	}
 
-	return AggregateProfilingResults(results), nil
+	return AggregateProfilingResults(results)
 }
 
 // Executes a single profiled function invocation.

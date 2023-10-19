@@ -1,14 +1,16 @@
 package profiler
 
 import (
+	"fmt"
+
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
 )
 
 // Aggregates individual (successful) profiling results for a single resource profile and single input size into one result.
-// If there are no successful results, the return value is nil.
-func AggregateProfilingResults(results []*function.ProfilingResult) *function.ProfilingResult {
+// If there are no successful results, an error is returned.
+func AggregateProfilingResults(results []*function.ProfilingResult) (*function.ProfilingResult, error) {
 	if len(results) == 0 {
-		return nil
+		return nil, fmt.Errorf("AggregateProfilingResults failed, because results are empty")
 	}
 
 	successfulResults := 0
@@ -23,7 +25,7 @@ func AggregateProfilingResults(results []*function.ProfilingResult) *function.Pr
 	}
 
 	if successfulResults == 0 {
-		return nil
+		return nil, fmt.Errorf("AggregateProfilingResults failed, because there are no successful results")
 	}
 
 	ret := &function.ProfilingResult{
@@ -31,7 +33,7 @@ func AggregateProfilingResults(results []*function.ProfilingResult) *function.Pr
 		InputSizeBytes:  results[0].InputSizeBytes,
 		ExecutionTimeMs: totalTimeMs / int64(successfulResults),
 	}
-	return ret
+	return ret, nil
 }
 
 // Creates a buffered channel filled with the candidate profiles for distributing them to worker goroutines.
