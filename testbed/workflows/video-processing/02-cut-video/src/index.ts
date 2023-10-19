@@ -59,7 +59,7 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
 async function processVideoFile(req: VideoCutRequest): Promise<VideoProcessingResponse> {
     const s3Client = createS3ObjectStoreClient(req.input);
     const srcUrl = await s3Client.createPresignedReadUrl(req.input);
-    const tempFilePath = getTempFilePath();
+    const tempFilePath = getTempFilePath('mp4');
 
     try {
         const ffmpegLog = await cutVideo(req, srcUrl, tempFilePath);
@@ -103,10 +103,10 @@ function createTargetObjRef(baseObjRef: ObjectStoreReference): ObjectStoreRefere
     return targetObjRef;
 }
 
-function getTempFilePath(): string {
+function getTempFilePath(extension: string): string {
     let tmpFile: string;
     do {
-        tmpFile = `/tmp/${randomUUID()}.mp4`;
+        tmpFile = `/tmp/${randomUUID()}.${extension}`;
     } while (fs.existsSync(tmpFile));
     return tmpFile;
 }

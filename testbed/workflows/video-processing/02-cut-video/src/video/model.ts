@@ -71,7 +71,7 @@ export function isValidVideoEditRequest(obj: any): obj is VideoEditRequest {
     let isValid = isValidObjectStoreReference(req.input);
     isValid = isValid && typeof req.quality === 'number';
     isValid = isValid && req.quality! >= 0 && req.quality! <= 63;
-    isValid = isValid && Array.isArray(req.segments);
+    isValid = isValid && Array.isArray(req.segments) && req.segments.length > 0;
     if (isValid) {
         for (const segment of req.segments!) {
             isValid = isValid && isValidVideoSegment(segment);
@@ -99,10 +99,14 @@ export function isValidVideoMergeRequest(obj: any): obj is VideoMergeRequest {
     }
 
     const req = obj as Partial<VideoMergeRequest>;
-    let isValid = Array.isArray(req.input);
+    let isValid = Array.isArray(req.input) && req.input.length > 0;
+    const firstSegment = req.input![0];
     if (isValid) {
         for (const segment of req.input!) {
-            isValid = isValid && isValidVideoSegment(segment);
+            isValid = isValid && isValidObjectStoreReference(segment);
+            isValid = isValid && segment.url === firstSegment.url;
+            isValid = isValid && segment.user === firstSegment.user;
+            isValid = isValid && segment.password === firstSegment.password;
         }
     }
     return isValid;
