@@ -1,12 +1,14 @@
 import { Context, HTTPFunction, HealthCheck, IncomingBody, StructuredReturn } from 'faas-js-runtime';
 import ffmpegPath from 'ffmpeg-static';
 import { exec } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
+import * as fs from 'node:fs';
+import { ObjectStoreReference } from './object-store';
 import { createS3ObjectStoreClient } from './object-store/impl/factories';
 import { createErrorResponse, reportInvalidVideoRequest } from './util';
-import { VideoCutRequest, VideoProcessingResponse, isValidVideoCutRequest } from './video';
-import { ObjectStoreReference } from './object-store';
-import { randomUUID } from 'node:crypto';
+import { FFmpegLog, VideoCutRequest, VideoProcessingResponse, isValidVideoCutRequest } from './video';
 
+const OUTPUT_BUCKET = 'output';
 const FFMPEG_VIDEO_PRESET = '-vf scale=640:-1 -c:v libx264 -preset veryfast -crf 35';
 const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 128k';
 
@@ -57,25 +59,34 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
 async function processVideoFile(req: VideoCutRequest): Promise<VideoProcessingResponse> {
     const s3Client = createS3ObjectStoreClient(req.input);
     const readUrl = await s3Client.createPresignedReadUrl(req.input);
-    const targetObjRef = createTargetObjRef(req.input);
-    const writeUrl = await s3Client.createPresignedWriteUrl(targetObjRef);
-    return cutVideo(req, readUrl, writeUrl, targetObjRef);
+    const tempFilePath = getTempFilePath();
+
+    try {
+        const ffmpegLog = await cutVideo(req, readUrl, tempFilePath);
+        let targetObjRef = createTargetObjRef(req.input);
+        targetObjRef = await s3Client.uploadFile(tempFilePath, targetObjRef);
+
+        return {
+            ffmpegLog,
+            output: targetObjRef,
+        };
+    } finally {
+        fs.rmSync(tempFilePath, { force: true });
+    }
 }
 
-function cutVideo(req: VideoCutRequest, readUrl: string, writeUrl: string, targetObjRef: ObjectStoreReference): Promise<VideoProcessingResponse> {
-    const ffmpegArgs = `-i "${readUrl}" -ss ${req.segment.start} -to ${req.segment.end} ${FFMPEG_VIDEO_PRESET} ${FFMPEG_AUDIO_PRESET} -f mpegts "${writeUrl}"`;
+function cutVideo(req: VideoCutRequest, readUrl: string, targetFile: string): Promise<FFmpegLog> {
+    const ffmpegArgs = `-i "${readUrl}" -ss ${req.segment.start} -to ${req.segment.end} ${FFMPEG_VIDEO_PRESET} ${FFMPEG_AUDIO_PRESET} -f mp4 "${targetFile}"`;
     return new Promise((resolve, reject) => {
-        const proc = exec(`"${ffmpegPath}" ${ffmpegArgs}`, (error, stdout, stderr) => {
+        exec(`"${ffmpegPath}" ${ffmpegArgs}`, (error, stdout, stderr) => {
             if (error) {
                 reject(error);
             }
 
+            console.log('Encoding finished');
             resolve({
-                ffmpegLog: {
-                    statusCode: 0,
-                    log: stdout,
-                },
-                output: targetObjRef,
+                statusCode: 0,
+                log: stderr,
             });
         });
     });
@@ -85,9 +96,19 @@ function createTargetObjRef(baseObjRef: ObjectStoreReference): ObjectStoreRefere
     const targetFileName = randomUUID();
     const targetObjRef: ObjectStoreReference = {
         ...baseObjRef,
-        objectKey: `${targetFileName}.ts`,
+        bucket: OUTPUT_BUCKET,
+        objectKey: `${targetFileName}.mp4`,
+        objectSizeBytes: 0,
     };
     return targetObjRef;
+}
+
+function getTempFilePath(): string {
+    let tmpFile: string;
+    do {
+        tmpFile = `/tmp/${randomUUID()}.mp4`;
+    } while (fs.existsSync(tmpFile));
+    return tmpFile;
 }
 
 export { handle, liveness, readiness };
