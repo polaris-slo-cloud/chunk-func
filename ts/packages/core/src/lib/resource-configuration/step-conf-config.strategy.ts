@@ -133,11 +133,11 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
  */
 function* getResultsForMiddleInput(profilingSessionResults: ProfilingSessionResults): Generator<ProfilingResultWithProfileId> {
     for (const profileResult of profilingSessionResults.results) {
-        if (!profileResult.results) {
+        if (!profileResult.results || profileResult.results.length === 0) {
             throw new Error(`ResourceProfileResults for ${profileResult.resourceProfileId} does not contain any results.`);
         }
 
-        const middleIndex = Math.floor(profileResult.results.length / 2);
+        const middleIndex = Math.floor((profileResult.results.length - 1) / 2);
         const middleInputResult = profileResult.results[middleIndex];
 
         if (isSuccessStatusCode(middleInputResult.statusCode)) {
