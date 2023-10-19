@@ -1,4 +1,4 @@
-import { ProfilingResultWithProfileId, ProfilingSessionResults, ResourceProfile, WorkflowStepType } from '../model';
+import { ProfilingResultWithProfileId, ProfilingSessionResults, ResourceProfile, WorkflowStepType, isSuccessStatusCode } from '../model';
 import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, WorkflowStepWeight, WorkflowPath } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
@@ -91,7 +91,7 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
         }
 
         if (!selectedProfileId) {
-            throw new Error('ProfilingResults did not contain any results.');
+            throw new Error('ProfilingResults did not contain any results or no successful results.');
         }
         return selectedProfileId;
     }
@@ -140,9 +140,11 @@ function* getResultsForMiddleInput(profilingSessionResults: ProfilingSessionResu
         const middleIndex = Math.floor(profileResult.results.length / 2);
         const middleInputResult = profileResult.results[middleIndex];
 
-        yield {
-            resourceProfileId: profileResult.resourceProfileId,
-            result: middleInputResult,
+        if (isSuccessStatusCode(middleInputResult.statusCode)) {
+            yield {
+                resourceProfileId: profileResult.resourceProfileId,
+                result: middleInputResult,
+            }
         }
     }
 }

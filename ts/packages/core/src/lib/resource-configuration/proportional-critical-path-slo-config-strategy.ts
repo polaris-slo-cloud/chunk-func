@@ -1,4 +1,4 @@
-import { ResourceProfile, WorkflowStepType } from '../model';
+import { ResourceProfile, WorkflowStepType, isSuccessStatusCode } from '../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -73,9 +73,15 @@ export class ProportionalCriticalPathSloConfigStrategy extends ProportionalCriti
                 continue;
             }
             for (const profileResult of results.results) {
-                totalExecTime += profileResult.executionTimeMs;
-                ++measurementsCount;
+                if (isSuccessStatusCode(profileResult.statusCode)) {
+                    totalExecTime += profileResult.executionTimeMs;
+                    ++measurementsCount;
+                }
             }
+        }
+
+        if (measurementsCount === 0) {
+            throw new Error(`No successful profiling runs for step ${step.name}`);
         }
 
         return totalExecTime / measurementsCount;

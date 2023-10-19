@@ -70,6 +70,9 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
         }
 
         const result = findResultForInput(input.totalDataSizeBytes, profileResults.results);
+        if (!result) {
+            throw new Error(`ResourceProfile ${getResourceProfileId(resourceProfile)}MiB does not contain a successful profiling result for input ${input.totalDataSizeBytes}.`);
+        }
         output.executionTimeMs = result.executionTimeMs;
         output.cost = result.executionCost;
         return output;

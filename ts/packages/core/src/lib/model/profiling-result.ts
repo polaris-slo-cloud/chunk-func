@@ -118,11 +118,15 @@ export function findResourceProfileResults(profile: ResourceProfile, profilingSe
 
 /**
  * Finds the ProfilingResult for the specified inputSize, assuming the the profileResults are ordered by increasing input size.
+ * If no profile with a success status code can be found, `undefined` is returned.
  */
-export function findResultForInput(inputSizeBytes: number, profileResults: ProfilingResult[]): ProfilingResult {
+export function findResultForInput(inputSizeBytes: number, profileResults: ProfilingResult[]): ProfilingResult | undefined {
     let profilingResult = profileResults.find(result => inputSizeBytes <= result.inputSizeBytes && isSuccessStatusCode(result.statusCode));
     if (!profilingResult) {
-        profilingResult = profileResults[profileResults.length - 1];
+        const largestInputResult = profileResults[profileResults.length - 1];
+        if (isSuccessStatusCode(largestInputResult.statusCode)) {
+            profilingResult = largestInputResult;
+        }
     }
     return profilingResult;
 }
@@ -140,9 +144,11 @@ export function* getResultsForInput(profilingSessionResults: ProfilingSessionRes
             throw new Error(`ResourceProfileResults for ${profileResult.resourceProfileId} does not contain any results.`);
         }
         const resultForInput = findResultForInput(inputSizeBytes, profileResult.results);
-        yield {
-            resourceProfileId: profileResult.resourceProfileId,
-            result: resultForInput,
+        if (resultForInput) {
+            yield {
+                resourceProfileId: profileResult.resourceProfileId,
+                result: resultForInput,
+            }
         }
     }
 }
@@ -157,9 +163,11 @@ export function* getAllResults(profilingSessionResults: ProfilingSessionResults)
         }
 
         for (const result of profileResult.results) {
-            yield {
-                resourceProfileId: profileResult.resourceProfileId,
-                result: result,
+            if (isSuccessStatusCode(result.statusCode)) {
+                yield {
+                    resourceProfileId: profileResult.resourceProfileId,
+                    result: result,
+                }
             }
         }
     }

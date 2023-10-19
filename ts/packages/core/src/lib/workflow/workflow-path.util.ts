@@ -17,7 +17,7 @@ export const getLongestExecutionTime: GetStepWeightFn = (step: WorkflowFunctionS
     }
 
     if (!selectedResult) {
-        throw new Error(`Step ${step.name} does not contain any profiling results.`)
+        throw new Error(`Step ${step.name} does not contain any profiling results or no successful profiling results.`)
     }
 
     return {
