@@ -10,11 +10,6 @@ import { randomUUID } from 'node:crypto';
 const FFMPEG_VIDEO_PRESET = '-vf scale=640:-1 -c:v libx264 -preset veryfast -crf 35';
 const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 128k';
 
-interface FFmpegLog {
-    statusCode: number;
-    log: string;
-}
-
 const liveness: HealthCheck = () => {
     return {
         status: 200,
@@ -68,7 +63,7 @@ async function processVideoFile(req: VideoCutRequest): Promise<VideoProcessingRe
 }
 
 function cutVideo(req: VideoCutRequest, readUrl: string, writeUrl: string, targetObjRef: ObjectStoreReference): Promise<VideoProcessingResponse> {
-    const ffmpegArgs = `-i "${readUrl}" -ss ${req.segment.start} -to ${req.segment.end} ${FFMPEG_VIDEO_PRESET} ${FFMPEG_AUDIO_PRESET} -f mp4 "${writeUrl}"`;
+    const ffmpegArgs = `-i "${readUrl}" -ss ${req.segment.start} -to ${req.segment.end} ${FFMPEG_VIDEO_PRESET} ${FFMPEG_AUDIO_PRESET} -f mpegts "${writeUrl}"`;
     return new Promise((resolve, reject) => {
         const proc = exec(`"${ffmpegPath}" ${ffmpegArgs}`, (error, stdout, stderr) => {
             if (error) {
@@ -90,7 +85,7 @@ function createTargetObjRef(baseObjRef: ObjectStoreReference): ObjectStoreRefere
     const targetFileName = randomUUID();
     const targetObjRef: ObjectStoreReference = {
         ...baseObjRef,
-        objectKey: `${targetFileName}.mp4`,
+        objectKey: `${targetFileName}.ts`,
     };
     return targetObjRef;
 }
