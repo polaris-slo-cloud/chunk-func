@@ -9,7 +9,7 @@ import { createErrorResponse, reportInvalidVideoRequest } from './util';
 import { FFmpegLog, VideoCutRequest, VideoProcessingResponse, isValidVideoCutRequest } from './video';
 
 const OUTPUT_BUCKET = 'output';
-const FFMPEG_VIDEO_PRESET = '-vf scale=640:-1 -c:v libx264 -preset veryfast -crf 35';
+const FFMPEG_VIDEO_PRESET = '-vf scale=640:-1 -c:v libx264 -preset veryfast';
 const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 128k';
 
 const liveness: HealthCheck = () => {
@@ -58,11 +58,11 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
 
 async function processVideoFile(req: VideoCutRequest): Promise<VideoProcessingResponse> {
     const s3Client = createS3ObjectStoreClient(req.input);
-    const readUrl = await s3Client.createPresignedReadUrl(req.input);
+    const srcUrl = await s3Client.createPresignedReadUrl(req.input);
     const tempFilePath = getTempFilePath();
 
     try {
-        const ffmpegLog = await cutVideo(req, readUrl, tempFilePath);
+        const ffmpegLog = await cutVideo(req, srcUrl, tempFilePath);
         let targetObjRef = createTargetObjRef(req.input);
         targetObjRef = await s3Client.uploadFile(tempFilePath, targetObjRef);
 
@@ -75,8 +75,8 @@ async function processVideoFile(req: VideoCutRequest): Promise<VideoProcessingRe
     }
 }
 
-function cutVideo(req: VideoCutRequest, readUrl: string, targetFile: string): Promise<FFmpegLog> {
-    const ffmpegArgs = `-i "${readUrl}" -ss ${req.segment.start} -to ${req.segment.end} ${FFMPEG_VIDEO_PRESET} ${FFMPEG_AUDIO_PRESET} -f mp4 "${targetFile}"`;
+function cutVideo(req: VideoCutRequest, srcUrl: string, targetFile: string): Promise<FFmpegLog> {
+    const ffmpegArgs = `-i "${srcUrl}" -ss ${req.segment.start} -to ${req.segment.end} ${FFMPEG_VIDEO_PRESET} -crf ${req.quality} ${FFMPEG_AUDIO_PRESET} -f mp4 "${targetFile}"`;
     return new Promise((resolve, reject) => {
         exec(`"${ffmpegPath}" ${ffmpegArgs}`, (error, stdout, stderr) => {
             if (error) {

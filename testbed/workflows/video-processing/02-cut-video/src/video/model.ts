@@ -21,6 +21,9 @@ export interface VideoSegment {
 export interface VideoEditRequest {
     input: ObjectStoreReference;
     segments: VideoSegment[];
+
+    /** Encoding quality in the range 0-63 */
+    quality: number;
 }
 
 /**
@@ -29,6 +32,9 @@ export interface VideoEditRequest {
 export interface VideoCutRequest {
     input: ObjectStoreReference;
     segment: VideoSegment;
+
+    /** Encoding quality in the range 0-63 */
+    quality: number;
 }
 
 export interface VideoProcessingResponse {
@@ -63,6 +69,8 @@ export function isValidVideoEditRequest(obj: any): obj is VideoEditRequest {
 
     const req = obj as Partial<VideoEditRequest>;
     let isValid = isValidObjectStoreReference(req.input);
+    isValid = isValid && typeof req.quality === 'number';
+    isValid = isValid && req.quality! >= 0 && req.quality! <= 63;
     isValid = isValid && Array.isArray(req.segments);
     if (isValid) {
         for (const segment of req.segments!) {
@@ -80,6 +88,8 @@ export function isValidVideoCutRequest(obj: any): obj is VideoCutRequest {
     const req = obj as Partial<VideoCutRequest>;
     let isValid = isValidObjectStoreReference(req.input);
     isValid = isValid && isValidVideoSegment(req.segment);
+    isValid = isValid && typeof req.quality === 'number';
+    isValid = isValid && req.quality! >= 0 && req.quality! <= 63;
     return isValid;
 }
 
