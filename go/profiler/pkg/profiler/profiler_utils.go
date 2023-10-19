@@ -25,7 +25,8 @@ func AggregateProfilingResults(results []*function.ProfilingResult) (*function.P
 	}
 
 	if successfulResults == 0 {
-		return nil, fmt.Errorf("AggregateProfilingResults failed, because there are no successful results")
+		// If all requests resulted in an error, return one of the error results
+		return results[0], nil
 	}
 
 	ret := &function.ProfilingResult{

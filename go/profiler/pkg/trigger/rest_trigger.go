@@ -63,7 +63,11 @@ func (rt *RestTrigger) TriggerFunction(ctx context.Context, fn *knServing.Servic
 	}
 	if httpResp.Body != nil {
 		defer httpResp.Body.Close()
-		responseBody, err = parseResponseBody[any](httpResp)
+		if function.IsSuccessStatusCode(int32(httpResp.StatusCode)) {
+			responseBody, err = parseResponseBody[any](httpResp)
+		} else {
+			responseBody, err = getErrorResponseBody(httpResp)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -99,8 +103,16 @@ func parseResponseBody[T any](httpResp *http.Response) (*T, error) {
 
 	responseObj := new(T)
 	if err := json.Unmarshal(body, responseObj); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%v StatusCode: %v, Body: %s", err, httpResp.StatusCode, string(body))
 	}
 
 	return responseObj, nil
+}
+
+func getErrorResponseBody(httpResp *http.Response) (string, error) {
+	body, err := io.ReadAll(httpResp.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }
