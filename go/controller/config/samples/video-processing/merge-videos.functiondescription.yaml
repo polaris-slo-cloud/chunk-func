@@ -1,0 +1,71 @@
+# This FunctionDescription example refers to the merge-videos function located in the repository folder
+# testbed/workflows/video-processing/03-merge-videos
+
+apiVersion: chunk-func.polaris-slo-cloud.github.io/v1
+kind: FunctionDescription
+metadata:
+  namespace: func-test
+  name: merge-videos
+  labels:
+    app.kubernetes.io/name: functiondescription
+    app.kubernetes.io/instance: merge-videos
+    app.kubernetes.io/part-of: chunk-func-controller
+spec:
+  functionDescription:
+    functionName: merge-videos
+    functionContainer: user-container
+    maxResponseTimeMs: 4000
+    typicalInputs:
+      - sizeBytes: 15451354 # 1m + 2m segments
+        message:
+          input:
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-1m.mp4
+              objectSizeBytes: 5621301
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-2m.mp4
+              objectSizeBytes: 9830053
+
+      - sizeBytes: 23807460 # 3m + 2m segments
+        message:
+          input:
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-3m.mp4
+              objectSizeBytes: 13977407
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-2m.mp4
+              objectSizeBytes: 9830053
+
+      - sizeBytes: 42778355 # 5m + 4m segments
+        message:
+          input:
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-5m.mp4
+              objectSizeBytes: 23841366
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-4m.mp4
+              objectSizeBytes: 18936989
