@@ -65,21 +65,6 @@ spec:
             end: 00:02:00
           quality: 20
 
-      - sizeBytes: 1911322760 # 227 MiB * 8m segment
-        message:
-          input:
-            url: http://10.152.183.192
-            # This is a demo deployment, we don't care about the password here.
-            user: HYlOGOqiOSpSnBjP
-            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
-            bucket: videos
-            objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
-            objectSizeBytes: 238915345
-          segment:
-            start: 00:00:00
-            end: 00:08:00
-          quality: 20
-
       - sizeBytes: 1050098848 # 500 MiB * 2m segment
         message:
           input:
@@ -93,6 +78,21 @@ spec:
           segment:
             start: 00:00:00
             end: 00:02:00
+          quality: 20
+
+      - sizeBytes: 1911322760 # 227 MiB * 8m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
+            objectSizeBytes: 238915345
+          segment:
+            start: 00:00:00
+            end: 00:08:00
           quality: 20
 
       - sizeBytes: 4200395392 # 500 MiB * 8m segment

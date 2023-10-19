@@ -1,0 +1,52 @@
+{
+  "scenarioName": "scenario-01-input-500-Mib",
+  "resourceConfigStrategy": "ProportionalCriticalPathSloConfigStrategy",
+  "inputDataSizeMib": 500.7261505126953,
+  "sloMs": 220000,
+  "workflowOutput": {
+    "executionTimeMs": 211253,
+    "totalCost": 0.039793999999999996,
+    "data": {
+      "sizeBytes": 37873978
+    },
+    "stepLogs": {
+      "validate-video": {
+        "resourceProfile": {
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
+        },
+        "executionTimeMs": 243,
+        "executionCost": 0.000004
+      },
+      "cut-video-segment-a": {
+        "resourceProfile": {
+          "memoryMiB": 8192,
+          "milliCpu": 2000,
+          "price100Ms": 0.00000952
+        },
+        "executionTimeMs": 208368,
+        "executionCost": 0.01984
+      },
+      "cut-video-segment-b": {
+        "resourceProfile": {
+          "memoryMiB": 8192,
+          "milliCpu": 2000,
+          "price100Ms": 0.00000952
+        },
+        "executionTimeMs": 208368,
+        "executionCost": 0.01984
+      },
+      "merge-videos": {
+        "resourceProfile": {
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "price100Ms": 0.00000406
+        },
+        "executionTimeMs": 2642,
+        "executionCost": 0.00011
+      }
+    }
+  },
+  "sloFulfilled": true
+}

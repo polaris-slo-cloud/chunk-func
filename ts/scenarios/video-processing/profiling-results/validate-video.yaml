@@ -1,0 +1,195 @@
+apiVersion: chunk-func.polaris-slo-cloud.github.io/v1
+kind: FunctionDescription
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"chunk-func.polaris-slo-cloud.github.io/v1","kind":"FunctionDescription","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"validate-video","app.kubernetes.io/name":"functiondescription","app.kubernetes.io/part-of":"chunk-func-controller"},"name":"validate-video","namespace":"func-test"},"spec":{"functionDescription":{"functionContainer":"user-container","functionName":"validate-video","maxResponseTimeMs":4000,"typicalInputs":[{"message":{"input":{"bucket":"videos","objectKey":"BigBuckBunny_360p_30fps_crf25_audio96kbps.mp4","objectSizeBytes":42254483,"password":"wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx","url":"http://10.152.183.192","user":"HYlOGOqiOSpSnBjP"},"quality":20,"segments":[{"end":"00:02:00","start":"00:00:00"},{"end":"00:10:00","start":"00:08:00"}]},"sizeBytes":42254483},{"message":{"input":{"bucket":"videos","objectKey":"BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4","objectSizeBytes":238915345,"password":"wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx","url":"http://10.152.183.192","user":"HYlOGOqiOSpSnBjP"},"quality":20,"segments":[{"end":"00:02:00","start":"00:00:00"},{"end":"00:10:00","start":"00:08:00"}]},"sizeBytes":238915345},{"message":{"input":{"bucket":"videos","objectKey":"BigBuckBunny_1080p_30fps_crf16_audio256kbps.mp4","objectSizeBytes":525049424,"password":"wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx","url":"http://10.152.183.192","user":"HYlOGOqiOSpSnBjP"},"quality":20,"segments":[{"end":"00:02:00","start":"00:00:00"},{"end":"00:10:00","start":"00:08:00"}]},"sizeBytes":525049424}]}}}
+  creationTimestamp: "2023-10-19T11:27:07Z"
+  generation: 3
+  labels:
+    app.kubernetes.io/instance: validate-video
+    app.kubernetes.io/name: functiondescription
+    app.kubernetes.io/part-of: chunk-func-controller
+  name: validate-video
+  namespace: func-test
+  resourceVersion: "88713751"
+  uid: b9b429ff-3d64-4569-8203-2a4e8d604d60
+spec:
+  functionDescription:
+    functionContainer: user-container
+    functionName: validate-video
+    maxResponseTimeMs: 4000
+    typicalInputs:
+    - message:
+        input:
+          bucket: videos
+          objectKey: BigBuckBunny_360p_30fps_crf25_audio96kbps.mp4
+          objectSizeBytes: 42254483
+          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          url: http://10.152.183.192
+          user: HYlOGOqiOSpSnBjP
+        quality: 20
+        segments:
+        - end: "00:02:00"
+          start: "00:00:00"
+        - end: "00:10:00"
+          start: "00:08:00"
+      sizeBytes: 42254483
+    - message:
+        input:
+          bucket: videos
+          objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
+          objectSizeBytes: 238915345
+          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          url: http://10.152.183.192
+          user: HYlOGOqiOSpSnBjP
+        quality: 20
+        segments:
+        - end: "00:02:00"
+          start: "00:00:00"
+        - end: "00:10:00"
+          start: "00:08:00"
+      sizeBytes: 238915345
+    - message:
+        input:
+          bucket: videos
+          objectKey: BigBuckBunny_1080p_30fps_crf16_audio256kbps.mp4
+          objectSizeBytes: 525049424
+          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          url: http://10.152.183.192
+          user: HYlOGOqiOSpSnBjP
+        quality: 20
+        segments:
+        - end: "00:02:00"
+          start: "00:00:00"
+        - end: "00:10:00"
+          start: "00:08:00"
+      sizeBytes: 525049424
+status:
+  optimizedConfigs:
+  - config:
+      memoryMiB: 512
+      milliCpu: 333
+    inputSizeBytes: 42254483
+    optimizedFor: response-time-slo-and-min-cost
+  - config:
+      memoryMiB: 512
+      milliCpu: 333
+    inputSizeBytes: 238915345
+    optimizedFor: response-time-slo-and-min-cost
+  - config:
+      memoryMiB: 512
+      milliCpu: 333
+    inputSizeBytes: 525049424
+    optimizedFor: response-time-slo-and-min-cost
+  profilingResults:
+    profilingDurationSeconds: 138
+    profilingStarted: "2023-10-19T12:11:57Z"
+    results:
+    - deploymentStatus: Timeout
+      resourceProfileId: 128mib-83m
+    - deploymentStatus: Success
+      resourceProfileId: 256mib-167m
+      results:
+      - executionCost: '  0.000004'
+        executionTimeMs: 519
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: '  0.000005'
+        executionTimeMs: 620
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: '  0.000005'
+        executionTimeMs: 657
+        inputSizeBytes: 525049424
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 512mib-333m
+      results:
+      - executionCost: '  0.000004'
+        executionTimeMs: 214
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: '  0.000004'
+        executionTimeMs: 223
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: '  0.000004'
+        executionTimeMs: 243
+        inputSizeBytes: 525049424
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 1024mib-583m
+      results:
+      - executionCost: '  0.000005'
+        executionTimeMs: 115
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: '  0.000005'
+        executionTimeMs: 101
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: '  0.000005'
+        executionTimeMs: 155
+        inputSizeBytes: 525049424
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 2048mib-1000m
+      results:
+      - executionCost: '  0.000004'
+        executionTimeMs: 96
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: '  0.000008'
+        executionTimeMs: 109
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: '  0.000008'
+        executionTimeMs: 150
+        inputSizeBytes: 525049424
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 4096mib-2000m
+      results:
+      - executionCost: '  0.000008'
+        executionTimeMs: 93
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: '  0.000016'
+        executionTimeMs: 102
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: '  0.000016'
+        executionTimeMs: 126
+        inputSizeBytes: 525049424
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 8192mib-2000m
+      results:
+      - executionCost: '  0.000010'
+        executionTimeMs: 73
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: '  0.000010'
+        executionTimeMs: 91
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: '  0.000019'
+        executionTimeMs: 130
+        inputSizeBytes: 525049424
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 16384mib-4000m
+      results:
+      - executionCost: '  0.000381'
+        executionTimeMs: 102
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: '  0.000381'
+        executionTimeMs: 142
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: '  0.000381'
+        executionTimeMs: 151
+        inputSizeBytes: 525049424
+        statusCode: 200

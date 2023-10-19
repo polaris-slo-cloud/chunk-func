@@ -1,0 +1,14 @@
+# This is a WorkflowExecutionDescription that uses the median input sizes for the SLAM algorithm.
+scenarioName: slam-scenario
+inputSizeBytes: 238915345
+
+maxResponseTimeMsOverride: 120000 # The SLO of the SLAM scenario is ignored and replaced by the SLO of the eval scenario.
+stepExecutions:
+  validate-video:
+    outputSizeBytes: 763964769 # (227 MiB * 2m + 500 Mib *2m) / 2
+  cut-video-segment-a:
+    outputSizeBytes: 9830053 # 2min
+  cut-video-segment-b:
+    outputSizeBytes: 9830053 # 2min
+  merge-videos:
+    outputSizeBytes: 18936989
