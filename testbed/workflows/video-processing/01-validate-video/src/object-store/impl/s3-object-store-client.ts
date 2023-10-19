@@ -1,5 +1,7 @@
 import { GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import * as fs from 'node:fs';
+import { pipeline } from 'node:stream/promises';
 import { ObjectStoreCredentials, ObjectStoreReference } from '../model';
 import { ObjectReader, ObjectStoreClient, WritableStream } from '../object-store';
 import { S3ObjectReader } from './s3-object-reader';
@@ -85,5 +87,15 @@ export class S3ObjectStoreClient implements ObjectStoreClient {
         });
 
         return getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+    }
+
+    async uploadFile(filePath: string, destObjRef: ObjectStoreReference): Promise<ObjectStoreReference> {
+        const fileInfo = fs.statSync(filePath);
+        destObjRef.objectSizeBytes = fileInfo.size;
+
+        const readStream = fs.createReadStream(filePath);
+        const writeStream = await this.createObjectWritableStream(destObjRef, 'binary');
+        await pipeline(readStream, writeStream);
+        return destObjRef;
     }
 }

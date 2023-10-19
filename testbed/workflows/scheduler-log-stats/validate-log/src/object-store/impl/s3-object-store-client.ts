@@ -1,4 +1,7 @@
-import { HeadObjectCommand, HeadObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import * as fs from 'node:fs';
+import { pipeline } from 'node:stream/promises';
 import { ObjectStoreCredentials, ObjectStoreReference } from '../model';
 import { ObjectReader, ObjectStoreClient, WritableStream } from '../object-store';
 import { S3ObjectReader } from './s3-object-reader';
@@ -52,11 +55,47 @@ export class S3ObjectStoreClient implements ObjectStoreClient {
         return new S3ObjectReader(this.s3Client, { objRef, size: objInfo.ContentLength });
     }
 
+    createPresignedReadUrl(objRef: ObjectStoreReference): Promise<string> {
+        if (!this.s3Client) {
+            throw new Error('This client has already been destroyed.');
+        }
+
+        const command = new GetObjectCommand({
+            Bucket: objRef.bucket,
+            Key: objRef.objectKey,
+        });
+
+        return getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+    }
+
     createObjectWritableStream(objRef: ObjectStoreReference, encoding: BufferEncoding = 'utf8'): Promise<WritableStream> {
         if (!this.s3Client) {
             throw new Error('This client has already been destroyed.');
         }
 
         return Promise.resolve(new S3ObjectStreamWritable(this.s3Client, objRef, encoding));
+    }
+
+    createPresignedWriteUrl(objRef: ObjectStoreReference): Promise<string> {
+        if (!this.s3Client) {
+            throw new Error('This client has already been destroyed.');
+        }
+
+        const command = new PutObjectCommand({
+            Bucket: objRef.bucket,
+            Key: objRef.objectKey,
+        });
+
+        return getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+    }
+
+    async uploadFile(filePath: string, destObjRef: ObjectStoreReference): Promise<ObjectStoreReference> {
+        const fileInfo = fs.statSync(filePath);
+        destObjRef.objectSizeBytes = fileInfo.size;
+
+        const readStream = fs.createReadStream(filePath);
+        const writeStream = await this.createObjectWritableStream(destObjRef, 'binary');
+        await pipeline(readStream, writeStream);
+        return destObjRef;
     }
 }

@@ -23,6 +23,13 @@ export interface ObjectStoreClient {
     createObjectReader(objRef: ObjectStoreReference): Promise<ObjectReader>;
 
     /**
+     * Creates a presigned URL for reading the specified object that expires in 1 hour.
+     *
+     * @param objRef The ObjectStoreReference that indicates the object to be read.
+     */
+    createPresignedReadUrl(objRef: ObjectStoreReference): Promise<string>;
+
+    /**
      * Creates a {@link WritableStream} for a new or existing object.
      *
      * @param objRef The ObjectStoreReference that indicates the object to be created/overwritten.
@@ -30,6 +37,21 @@ export interface ObjectStoreClient {
      * This has no effect on writing `Buffer` or `Uint8Array` objects.
      */
     createObjectWritableStream(objRef: ObjectStoreReference, encoding?: BufferEncoding): Promise<WritableStream>;
+
+    /**
+     * Creates a presigned URL for writing/creating the specified object that expires in 1 hour.
+     *
+     * @param objRef The ObjectStoreReference that indicates the object to be read.
+     */
+    createPresignedWriteUrl(objRef: ObjectStoreReference): Promise<string>;
+
+    /**
+     * Uploads a local file to the object store.
+     *
+     * @param filePath The local file to upload.
+     * @param destObjRef The destination object. If it exists, it will be overwritten.
+     */
+    uploadFile(filePath: string, destObjRef: ObjectStoreReference): Promise<ObjectStoreReference>;
 }
 
 /**

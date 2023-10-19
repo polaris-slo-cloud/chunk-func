@@ -44,6 +44,14 @@ export interface ObjectStoreClient {
      * @param objRef The ObjectStoreReference that indicates the object to be read.
      */
     createPresignedWriteUrl(objRef: ObjectStoreReference): Promise<string>;
+
+    /**
+     * Uploads a local file to the object store.
+     *
+     * @param filePath The local file to upload.
+     * @param destObjRef The destination object. If it exists, it will be overwritten.
+     */
+    uploadFile(filePath: string, destObjRef: ObjectStoreReference): Promise<ObjectStoreReference>;
 }
 
 /**
