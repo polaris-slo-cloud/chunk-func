@@ -2,6 +2,7 @@ package profiler
 
 import (
 	"fmt"
+	"slices"
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
 )
@@ -45,4 +46,21 @@ func setUpCandidateProfilesChan(candidateProfiles []*function.ResourceProfile) c
 	}
 	close(profiles)
 	return profiles
+}
+
+// Sorts the specified results by increasing input size.
+func sortProfilingResultsByInputSize(results []*function.ProfilingResult) {
+	slices.SortFunc(results, func(a, b *function.ProfilingResult) int { return int(a.InputSizeBytes - b.InputSizeBytes) })
+}
+
+// Copies the results with a success status code to a new slice and returns that slice.
+// If none of the results have a success status code, the returned slice will be empty.
+func copyAndPruneResults(results []*function.ProfilingResult) []*function.ProfilingResult {
+	dest := make([]*function.ProfilingResult, 0, len(results))
+	for _, result := range results {
+		if function.IsSuccessStatusCode(result.StatusCode) {
+			dest = append(dest, result.DeepCopy())
+		}
+	}
+	return dest
 }
