@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/go-logr/logr"
@@ -238,6 +239,7 @@ func (pr *exhaustiveFunctionProfilerSession) computeExecutionCosts(results *func
 	for _, result := range results.UnfilteredResults {
 		cost := profile.CalculateCost(result.ExecutionTimeMs)
 		costStr := fmt.Sprintf("%10f", cost)
+		costStr = strings.Trim(costStr, " ")
 		result.ExecutionCost = &costStr
 	}
 }
