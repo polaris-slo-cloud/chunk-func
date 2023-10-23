@@ -165,6 +165,7 @@ export class ConfigFinder {
                 return result.result;
             }
         }
+        throw new Error(`Could not find a successful ProfilingResult for ${profileId}.`);
     }
 
     private computeStepInputSizes(workflowInput: WorkflowInput<any>): Record<string, number> {

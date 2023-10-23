@@ -64,9 +64,20 @@ export interface ResourceProfileResults {
      * there was no successful run for a particular input size, this input size
      * is not present in this list.
      *
-     * This is only present if DeploymentStatus is DeploymentSuccess.
+     * Note 1: This is only present if DeploymentStatus is DeploymentSuccess.
+     * Note 2: If none of the profiling runs was successful, this list is empty.
      */
     results?: ProfilingResult[];
+
+    /**
+     * The unfiltered profiling results ordered by increasing input size.
+     *
+     * Unfiltered means that also input sizes with only failed runs are included.
+     * This is present for debugging purposes.
+     *
+     * If DeploymentStatus is not DeploymentSuccess, this is undefined.
+     */
+    unfilteredResults?: ProfilingResult[];
 
 }
 

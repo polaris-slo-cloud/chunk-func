@@ -1,11 +1,20 @@
 import { DirectedGraph } from 'graphology';
-import { ResourceProfile, WorkflowDescription, WorkflowExecutionDescription, WorkflowStepType, getResourceProfileId } from '../model';
+import {
+    ResourceProfile,
+    ResourceProfileResults,
+    WorkflowDescription,
+    WorkflowExecutionDescription,
+    WorkflowStepDescription,
+    WorkflowStepType,
+    getResourceProfileId,
+    isSuccessStatusCode,
+} from '../model';
+import { WorkflowImpl } from './impl';
+import { GenericWorkflowStepImpl, WorkflowFunctionStepImpl } from './impl/step.impl';
+import { WorkflowGraphImpl } from './impl/workflow-graph.impl';
+import { WorkflowStep } from './step';
 import { Workflow, WorkflowInput } from './workflow';
 import { WorkflowGraph, WorkflowNodeAttributes } from './workflow-graph';
-import { WorkflowStep } from './step';
-import { GenericWorkflowStepImpl, WorkflowFunctionStepImpl } from './impl/step.impl';
-import { WorkflowImpl } from './impl';
-import { WorkflowGraphImpl } from './impl/workflow-graph.impl';
 
 type StepsAndGraphPair = Pick<WorkflowGraph, 'steps' | 'graph'>
 
@@ -21,6 +30,33 @@ export class WorkflowBuilder {
     }
 
     /**
+     * Removes empty ResourceProfileResults and throws an error if a ProfilingResult contains a non success status code.
+     */
+    private pruneAndValidateProfilingResults(stepDesc: WorkflowStepDescription): void {
+        if (!stepDesc.profilingResults) {
+            return;
+        }
+
+        const prunedResProfileResults: ResourceProfileResults[] = [];
+        for (const resProfileResults of stepDesc.profilingResults.results) {
+            // Do not copy ResourceProfileResults that do not contain any profiling results.
+            if (!resProfileResults.results || resProfileResults.results.length === 0) {
+                continue;
+            }
+            for (const result of resProfileResults.results) {
+                if (!isSuccessStatusCode(result.statusCode)) {
+                    throw new Error(`Profiling results for ${resProfileResults.resourceProfileId} contain statusCode: ${result.statusCode} for input size ${result.inputSizeBytes}`);
+                }
+            }
+
+            // Now that we know that there are results and that all are valid, we copy the ResourceProfileResults to the pruned list.
+            prunedResProfileResults.push(resProfileResults);
+        }
+
+        stepDesc.profilingResults.results = prunedResProfileResults;
+    }
+
+    /**
      * Builds an array of workflow steps and the nodes of the graph,
      * but does not set the required inputs or edges yet.
      */
@@ -31,6 +67,7 @@ export class WorkflowBuilder {
         description.steps.forEach(stepDesc => {
             let step: WorkflowStep;
             if (stepDesc.type === WorkflowStepType.Function) {
+                this.pruneAndValidateProfilingResults(stepDesc);
                 step = new WorkflowFunctionStepImpl(stepDesc);
             } else {
                 step = new GenericWorkflowStepImpl(stepDesc);
