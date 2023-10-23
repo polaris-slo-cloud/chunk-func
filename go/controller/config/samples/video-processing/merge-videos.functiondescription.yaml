@@ -34,6 +34,24 @@ spec:
               objectKey: segment-crf20-2m.mp4
               objectSizeBytes: 9830053
 
+      - sizeBytes: 19660106 # 2m + 2m segments
+        message:
+          input:
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-2m.mp4
+              objectSizeBytes: 9830053
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-2m.mp4
+              objectSizeBytes: 9830053
+
       - sizeBytes: 23807460 # 3m + 2m segments
         message:
           input:
@@ -51,6 +69,24 @@ spec:
               bucket: videos
               objectKey: segment-crf20-2m.mp4
               objectSizeBytes: 9830053
+
+      - sizeBytes: 37873978 # 4m + 4m segments
+        message:
+          input:
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-4m.mp4
+              objectSizeBytes: 18936989
+            - url: http://10.152.183.192
+              # This is a demo deployment, we don't care about the password here.
+              user: HYlOGOqiOSpSnBjP
+              password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+              bucket: videos
+              objectKey: segment-crf20-4m.mp4
+              objectSizeBytes: 18936989
 
       - sizeBytes: 42778355 # 5m + 4m segments
         message:

@@ -4,16 +4,16 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"chunk-func.polaris-slo-cloud.github.io/v1","kind":"FunctionDescription","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"validate-video","app.kubernetes.io/name":"functiondescription","app.kubernetes.io/part-of":"chunk-func-controller"},"name":"validate-video","namespace":"func-test"},"spec":{"functionDescription":{"functionContainer":"user-container","functionName":"validate-video","maxResponseTimeMs":4000,"typicalInputs":[{"message":{"input":{"bucket":"videos","objectKey":"BigBuckBunny_360p_30fps_crf25_audio96kbps.mp4","objectSizeBytes":42254483,"password":"wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx","url":"http://10.152.183.192","user":"HYlOGOqiOSpSnBjP"},"quality":20,"segments":[{"end":"00:02:00","start":"00:00:00"},{"end":"00:10:00","start":"00:08:00"}]},"sizeBytes":42254483},{"message":{"input":{"bucket":"videos","objectKey":"BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4","objectSizeBytes":238915345,"password":"wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx","url":"http://10.152.183.192","user":"HYlOGOqiOSpSnBjP"},"quality":20,"segments":[{"end":"00:02:00","start":"00:00:00"},{"end":"00:10:00","start":"00:08:00"}]},"sizeBytes":238915345},{"message":{"input":{"bucket":"videos","objectKey":"BigBuckBunny_1080p_30fps_crf16_audio256kbps.mp4","objectSizeBytes":525049424,"password":"wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx","url":"http://10.152.183.192","user":"HYlOGOqiOSpSnBjP"},"quality":20,"segments":[{"end":"00:02:00","start":"00:00:00"},{"end":"00:10:00","start":"00:08:00"}]},"sizeBytes":525049424}]}}}
-  creationTimestamp: "2023-10-19T11:27:07Z"
-  generation: 3
+  creationTimestamp: "2023-10-23T12:21:03Z"
+  generation: 1
   labels:
     app.kubernetes.io/instance: validate-video
     app.kubernetes.io/name: functiondescription
     app.kubernetes.io/part-of: chunk-func-controller
   name: validate-video
   namespace: func-test
-  resourceVersion: "88713751"
-  uid: b9b429ff-3d64-4569-8203-2a4e8d604d60
+  resourceVersion: "91424987"
+  uid: 7e9c451e-6b4d-43fa-a462-29c74c3ec5ba
 spec:
   functionDescription:
     functionContainer: user-container
@@ -84,112 +84,203 @@ status:
     optimizedFor: response-time-slo-and-min-cost
   profilingResults:
     profilingDurationSeconds: 138
-    profilingStarted: "2023-10-19T12:11:57Z"
+    profilingStarted: "2023-10-23T12:29:54Z"
     results:
     - deploymentStatus: Timeout
       resourceProfileId: 128mib-83m
     - deploymentStatus: Success
       resourceProfileId: 256mib-167m
       results:
-      - executionCost: '  0.000004'
-        executionTimeMs: 519
+      - executionCost: "0.000004"
+        executionTimeMs: 501
         inputSizeBytes: 42254483
         statusCode: 200
-      - executionCost: '  0.000005'
-        executionTimeMs: 620
+      - executionCost: "0.000005"
+        executionTimeMs: 636
         inputSizeBytes: 238915345
         statusCode: 200
-      - executionCost: '  0.000005'
-        executionTimeMs: 657
+      - executionCost: "0.000005"
+        executionTimeMs: 639
+        inputSizeBytes: 525049424
+        statusCode: 200
+      unfilteredResults:
+      - executionCost: "0.000004"
+        executionTimeMs: 501
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: "0.000005"
+        executionTimeMs: 636
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: "0.000005"
+        executionTimeMs: 639
         inputSizeBytes: 525049424
         statusCode: 200
     - deploymentStatus: Success
       resourceProfileId: 512mib-333m
       results:
-      - executionCost: '  0.000004'
-        executionTimeMs: 214
+      - executionCost: "0.000004"
+        executionTimeMs: 201
         inputSizeBytes: 42254483
         statusCode: 200
-      - executionCost: '  0.000004'
-        executionTimeMs: 223
+      - executionCost: "0.000004"
+        executionTimeMs: 202
         inputSizeBytes: 238915345
         statusCode: 200
-      - executionCost: '  0.000004'
-        executionTimeMs: 243
+      - executionCost: "0.000004"
+        executionTimeMs: 254
+        inputSizeBytes: 525049424
+        statusCode: 200
+      unfilteredResults:
+      - executionCost: "0.000004"
+        executionTimeMs: 201
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: "0.000004"
+        executionTimeMs: 202
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: "0.000004"
+        executionTimeMs: 254
         inputSizeBytes: 525049424
         statusCode: 200
     - deploymentStatus: Success
       resourceProfileId: 1024mib-583m
       results:
-      - executionCost: '  0.000005'
-        executionTimeMs: 115
+      - executionCost: "0.000005"
+        executionTimeMs: 113
         inputSizeBytes: 42254483
         statusCode: 200
-      - executionCost: '  0.000005'
-        executionTimeMs: 101
+      - executionCost: "0.000005"
+        executionTimeMs: 114
         inputSizeBytes: 238915345
         statusCode: 200
-      - executionCost: '  0.000005'
-        executionTimeMs: 155
+      - executionCost: "0.000005"
+        executionTimeMs: 117
+        inputSizeBytes: 525049424
+        statusCode: 200
+      unfilteredResults:
+      - executionCost: "0.000005"
+        executionTimeMs: 113
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: "0.000005"
+        executionTimeMs: 114
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: "0.000005"
+        executionTimeMs: 117
         inputSizeBytes: 525049424
         statusCode: 200
     - deploymentStatus: Success
       resourceProfileId: 2048mib-1000m
       results:
-      - executionCost: '  0.000004'
-        executionTimeMs: 96
+      - executionCost: "0.000004"
+        executionTimeMs: 89
         inputSizeBytes: 42254483
         statusCode: 200
-      - executionCost: '  0.000008'
-        executionTimeMs: 109
+      - executionCost: "0.000004"
+        executionTimeMs: 97
         inputSizeBytes: 238915345
         statusCode: 200
-      - executionCost: '  0.000008'
-        executionTimeMs: 150
+      - executionCost: "0.000008"
+        executionTimeMs: 119
+        inputSizeBytes: 525049424
+        statusCode: 200
+      unfilteredResults:
+      - executionCost: "0.000004"
+        executionTimeMs: 89
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: "0.000004"
+        executionTimeMs: 97
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: "0.000008"
+        executionTimeMs: 119
         inputSizeBytes: 525049424
         statusCode: 200
     - deploymentStatus: Success
       resourceProfileId: 4096mib-2000m
       results:
-      - executionCost: '  0.000008'
-        executionTimeMs: 93
+      - executionCost: "0.000008"
+        executionTimeMs: 88
         inputSizeBytes: 42254483
         statusCode: 200
-      - executionCost: '  0.000016'
-        executionTimeMs: 102
+      - executionCost: "0.000008"
+        executionTimeMs: 88
         inputSizeBytes: 238915345
         statusCode: 200
-      - executionCost: '  0.000016'
-        executionTimeMs: 126
+      - executionCost: "0.000016"
+        executionTimeMs: 116
+        inputSizeBytes: 525049424
+        statusCode: 200
+      unfilteredResults:
+      - executionCost: "0.000008"
+        executionTimeMs: 88
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: "0.000008"
+        executionTimeMs: 88
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: "0.000016"
+        executionTimeMs: 116
         inputSizeBytes: 525049424
         statusCode: 200
     - deploymentStatus: Success
       resourceProfileId: 8192mib-2000m
       results:
-      - executionCost: '  0.000010'
-        executionTimeMs: 73
+      - executionCost: "0.000010"
+        executionTimeMs: 80
         inputSizeBytes: 42254483
         statusCode: 200
-      - executionCost: '  0.000010'
-        executionTimeMs: 91
+      - executionCost: "0.000010"
+        executionTimeMs: 79
         inputSizeBytes: 238915345
         statusCode: 200
-      - executionCost: '  0.000019'
-        executionTimeMs: 130
+      - executionCost: "0.000019"
+        executionTimeMs: 123
+        inputSizeBytes: 525049424
+        statusCode: 200
+      unfilteredResults:
+      - executionCost: "0.000010"
+        executionTimeMs: 80
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: "0.000010"
+        executionTimeMs: 79
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: "0.000019"
+        executionTimeMs: 123
         inputSizeBytes: 525049424
         statusCode: 200
     - deploymentStatus: Success
       resourceProfileId: 16384mib-4000m
       results:
-      - executionCost: '  0.000381'
-        executionTimeMs: 102
+      - executionCost: "0.000190"
+        executionTimeMs: 82
         inputSizeBytes: 42254483
         statusCode: 200
-      - executionCost: '  0.000381'
-        executionTimeMs: 142
+      - executionCost: "0.000381"
+        executionTimeMs: 101
         inputSizeBytes: 238915345
         statusCode: 200
-      - executionCost: '  0.000381'
-        executionTimeMs: 151
+      - executionCost: "0.000381"
+        executionTimeMs: 101
+        inputSizeBytes: 525049424
+        statusCode: 200
+      unfilteredResults:
+      - executionCost: "0.000190"
+        executionTimeMs: 82
+        inputSizeBytes: 42254483
+        statusCode: 200
+      - executionCost: "0.000381"
+        executionTimeMs: 101
+        inputSizeBytes: 238915345
+        statusCode: 200
+      - executionCost: "0.000381"
+        executionTimeMs: 101
         inputSizeBytes: 525049424
         statusCode: 200

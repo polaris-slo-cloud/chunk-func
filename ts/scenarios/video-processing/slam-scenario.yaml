@@ -5,10 +5,10 @@ inputSizeBytes: 238915345
 maxResponseTimeMsOverride: 120000 # The SLO of the SLAM scenario is ignored and replaced by the SLO of the eval scenario.
 stepExecutions:
   validate-video:
-    outputSizeBytes: 763964769 # (227 MiB * 2m + 500 Mib *2m) / 2
+    outputSizeBytes: 95566138 # 227 MiB, 4m segment
   cut-video-segment-a:
-    outputSizeBytes: 9830053 # 2min
+    outputSizeBytes: 23807460 # 3m + 2m segments input for merge-videos
   cut-video-segment-b:
-    outputSizeBytes: 9830053 # 2min
+    outputSizeBytes: 23807460 # 3m + 2m segments input for merge-videos
   merge-videos:
-    outputSizeBytes: 18936989
+    outputSizeBytes: 23841366

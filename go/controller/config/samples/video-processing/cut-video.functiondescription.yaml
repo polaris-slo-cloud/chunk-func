@@ -18,9 +18,10 @@ spec:
 
     # The workload of the function depends on multiple parameters: the input video size, the length of the segment to extract, and the quality.
     # We keep the quality always the same to reduce it to two parameters.
-    # We calculate a "virtual input size" by multiplying the video size with the segment length in minutes.
+    # We calculate a "virtual input size" by multiplying the source file size with the percentage of minutes to be extracted,
+    # e.g., extract 2m from 10m file of 100MiB size: 100 * 20% = 20
     typicalInputs:
-      - sizeBytes: 84508966 # 40.2 MiB * 2m segment
+      - sizeBytes: 8450897 # 40.2 MiB, 2m segment
         message:
           input:
             url: http://10.152.183.192
@@ -35,7 +36,22 @@ spec:
             end: 00:02:00
           quality: 20
 
-      - sizeBytes: 338035864 # 40.2 MiB * 8m segment
+      - sizeBytes: 16901793 # 40.2 MiB, 4m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_360p_30fps_crf25_audio96kbps.mp4
+            objectSizeBytes: 42254483
+          segment:
+            start: 00:00:00
+            end: 00:04:00
+          quality: 20
+
+      - sizeBytes: 33803586 # 40.2 MiB, 8m segment
         message:
           input:
             url: http://10.152.183.192
@@ -50,7 +66,7 @@ spec:
             end: 00:08:00
           quality: 20
 
-      - sizeBytes: 477830690 # 227 MiB * 2m segment
+      - sizeBytes: 47783069 # 227 MiB, 2m segment
         message:
           input:
             url: http://10.152.183.192
@@ -65,7 +81,37 @@ spec:
             end: 00:02:00
           quality: 20
 
-      - sizeBytes: 1050098848 # 500 MiB * 2m segment
+      - sizeBytes: 95566138 # 227 MiB, 4m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
+            objectSizeBytes: 238915345
+          segment:
+            start: 00:00:00
+            end: 00:04:00
+          quality: 20
+
+      - sizeBytes: 191132276 # 227 MiB, 8m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
+            objectSizeBytes: 238915345
+          segment:
+            start: 00:00:00
+            end: 00:08:00
+          quality: 20
+
+      - sizeBytes: 105009885 # 500 MiB, 2m segment
         message:
           input:
             url: http://10.152.183.192
@@ -80,7 +126,7 @@ spec:
             end: 00:02:00
           quality: 20
 
-      - sizeBytes: 1911322760 # 227 MiB * 8m segment
+      - sizeBytes: 210019770 # 500 MiB, 4m segment
         message:
           input:
             url: http://10.152.183.192
@@ -88,14 +134,14 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: videos
-            objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
-            objectSizeBytes: 238915345
+            objectKey: BigBuckBunny_1080p_30fps_crf16_audio256kbps.mp4
+            objectSizeBytes: 525049424
           segment:
             start: 00:00:00
-            end: 00:08:00
+            end: 00:04:00
           quality: 20
 
-      - sizeBytes: 4200395392 # 500 MiB * 8m segment
+      - sizeBytes: 420039539 # 500 MiB, 8m segment
         message:
           input:
             url: http://10.152.183.192
