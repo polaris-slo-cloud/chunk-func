@@ -32,4 +32,7 @@ export interface SimulatorOutput {
      */
     sloFulfilled: boolean;
 
+    /** Contains the error info if an error occurred. */
+    error?: any;
+
 }

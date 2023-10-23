@@ -29,6 +29,7 @@ import {
     createInputHeuristicProportionalCPSloConfigStrategy,
     FixedOutputProportionalCPSloConfigStrategy,
     createFixedOutputProportionalCPSloConfigStrategy,
+    WorkflowOutput,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -69,9 +70,20 @@ const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
 const slo = execDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs;
 
-const input = buildWorkflowInput(execDesc);
-const resConfigStrat = resConfigStratFactory(workflow.graph, workflow.availableResourceProfiles);
-const output = workflow.execute(input, resConfigStrat);
+let output: WorkflowOutput<unknown>;
+let error: Error;
+
+try {
+    const input = buildWorkflowInput(execDesc);
+    const resConfigStrat = resConfigStratFactory(workflow.graph, workflow.availableResourceProfiles);
+    output = workflow.execute(input, resConfigStrat);
+} catch (err) {
+    output = {
+        executionTimeMs: -1,
+        totalCost: -1,
+    } as any;
+    error = err;
+}
 
 const simOutput: SimulatorOutput = {
     scenarioName: execDesc.scenarioName,
@@ -81,5 +93,9 @@ const simOutput: SimulatorOutput = {
     workflowOutput: output,
     sloFulfilled: output.executionTimeMs <= slo,
 };
+
+if (error) {
+    simOutput.error = error.toString();
+}
 
 console.log(JSON.stringify(simOutput, null, 2));

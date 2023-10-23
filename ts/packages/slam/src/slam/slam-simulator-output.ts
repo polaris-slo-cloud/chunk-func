@@ -9,7 +9,4 @@ export interface SlamSimulatorOutput extends SimulatorOutput {
     /** The result of finding the SLAM config. */
     slamResult: SlamOutput;
 
-    /** Contains the error info if an error occurred. */
-    error?: any;
-
 }

@@ -63,7 +63,7 @@ const simOutput: SlamSimulatorOutput = {
     sloFulfilled: output.executionTimeMs > 0 && output.executionTimeMs <= evalSlo,
 };
 if (error) {
-    simOutput.error = error;
+    simOutput.error = error.toString();
 }
 
 console.log(JSON.stringify(simOutput, null, 2));
