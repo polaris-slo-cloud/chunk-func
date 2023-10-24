@@ -4,38 +4,38 @@
   "inputDataSizeMib": 500.7261505126953,
   "sloMs": 180000,
   "workflowOutput": {
-    "executionTimeMs": 107488,
-    "totalCost": 0.398812,
+    "executionTimeMs": 109936,
+    "totalCost": 0.017925,
     "data": {
       "sizeBytes": 37873978
     },
     "stepLogs": {
       "validate-video": {
         "resourceProfile": {
-          "memoryMiB": 512,
-          "milliCpu": 333,
-          "price100Ms": 0.000001295
+          "memoryMiB": 16384,
+          "milliCpu": 4000,
+          "price100Ms": 0.0001904
         },
-        "executionTimeMs": 243,
-        "executionCost": 0.000004
+        "executionTimeMs": 101,
+        "executionCost": 0.000381
       },
       "cut-video-segment-a": {
         "resourceProfile": {
-          "memoryMiB": 16384,
-          "milliCpu": 4000,
-          "price100Ms": 0.0001904
+          "memoryMiB": 4096,
+          "milliCpu": 2000,
+          "price100Ms": 0.00000812
         },
-        "executionTimeMs": 104603,
-        "executionCost": 0.199349
+        "executionTimeMs": 107389,
+        "executionCost": 0.008721
       },
       "cut-video-segment-b": {
         "resourceProfile": {
-          "memoryMiB": 16384,
-          "milliCpu": 4000,
-          "price100Ms": 0.0001904
+          "memoryMiB": 4096,
+          "milliCpu": 2000,
+          "price100Ms": 0.00000812
         },
-        "executionTimeMs": 104603,
-        "executionCost": 0.199349
+        "executionTimeMs": 107389,
+        "executionCost": 0.008721
       },
       "merge-videos": {
         "resourceProfile": {
@@ -43,8 +43,8 @@
           "milliCpu": 1000,
           "price100Ms": 0.00000406
         },
-        "executionTimeMs": 2642,
-        "executionCost": 0.00011
+        "executionTimeMs": 2446,
+        "executionCost": 0.000102
       }
     }
   },

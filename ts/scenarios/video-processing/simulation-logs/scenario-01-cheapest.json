@@ -4,8 +4,8 @@
   "inputDataSizeMib": 500.7261505126953,
   "sloMs": 120000,
   "workflowOutput": {
-    "executionTimeMs": 215028,
-    "totalCost": 0.034575999999999996,
+    "executionTimeMs": 185440,
+    "totalCost": 0.0048400000000000006,
     "data": {
       "sizeBytes": 37873978
     },
@@ -16,26 +16,26 @@
           "milliCpu": 333,
           "price100Ms": 0.000001295
         },
-        "executionTimeMs": 243,
+        "executionTimeMs": 254,
         "executionCost": 0.000004
       },
       "cut-video-segment-a": {
         "resourceProfile": {
-          "memoryMiB": 4096,
-          "milliCpu": 2000,
-          "price100Ms": 0.00000812
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
         },
-        "executionTimeMs": 212143,
-        "executionCost": 0.017231
+        "executionTimeMs": 182740,
+        "executionCost": 0.002367
       },
       "cut-video-segment-b": {
         "resourceProfile": {
-          "memoryMiB": 4096,
-          "milliCpu": 2000,
-          "price100Ms": 0.00000812
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
         },
-        "executionTimeMs": 212143,
-        "executionCost": 0.017231
+        "executionTimeMs": 182740,
+        "executionCost": 0.002367
       },
       "merge-videos": {
         "resourceProfile": {
@@ -43,8 +43,8 @@
           "milliCpu": 1000,
           "price100Ms": 0.00000406
         },
-        "executionTimeMs": 2642,
-        "executionCost": 0.00011
+        "executionTimeMs": 2446,
+        "executionCost": 0.000102
       }
     }
   },
