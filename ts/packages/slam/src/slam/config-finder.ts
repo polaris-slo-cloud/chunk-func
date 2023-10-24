@@ -60,7 +60,11 @@ export class ConfigFinder {
     optimizeForSlo(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamOutput{
         // In the base version of the algorithm we always return a function to the heap if it hasn't exhausted all available profiles.
         const alwaysReturnToHeap: CheckReturnToHeapFn = () => true;
-        return this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, alwaysReturnToHeap);
+        const result = this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, alwaysReturnToHeap);
+        if (!result) {
+            throw new Error(`There is no configuration that satisfies the SLO of ${maxExecutionTimeMs}`);
+        }
+        return result;
     }
 
     /**
@@ -81,16 +85,26 @@ export class ConfigFinder {
         };
         const costOptimizedResult = this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, returnToHeapIfCostEfficient);
 
-        if (costOptimizedResult.workflowOutput.totalCost < baseResult.workflowOutput.totalCost) {
-            // console.log(`Returning cost optimized result (${costOptimizedResult.workflowOutput.totalCost}) instead of base result (${baseResult.workflowOutput.totalCost}).`)
+        if (costOptimizedResult && (!baseResult || costOptimizedResult.workflowOutput.totalCost < baseResult.workflowOutput.totalCost)) {
+            // Cost optimized result is cheaper than baseResult or baseResult does not exist (i.e., could not fulfill the SLO).
             return costOptimizedResult;
         } else {
-            // console.log(`Returning base result (${baseResult.workflowOutput.totalCost}) instead of cost optimized result (${costOptimizedResult.workflowOutput.totalCost}).`)
-            return baseResult;
+            // Cost optimized result is not cheaper or it does not exist (i.e., could not fulfill the SLO).
+            // Ensure that baseResult exists.
+            if (baseResult) {
+                return baseResult;
+            }
         }
+
+        throw new Error(`There is no configuration that satisfies the SLO of ${maxExecutionTimeMs}`);
     }
 
-    private optimizeForSloInternal(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>, checkReturnToHeap: CheckReturnToHeapFn): SlamOutput {
+    /**
+     * Optimizes for the specified SLO.
+     *
+     * @returns the workflowOutput and the stepConfigs on success or `undefined` if no configuration to satisfy the SLO can be found.
+     */
+    private optimizeForSloInternal(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>, checkReturnToHeap: CheckReturnToHeapFn): SlamOutput | undefined {
         const stepInputSizes = this.computeStepInputSizes(workflowInput);
         const state = this.initSlamState(maxExecutionTimeMs, workflowInput);
 
@@ -119,7 +133,8 @@ export class ConfigFinder {
             }
         } while (!state.funcHeap.isEmpty());
 
-        throw new Error(`There is no configuration that satisfies the SLO of ${maxExecutionTimeMs}`);
+        // There is no configuration that satisfies the SLO.
+        return undefined;
     }
 
     private getResourceProfiles(workflow: Workflow): ResourceProfile[] {
