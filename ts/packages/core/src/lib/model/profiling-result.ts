@@ -97,7 +97,7 @@ export interface ProfilingSessionResults {
     profilingDurationSeconds: number;
 
     /**
-     * The list of results grouped by ResourceProfiles, ordered by increasing cost (per 100ms).
+     * The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (per 100ms).
      */
     results: ResourceProfileResults[];
 
@@ -148,6 +148,8 @@ export function isSuccessStatusCode(statusCode: number): boolean {
 
 /**
  * Allows iterating over the ProfilingResults for a particular input size.
+ *
+ * The iteration order goes from the profile with the smallest memory size to the one with the largest.
  */
 export function* getResultsForInput(profilingSessionResults: ProfilingSessionResults, inputSizeBytes: number): Generator<ProfilingResultWithProfileId> {
     for (const profileResult of profilingSessionResults.results) {

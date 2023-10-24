@@ -2,6 +2,7 @@ import { Heap } from 'heap-js';
 import {
     PreconfiguredConfigStrategy,
     ProfilingResult,
+    ProfilingResultWithProfileId,
     ResourceProfile,
     Workflow,
     WorkflowExecutionDescription,
@@ -103,7 +104,7 @@ export class ConfigFinder {
             }
 
             const longestFunc = state.funcHeap.pop();
-            if (longestFunc.selectedProfileIndex < longestFunc.step.profilingResults.results.length - 1) {
+            if (longestFunc.selectedProfileIndex < this.availableProfiles.length - 1) {
                 const oldProfileResult = longestFunc.profilingResult;
                 longestFunc.selectedProfileIndex++;
                 longestFunc.profilingResult = this.getProfilingResultForProfile(
@@ -140,22 +141,43 @@ export class ConfigFinder {
     }
 
     private fillHeap(state: SlamState): void {
-        const baseProfile = this.availableProfiles[0];
         const graph = this.workflow.graph;
 
         for (const stepName in graph.steps) {
             const step = graph.steps[stepName];
             if (step.type === WorkflowStepType.Function) {
                 const functionStep = step as WorkflowFunctionStep;
+                const baseProfilingResult = this.getProfilingResultForBaseProfile(functionStep, state.stepInputSizes[functionStep.name]);
+
                 const slamInfo: SlamFunctionInfo = {
                     step: functionStep,
-                    selectedProfileIndex: 0,
-                    profilingResult: this.getProfilingResultForProfile(functionStep, state.stepInputSizes[functionStep.name], baseProfile),
+                    selectedProfileIndex: this.getProfileIndex(baseProfilingResult.resourceProfileId),
+                    profilingResult: baseProfilingResult.result,
                 };
                 state.funcHeap.add(slamInfo);
                 state.funcSteps.push(slamInfo);
             }
         }
+    }
+
+    /**
+     * Gets the ProfilingResult with the lowest memory configuration for the specified step.
+     *
+     * Each step may have a different base profile, because some may not work with the lower end resource profiles.
+     */
+    private getProfilingResultForBaseProfile(step: WorkflowFunctionStep, inputSize: number): ProfilingResultWithProfileId {
+        for (const result of getResultsForInput(step.profilingResults, inputSize)) {
+            return result;
+        }
+        throw new Error(`Could not find a successful ProfilingResult for step ${step.name}.`);
+    }
+
+    private getProfileIndex(profileId: string): number {
+        const index = this.availableProfiles.findIndex(profile => getResourceProfileId(profile) === profileId);
+        if (index === -1) {
+            throw new Error(`Could not find profile ${profileId} in the list of available profiles`);
+        }
+        return index;
     }
 
     private getProfilingResultForProfile(step: WorkflowFunctionStep, inputSize:number, profile: ResourceProfile): ProfilingResult {

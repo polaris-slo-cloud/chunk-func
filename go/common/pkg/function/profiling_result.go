@@ -85,7 +85,7 @@ type ProfilingSessionResults struct {
 	// The number of seconds that the profiling session lasted.
 	ProfilingDurationSeconds int32 `json:"profilingDurationSeconds" yaml:"profilingDurationSeconds"`
 
-	// The list of results grouped by ResourceProfiles, ordered by increasing base cost (price per 100ms).
+	// The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (price per 100ms).
 	Results []*ResourceProfileResults `json:"results" yaml:"results"`
 }
 

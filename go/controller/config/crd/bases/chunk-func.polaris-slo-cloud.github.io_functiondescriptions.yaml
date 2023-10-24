@@ -139,7 +139,7 @@ spec:
                     type: string
                   results:
                     description: The list of results grouped by ResourceProfiles,
-                      ordered by increasing base cost (price per 100ms).
+                      ordered by increasing memory size and base cost (price per 100ms).
                     items:
                       description: Collects all profiling results for a ResourceProfile.
                       properties:
