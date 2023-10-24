@@ -7,10 +7,9 @@
 scenarioName: scenario-01-input-40-Mib
 inputSizeBytes: 42254483
 
-# 9431 is the fastest possible time.
-# ??? is the time for the cheapest possible config.
-# ??? is the time for the slowest possible config.
-maxResponseTimeMsOverride: 25000
+# 9014 is the fastest possible time.
+# 20090 is the time for the cheapest possible config.
+maxResponseTimeMsOverride: 10000
 stepExecutions:
   validate-video:
     outputSizeBytes: 8450897
