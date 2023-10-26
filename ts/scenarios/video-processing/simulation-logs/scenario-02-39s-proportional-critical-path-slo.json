@@ -1,11 +1,11 @@
 {
   "scenarioName": "scenario-02-input-227-Mib",
-  "resourceConfigStrategy": "FastestConfigStrategy",
+  "resourceConfigStrategy": "ProportionalCriticalPathSloConfigStrategy",
   "inputDataSizeMib": 227.84742832183838,
-  "sloMs": 33000,
+  "sloMs": 39000,
   "workflowOutput": {
-    "executionTimeMs": 29287,
-    "totalCost": 0.10562200000000001,
+    "executionTimeMs": 30141,
+    "totalCost": 0.10559400000000001,
     "data": {
       "sizeBytes": 37873978
     },
@@ -39,12 +39,12 @@
       },
       "merge-videos": {
         "resourceProfile": {
-          "memoryMiB": 4096,
-          "milliCpu": 2000,
-          "price100Ms": 0.00000812
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "price100Ms": 0.00000406
         },
-        "executionTimeMs": 1592,
-        "executionCost": 0.00013
+        "executionTimeMs": 2446,
+        "executionCost": 0.000102
       }
     }
   },
