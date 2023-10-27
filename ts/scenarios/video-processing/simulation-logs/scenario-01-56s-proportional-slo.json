@@ -1,0 +1,12 @@
+{
+  "scenarioName": "scenario-01-input-500-Mib",
+  "resourceConfigStrategy": "ProportionalSloConfigStrategy",
+  "inputDataSizeMib": 500.7261505126953,
+  "sloMs": 56000,
+  "workflowOutput": {
+    "executionTimeMs": -1,
+    "totalCost": -1
+  },
+  "sloFulfilled": true,
+  "error": "Error: ProportionalSloConfigStrategy only supports simple workflows with with a single path of execution (i.e., no forks or joins)."
+}
