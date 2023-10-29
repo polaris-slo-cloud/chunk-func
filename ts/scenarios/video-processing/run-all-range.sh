@@ -97,3 +97,7 @@ done
 # Convert the results to CSV
 echo "Converting results and storing them in $RESULTS_CSV"
 node "$RESULTS_CONVERTER_JS" "$OUTPUT_DIR" "$RESULTS_CSV"
+
+# Sort the CSV by strategy, scenario, and SLO
+sortedCsv=$(head -n 1 "$RESULTS_CSV" && tail -n +2 "$RESULTS_CSV" | sort -t "," -k 1,1d -k 2,2h -k 3,3n)
+echo "$sortedCsv" > "$RESULTS_CSV"
