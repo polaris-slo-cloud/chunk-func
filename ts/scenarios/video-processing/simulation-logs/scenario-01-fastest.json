@@ -2,7 +2,7 @@
   "scenarioName": "scenario-01-input-500-Mib",
   "resourceConfigStrategy": "FastestConfigStrategy",
   "inputDataSizeMib": 500.7261505126953,
-  "sloMs": 56000,
+  "sloMs": 100,
   "workflowOutput": {
     "executionTimeMs": 44788,
     "totalCost": 0.164635,
@@ -48,5 +48,5 @@
       }
     }
   },
-  "sloFulfilled": true
+  "sloFulfilled": false
 }
