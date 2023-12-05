@@ -1,0 +1,21 @@
+# This is a WorkflowExecutionDescription
+# Input: BigBuckBunny_360p_30fps_crf25_audio96kbps.mp4 (40 MiB)
+# Segment A: 2 min (9.37 MiB)
+# Segment B: 2 min (9.37 MiB)
+# In the current simulator we need to use equal segment sizes, because we cannot feed different
+# output sizes to the two parallel functions cut-video-segment-a and cut-video-segment-b
+scenarioName: scenario-03-input-40-Mib
+inputSizeBytes: 42254483
+
+# 9014 is the fastest possible time.
+# 20090 is the time for the cheapest possible config.
+maxResponseTimeMsOverride: 11500
+stepExecutions:
+  validate-video:
+    outputSizeBytes: 8450897
+  cut-video-segment-a:
+    outputSizeBytes: 9830053
+  cut-video-segment-b:
+    outputSizeBytes: 9830053
+  merge-videos:
+    outputSizeBytes: 18936989

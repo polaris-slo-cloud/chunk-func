@@ -1,0 +1,68 @@
+# This FunctionDescription example refers to the validate-video function located in the repository folder
+# testbed/workflows/video-processing/01-validate-video
+
+apiVersion: chunk-func.polaris-slo-cloud.github.io/v1
+kind: FunctionDescription
+metadata:
+  namespace: func-test
+  name: validate-video
+  labels:
+    app.kubernetes.io/name: functiondescription
+    app.kubernetes.io/instance: validate-video
+    app.kubernetes.io/part-of: chunk-func-controller
+spec:
+  functionDescription:
+    functionName: validate-video
+    functionContainer: user-container
+    maxResponseTimeMs: 4000
+    typicalInputs:
+      - sizeBytes: 42254483 # 40.2 MiB
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_360p_30fps_crf25_audio96kbps.mp4
+            objectSizeBytes: 42254483
+          segments:
+            - start: 00:00:00
+              end: 00:02:00
+            - start: 00:08:00
+              end: 00:10:00
+          quality: 20
+
+      - sizeBytes: 238915345 # 227 MiB
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
+            objectSizeBytes: 238915345
+          segments:
+            - start: 00:00:00
+              end: 00:02:00
+            - start: 00:08:00
+              end: 00:10:00
+          quality: 20
+
+      - sizeBytes: 525049424 # 500 MiB
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_1080p_30fps_crf16_audio256kbps.mp4
+            objectSizeBytes: 525049424
+          segments:
+            - start: 00:00:00
+              end: 00:02:00
+            - start: 00:08:00
+              end: 00:10:00
+          quality: 20

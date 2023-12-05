@@ -57,10 +57,21 @@ type ResourceProfileResults struct {
 	// there was no successful run for a particular input size, this input size
 	// is not present in this list.
 	//
-	// This is only present if DeploymentStatus is DeploymentSuccess.
+	// Note 1: This is only present if DeploymentStatus is DeploymentSuccess.
+	// Note 2: If none of the profiling runs was successful, this list is empty.
 	//
 	// +optional
 	Results []*ProfilingResult `json:"results" yaml:"results"`
+
+	// The unfiltered profiling results ordered by increasing input size.
+	//
+	// Unfiltered means that also input sizes with only failed runs are included.
+	// This is present for debugging purposes.
+	//
+	// If DeploymentStatus is not DeploymentSuccess, this is nil.
+	//
+	// +optional
+	UnfilteredResults []*ProfilingResult `json:"unfilteredResults" yaml:"unfilteredResults"`
 }
 
 // A collection of profiling results from a complete profiling session.
@@ -74,11 +85,11 @@ type ProfilingSessionResults struct {
 	// The number of seconds that the profiling session lasted.
 	ProfilingDurationSeconds int32 `json:"profilingDurationSeconds" yaml:"profilingDurationSeconds"`
 
-	// The list of results grouped by ResourceProfiles, ordered by increasing base cost (price per 100ms).
+	// The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (price per 100ms).
 	Results []*ResourceProfileResults `json:"results" yaml:"results"`
 }
 
-// Returns the result that exactly matches the specified input size or nil.
+// Returns the result that matches the specified input size or nil.
 func (rpr *ResourceProfileResults) FindResultForInputSize(inputSizeBytes int64) *ProfilingResult {
 	index := sort.Search(
 		len(rpr.Results),

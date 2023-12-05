@@ -2,6 +2,7 @@ import { Heap } from 'heap-js';
 import {
     PreconfiguredConfigStrategy,
     ProfilingResult,
+    ProfilingResultWithProfileId,
     ResourceProfile,
     Workflow,
     WorkflowExecutionDescription,
@@ -59,7 +60,11 @@ export class ConfigFinder {
     optimizeForSlo(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamOutput{
         // In the base version of the algorithm we always return a function to the heap if it hasn't exhausted all available profiles.
         const alwaysReturnToHeap: CheckReturnToHeapFn = () => true;
-        return this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, alwaysReturnToHeap);
+        const result = this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, alwaysReturnToHeap);
+        if (!result) {
+            throw new Error(`There is no configuration that satisfies the SLO of ${maxExecutionTimeMs}`);
+        }
+        return result;
     }
 
     /**
@@ -80,16 +85,26 @@ export class ConfigFinder {
         };
         const costOptimizedResult = this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, returnToHeapIfCostEfficient);
 
-        if (costOptimizedResult.workflowOutput.totalCost < baseResult.workflowOutput.totalCost) {
-            // console.log(`Returning cost optimized result (${costOptimizedResult.workflowOutput.totalCost}) instead of base result (${baseResult.workflowOutput.totalCost}).`)
+        if (costOptimizedResult && (!baseResult || costOptimizedResult.workflowOutput.totalCost < baseResult.workflowOutput.totalCost)) {
+            // Cost optimized result is cheaper than baseResult or baseResult does not exist (i.e., could not fulfill the SLO).
             return costOptimizedResult;
         } else {
-            // console.log(`Returning base result (${baseResult.workflowOutput.totalCost}) instead of cost optimized result (${costOptimizedResult.workflowOutput.totalCost}).`)
-            return baseResult;
+            // Cost optimized result is not cheaper or it does not exist (i.e., could not fulfill the SLO).
+            // Ensure that baseResult exists.
+            if (baseResult) {
+                return baseResult;
+            }
         }
+
+        throw new Error(`There is no configuration that satisfies the SLO of ${maxExecutionTimeMs}`);
     }
 
-    private optimizeForSloInternal(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>, checkReturnToHeap: CheckReturnToHeapFn): SlamOutput {
+    /**
+     * Optimizes for the specified SLO.
+     *
+     * @returns the workflowOutput and the stepConfigs on success or `undefined` if no configuration to satisfy the SLO can be found.
+     */
+    private optimizeForSloInternal(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>, checkReturnToHeap: CheckReturnToHeapFn): SlamOutput | undefined {
         const stepInputSizes = this.computeStepInputSizes(workflowInput);
         const state = this.initSlamState(maxExecutionTimeMs, workflowInput);
 
@@ -103,7 +118,7 @@ export class ConfigFinder {
             }
 
             const longestFunc = state.funcHeap.pop();
-            if (longestFunc.selectedProfileIndex < longestFunc.step.profilingResults.results.length - 1) {
+            if (longestFunc.selectedProfileIndex < this.availableProfiles.length - 1) {
                 const oldProfileResult = longestFunc.profilingResult;
                 longestFunc.selectedProfileIndex++;
                 longestFunc.profilingResult = this.getProfilingResultForProfile(
@@ -118,7 +133,8 @@ export class ConfigFinder {
             }
         } while (!state.funcHeap.isEmpty());
 
-        throw new Error(`There is no configuration that satisfies the SLO of ${maxExecutionTimeMs}`);
+        // There is no configuration that satisfies the SLO.
+        return undefined;
     }
 
     private getResourceProfiles(workflow: Workflow): ResourceProfile[] {
@@ -140,22 +156,43 @@ export class ConfigFinder {
     }
 
     private fillHeap(state: SlamState): void {
-        const baseProfile = this.availableProfiles[0];
         const graph = this.workflow.graph;
 
         for (const stepName in graph.steps) {
             const step = graph.steps[stepName];
             if (step.type === WorkflowStepType.Function) {
                 const functionStep = step as WorkflowFunctionStep;
+                const baseProfilingResult = this.getProfilingResultForBaseProfile(functionStep, state.stepInputSizes[functionStep.name]);
+
                 const slamInfo: SlamFunctionInfo = {
                     step: functionStep,
-                    selectedProfileIndex: 0,
-                    profilingResult: this.getProfilingResultForProfile(functionStep, state.stepInputSizes[functionStep.name], baseProfile),
+                    selectedProfileIndex: this.getProfileIndex(baseProfilingResult.resourceProfileId),
+                    profilingResult: baseProfilingResult.result,
                 };
                 state.funcHeap.add(slamInfo);
                 state.funcSteps.push(slamInfo);
             }
         }
+    }
+
+    /**
+     * Gets the ProfilingResult with the lowest memory configuration for the specified step.
+     *
+     * Each step may have a different base profile, because some may not work with the lower end resource profiles.
+     */
+    private getProfilingResultForBaseProfile(step: WorkflowFunctionStep, inputSize: number): ProfilingResultWithProfileId {
+        for (const result of getResultsForInput(step.profilingResults, inputSize)) {
+            return result;
+        }
+        throw new Error(`Could not find a successful ProfilingResult for step ${step.name}.`);
+    }
+
+    private getProfileIndex(profileId: string): number {
+        const index = this.availableProfiles.findIndex(profile => getResourceProfileId(profile) === profileId);
+        if (index === -1) {
+            throw new Error(`Could not find profile ${profileId} in the list of available profiles`);
+        }
+        return index;
     }
 
     private getProfilingResultForProfile(step: WorkflowFunctionStep, inputSize:number, profile: ResourceProfile): ProfilingResult {
@@ -165,6 +202,7 @@ export class ConfigFinder {
                 return result.result;
             }
         }
+        throw new Error(`Could not find a successful ProfilingResult for ${profileId}.`);
     }
 
     private computeStepInputSizes(workflowInput: WorkflowInput<any>): Record<string, number> {

@@ -1,4 +1,4 @@
-import { ProfilingResultWithProfileId, ProfilingSessionResults, ResourceProfile, WorkflowStepType } from '../model';
+import { ProfilingResultWithProfileId, ProfilingSessionResults, ResourceProfile, WorkflowStepType, isSuccessStatusCode } from '../model';
 import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, WorkflowStepWeight, WorkflowPath } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
@@ -91,7 +91,7 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
         }
 
         if (!selectedProfileId) {
-            throw new Error('ProfilingResults did not contain any results.');
+            throw new Error('ProfilingResults did not contain any results or no successful results.');
         }
         return selectedProfileId;
     }
@@ -133,16 +133,18 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
  */
 function* getResultsForMiddleInput(profilingSessionResults: ProfilingSessionResults): Generator<ProfilingResultWithProfileId> {
     for (const profileResult of profilingSessionResults.results) {
-        if (!profileResult.results) {
+        if (!profileResult.results || profileResult.results.length === 0) {
             throw new Error(`ResourceProfileResults for ${profileResult.resourceProfileId} does not contain any results.`);
         }
 
-        const middleIndex = Math.floor(profileResult.results.length / 2);
+        const middleIndex = Math.floor((profileResult.results.length - 1) / 2);
         const middleInputResult = profileResult.results[middleIndex];
 
-        yield {
-            resourceProfileId: profileResult.resourceProfileId,
-            result: middleInputResult,
+        if (isSuccessStatusCode(middleInputResult.statusCode)) {
+            yield {
+                resourceProfileId: profileResult.resourceProfileId,
+                result: middleInputResult,
+            }
         }
     }
 }

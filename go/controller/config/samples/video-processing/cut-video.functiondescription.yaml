@@ -1,0 +1,157 @@
+# This FunctionDescription example refers to the cut-video function located in the repository folder
+# testbed/workflows/video-processing/02-cut-video
+
+apiVersion: chunk-func.polaris-slo-cloud.github.io/v1
+kind: FunctionDescription
+metadata:
+  namespace: func-test
+  name: cut-video
+  labels:
+    app.kubernetes.io/name: functiondescription
+    app.kubernetes.io/instance: cut-video
+    app.kubernetes.io/part-of: chunk-func-controller
+spec:
+  functionDescription:
+    functionName: cut-video
+    functionContainer: user-container
+    maxResponseTimeMs: 120000
+
+    # The workload of the function depends on multiple parameters: the input video size, the length of the segment to extract, and the quality.
+    # We keep the quality always the same to reduce it to two parameters.
+    # We calculate a "virtual input size" by multiplying the source file size with the percentage of minutes to be extracted,
+    # e.g., extract 2m from 10m file of 100MiB size: 100 * 20% = 20
+    typicalInputs:
+      - sizeBytes: 8450897 # 40.2 MiB, 2m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_360p_30fps_crf25_audio96kbps.mp4
+            objectSizeBytes: 42254483
+          segment:
+            start: 00:00:00
+            end: 00:02:00
+          quality: 20
+
+      - sizeBytes: 16901793 # 40.2 MiB, 4m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_360p_30fps_crf25_audio96kbps.mp4
+            objectSizeBytes: 42254483
+          segment:
+            start: 00:00:00
+            end: 00:04:00
+          quality: 20
+
+      - sizeBytes: 33803586 # 40.2 MiB, 8m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_360p_30fps_crf25_audio96kbps.mp4
+            objectSizeBytes: 42254483
+          segment:
+            start: 00:00:00
+            end: 00:08:00
+          quality: 20
+
+      - sizeBytes: 47783069 # 227 MiB, 2m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
+            objectSizeBytes: 238915345
+          segment:
+            start: 00:00:00
+            end: 00:02:00
+          quality: 20
+
+      - sizeBytes: 95566138 # 227 MiB, 4m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
+            objectSizeBytes: 238915345
+          segment:
+            start: 00:00:00
+            end: 00:04:00
+          quality: 20
+
+      - sizeBytes: 191132276 # 227 MiB, 8m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_720p_30fps_crf18_audio192kbps.mp4
+            objectSizeBytes: 238915345
+          segment:
+            start: 00:00:00
+            end: 00:08:00
+          quality: 20
+
+      - sizeBytes: 105009885 # 500 MiB, 2m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_1080p_30fps_crf16_audio256kbps.mp4
+            objectSizeBytes: 525049424
+          segment:
+            start: 00:00:00
+            end: 00:02:00
+          quality: 20
+
+      - sizeBytes: 210019770 # 500 MiB, 4m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_1080p_30fps_crf16_audio256kbps.mp4
+            objectSizeBytes: 525049424
+          segment:
+            start: 00:00:00
+            end: 00:04:00
+          quality: 20
+
+      - sizeBytes: 420039539 # 500 MiB, 8m segment
+        message:
+          input:
+            url: http://10.152.183.192
+            # This is a demo deployment, we don't care about the password here.
+            user: HYlOGOqiOSpSnBjP
+            password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+            bucket: videos
+            objectKey: BigBuckBunny_1080p_30fps_crf16_audio256kbps.mp4
+            objectSizeBytes: 525049424
+          segment:
+            start: 00:00:00
+            end: 00:08:00
+          quality: 20

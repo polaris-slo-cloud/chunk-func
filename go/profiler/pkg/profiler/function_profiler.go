@@ -10,7 +10,7 @@ import (
 // Configuration for a profiling session.
 type ProfilingConfig struct {
 	// The candidate profiles that should be tried out.
-	// These profiles are ordered by increasing cost (per 100ms).
+	// These profiles are ordered by increasing memory size and base cost (per 100ms).
 	CandidateProfiles []*function.ResourceProfile
 
 	// The number of iterations to execute for a single input size and profile.

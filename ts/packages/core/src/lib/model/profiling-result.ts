@@ -64,9 +64,20 @@ export interface ResourceProfileResults {
      * there was no successful run for a particular input size, this input size
      * is not present in this list.
      *
-     * This is only present if DeploymentStatus is DeploymentSuccess.
+     * Note 1: This is only present if DeploymentStatus is DeploymentSuccess.
+     * Note 2: If none of the profiling runs was successful, this list is empty.
      */
     results?: ProfilingResult[];
+
+    /**
+     * The unfiltered profiling results ordered by increasing input size.
+     *
+     * Unfiltered means that also input sizes with only failed runs are included.
+     * This is present for debugging purposes.
+     *
+     * If DeploymentStatus is not DeploymentSuccess, this is undefined.
+     */
+    unfilteredResults?: ProfilingResult[];
 
 }
 
@@ -86,7 +97,7 @@ export interface ProfilingSessionResults {
     profilingDurationSeconds: number;
 
     /**
-     * The list of results grouped by ResourceProfiles, ordered by increasing cost (per 100ms).
+     * The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (per 100ms).
      */
     results: ResourceProfileResults[];
 
@@ -118,11 +129,15 @@ export function findResourceProfileResults(profile: ResourceProfile, profilingSe
 
 /**
  * Finds the ProfilingResult for the specified inputSize, assuming the the profileResults are ordered by increasing input size.
+ * If no profile with a success status code can be found, `undefined` is returned.
  */
-export function findResultForInput(inputSizeBytes: number, profileResults: ProfilingResult[]): ProfilingResult {
+export function findResultForInput(inputSizeBytes: number, profileResults: ProfilingResult[]): ProfilingResult | undefined {
     let profilingResult = profileResults.find(result => inputSizeBytes <= result.inputSizeBytes && isSuccessStatusCode(result.statusCode));
     if (!profilingResult) {
-        profilingResult = profileResults[profileResults.length - 1];
+        const largestInputResult = profileResults[profileResults.length - 1];
+        if (isSuccessStatusCode(largestInputResult.statusCode)) {
+            profilingResult = largestInputResult;
+        }
     }
     return profilingResult;
 }
@@ -133,6 +148,8 @@ export function isSuccessStatusCode(statusCode: number): boolean {
 
 /**
  * Allows iterating over the ProfilingResults for a particular input size.
+ *
+ * The iteration order goes from the profile with the smallest memory size to the one with the largest.
  */
 export function* getResultsForInput(profilingSessionResults: ProfilingSessionResults, inputSizeBytes: number): Generator<ProfilingResultWithProfileId> {
     for (const profileResult of profilingSessionResults.results) {
@@ -140,9 +157,11 @@ export function* getResultsForInput(profilingSessionResults: ProfilingSessionRes
             throw new Error(`ResourceProfileResults for ${profileResult.resourceProfileId} does not contain any results.`);
         }
         const resultForInput = findResultForInput(inputSizeBytes, profileResult.results);
-        yield {
-            resourceProfileId: profileResult.resourceProfileId,
-            result: resultForInput,
+        if (resultForInput) {
+            yield {
+                resourceProfileId: profileResult.resourceProfileId,
+                result: resultForInput,
+            }
         }
     }
 }
@@ -157,9 +176,11 @@ export function* getAllResults(profilingSessionResults: ProfilingSessionResults)
         }
 
         for (const result of profileResult.results) {
-            yield {
-                resourceProfileId: profileResult.resourceProfileId,
-                result: result,
+            if (isSuccessStatusCode(result.statusCode)) {
+                yield {
+                    resourceProfileId: profileResult.resourceProfileId,
+                    result: result,
+                }
             }
         }
     }

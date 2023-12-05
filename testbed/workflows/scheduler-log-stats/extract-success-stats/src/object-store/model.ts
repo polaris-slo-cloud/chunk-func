@@ -20,6 +20,10 @@ export interface ObjectStoreReference extends ObjectStoreCredentials {
 }
 
 export function isValidObjectStoreReference(obj: IncomingBody | undefined): obj is ObjectStoreReference {
+    if (!obj) {
+        return false;
+    }
+
     const objRef = obj as ObjectStoreReference;
     let isValid = typeof objRef.url === 'string';
     isValid = isValid && typeof objRef.user === 'string';

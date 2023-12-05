@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/go-logr/logr"
@@ -151,7 +152,7 @@ func (pr *exhaustiveFunctionProfilerSession) evaluateResourceProfile(ctx context
 
 	var fnTrigger trigger.TimedFunctionTrigger[any] = trigger.NewRestTrigger()
 	results.DeploymentStatus = function.DeploymentSuccess
-	results.Results = make([]*function.ProfilingResult, len(pr.fn.Description.TypicalInputs))
+	results.UnfilteredResults = make([]*function.ProfilingResult, len(pr.fn.Description.TypicalInputs))
 
 	// Warm the function up.
 	_, err = pr.profileFunctionCall(ctx, fnTrigger, targetFn, pr.fn.Description.TypicalInputs[0])
@@ -167,12 +168,14 @@ func (pr *exhaustiveFunctionProfilerSession) evaluateResourceProfile(ctx context
 		if err != nil {
 			return nil, err
 		}
-		results.Results[i] = resultForInput
+		results.UnfilteredResults[i] = resultForInput
 
 		pr.logger.Info("Successfully profiled input size", "service", targetFnName, "inputSize", input.SizeBytes)
 	}
 
 	pr.computeExecutionCosts(results, resourceProfile)
+	sortProfilingResultsByInputSize(results.UnfilteredResults)
+	results.Results = copyAndPruneResults(results.UnfilteredResults)
 
 	return results, nil
 }
@@ -195,7 +198,7 @@ func (pr *exhaustiveFunctionProfilerSession) profileWithInput(
 		results[i] = result
 	}
 
-	return AggregateProfilingResults(results), nil
+	return AggregateProfilingResults(results)
 }
 
 // Executes a single profiled function invocation.
@@ -233,9 +236,10 @@ func (pr *exhaustiveFunctionProfilerSession) aggregateAllResults() *function.Pro
 }
 
 func (pr *exhaustiveFunctionProfilerSession) computeExecutionCosts(results *function.ResourceProfileResults, profile *function.ResourceProfile) {
-	for _, result := range results.Results {
+	for _, result := range results.UnfilteredResults {
 		cost := profile.CalculateCost(result.ExecutionTimeMs)
 		costStr := fmt.Sprintf("%10f", cost)
+		costStr = strings.Trim(costStr, " ")
 		result.ExecutionCost = &costStr
 	}
 }

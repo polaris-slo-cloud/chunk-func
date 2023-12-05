@@ -1,0 +1,122 @@
+{
+  "slamScenario": "slam-scenario",
+  "slamResult": {
+    "workflowOutput": {
+      "executionTimeMs": 11271,
+      "totalCost": 0.000172,
+      "data": {
+        "sizeBytes": 21512192
+      },
+      "stepLogs": {
+        "validate-log": {
+          "resourceProfile": {
+            "memoryMiB": 512,
+            "milliCpu": 333,
+            "price100Ms": 0.000001295
+          },
+          "executionTimeMs": 2975,
+          "executionCost": 0.000039
+        },
+        "extract-basic-stats": {
+          "resourceProfile": {
+            "memoryMiB": 1024,
+            "milliCpu": 583,
+            "price100Ms": 0.00000231
+          },
+          "executionTimeMs": 2318,
+          "executionCost": 0.000055
+        },
+        "extract-successes": {
+          "resourceProfile": {
+            "memoryMiB": 512,
+            "milliCpu": 333,
+            "price100Ms": 0.000001295
+          },
+          "executionTimeMs": 3896,
+          "executionCost": 0.000051
+        },
+        "extract-success-stats": {
+          "resourceProfile": {
+            "memoryMiB": 512,
+            "milliCpu": 333,
+            "price100Ms": 0.000001295
+          },
+          "executionTimeMs": 2082,
+          "executionCost": 0.000027
+        }
+      }
+    },
+    "stepConfigs": {
+      "validate-log": {
+        "memoryMiB": 512,
+        "milliCpu": 333,
+        "price100Ms": 0.000001295
+      },
+      "extract-basic-stats": {
+        "memoryMiB": 1024,
+        "milliCpu": 583,
+        "price100Ms": 0.00000231
+      },
+      "extract-successes": {
+        "memoryMiB": 512,
+        "milliCpu": 333,
+        "price100Ms": 0.000001295
+      },
+      "extract-success-stats": {
+        "memoryMiB": 512,
+        "milliCpu": 333,
+        "price100Ms": 0.000001295
+      }
+    }
+  },
+  "resourceConfigStrategy": "SLAM",
+  "scenarioName": "scenario-02-input-54-Mib",
+  "inputDataSizeMib": 54.2734375,
+  "sloMs": 13200,
+  "workflowOutput": {
+    "executionTimeMs": 11271,
+    "totalCost": 0.000172,
+    "data": {
+      "sizeBytes": 21569326
+    },
+    "stepLogs": {
+      "validate-log": {
+        "resourceProfile": {
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
+        },
+        "executionTimeMs": 2975,
+        "executionCost": 0.000039
+      },
+      "extract-basic-stats": {
+        "resourceProfile": {
+          "memoryMiB": 1024,
+          "milliCpu": 583,
+          "price100Ms": 0.00000231
+        },
+        "executionTimeMs": 2318,
+        "executionCost": 0.000055
+      },
+      "extract-successes": {
+        "resourceProfile": {
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
+        },
+        "executionTimeMs": 3896,
+        "executionCost": 0.000051
+      },
+      "extract-success-stats": {
+        "resourceProfile": {
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
+        },
+        "executionTimeMs": 2082,
+        "executionCost": 0.000027
+      }
+    }
+  },
+  "sloFulfilled": true
+}
