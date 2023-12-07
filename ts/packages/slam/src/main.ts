@@ -48,7 +48,7 @@ try {
     output = {
         executionTimeMs: -1,
         totalCost: -1,
-    } as any;
+    } as WorkflowOutput<unknown>;
     error = err;
 }
 
