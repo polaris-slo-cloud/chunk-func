@@ -1,19 +1,21 @@
 import { Heap } from 'heap-js';
 import {
-    PreconfiguredConfigStrategy,
     ProfilingResult,
     ProfilingResultWithProfileId,
     ResourceProfile,
-    Workflow,
     WorkflowExecutionDescription,
+    WorkflowStepType,
+    getResourceProfileId,
+    getResultsForInput,
+} from '../model';
+import {
+    Workflow,
     WorkflowFunctionStep,
     WorkflowInput,
     WorkflowOutput,
     WorkflowStep,
-    WorkflowStepType,
-    getResourceProfileId,
-    getResultsForInput,
-} from '@chunk-func/core';
+} from '../workflow';
+import { PreconfiguredConfigStrategy } from '../resource-configuration';
 import { SlamFunctionInfo, slamFunctionInfoMaxHeapComparator } from './slam-function-info';
 
 interface SlamState {
@@ -41,7 +43,7 @@ interface SloCheckResult extends SlamOutput {
  */
 type CheckReturnToHeapFn = (oldProfileResult: ProfilingResult, newProfileResult: ProfilingResult) => boolean;
 
-export class ConfigFinder {
+export class SlamConfigFinder {
 
     private workflow: Workflow;
     private availableProfiles: ResourceProfile[];
@@ -117,7 +119,7 @@ export class ConfigFinder {
                 };
             }
 
-            const longestFunc = state.funcHeap.pop();
+            const longestFunc = state.funcHeap.pop()!;
             if (longestFunc.selectedProfileIndex < this.availableProfiles.length - 1) {
                 const oldProfileResult = longestFunc.profilingResult;
                 longestFunc.selectedProfileIndex++;

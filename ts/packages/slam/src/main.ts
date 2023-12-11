@@ -1,16 +1,16 @@
 import * as fs from 'node:fs';
 import * as Yaml from 'js-yaml';
 import {
+    SlamConfigFinder,
     PreconfiguredConfigStrategy,
+    SlamOutput,
+    SlamSimulatorOutput,
     WorkflowBuilder,
     WorkflowDescription,
     WorkflowExecutionDescription,
     WorkflowOutput,
     buildWorkflowInput,
 } from '@chunk-func/core';
-import { ConfigFinder, SlamOutput } from './slam/config-finder';
-import { SlamSimulatorOutput } from './slam/slam-simulator-output';
-
 
 if (process.argv.length < 5) {
     console.log('Usage:');
@@ -31,7 +31,7 @@ const workflow = workflowBuilder.buildWorkflow(workflowDesc);
 const evalSlo = evalExecDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs;
 
 const slamInput = buildWorkflowInput(slamExecDesc);
-const configFinder = new ConfigFinder(workflow);
+const configFinder = new SlamConfigFinder(workflow);
 
 let slamResult: SlamOutput;
 let output: WorkflowOutput<unknown>;

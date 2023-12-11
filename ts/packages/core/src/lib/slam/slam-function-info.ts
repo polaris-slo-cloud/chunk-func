@@ -1,5 +1,6 @@
-import { ProfilingResult, WorkflowFunctionStep } from '@chunk-func/core';
 import { Comparator } from 'heap-js';
+import { ProfilingResult } from '../model';
+import { WorkflowFunctionStep } from '../workflow';
 
 export interface SlamFunctionInfo {
 

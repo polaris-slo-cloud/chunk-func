@@ -1,4 +1,4 @@
-import { SimulatorOutput } from '@chunk-func/core';
+import { SimulatorOutput } from '../simulator';
 import { SlamOutput } from './config-finder';
 
 export interface SlamSimulatorOutput extends SimulatorOutput {
