@@ -10,6 +10,10 @@ export const createSlamConfigStrategy: ChooseConfigurationStrategyFactory =
 /**
  * ResourceConfigurationStrategy that runs the SLAM algorithm on a training input and uses the result from that
  * as the predefined choices for the resource configurations during the workflow execution.
+ *
+ * SLAM was proposed in this paper:
+ * G. Safaryan, A. Jindal, M. Chadha, and M. Gerndt, “SLAM: SLO-Aware Memory Optimization for Serverless Applications,”
+ * in 2022 IEEE 15th International Conference on Cloud Computing (CLOUD), 2022, pp. 30–39.
  */
 export class SlamConfigStrategy extends ResourceConfigurationStrategyBase {
 

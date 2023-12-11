@@ -43,6 +43,11 @@ interface SloCheckResult extends SlamOutput {
  */
 type CheckReturnToHeapFn = (oldProfileResult: ProfilingResult, newProfileResult: ProfilingResult) => boolean;
 
+/**
+ * Computes resource configurations for a workflow using SLAM, which was proposed in this paper:
+ * G. Safaryan, A. Jindal, M. Chadha, and M. Gerndt, “SLAM: SLO-Aware Memory Optimization for Serverless Applications,”
+ * in 2022 IEEE 15th International Conference on Cloud Computing (CLOUD), 2022, pp. 30–39.
+ */
 export class SlamConfigFinder {
 
     private workflow: Workflow;
