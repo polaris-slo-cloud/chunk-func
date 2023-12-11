@@ -1,6 +1,9 @@
 {
-  "slamScenario": "slam-scenario",
-  "slamResult": {
+  "scenarioName": "scenario-02-input-54-Mib",
+  "resourceConfigStrategy": "SlamConfigStrategy",
+  "inputDataSizeMib": 54.2734375,
+  "sloMs": 12720,
+  "strategyTrainingOutput": {
     "workflowOutput": {
       "executionTimeMs": 11271,
       "totalCost": 0.000172,
@@ -69,10 +72,6 @@
       }
     }
   },
-  "resourceConfigStrategy": "SLAM",
-  "scenarioName": "scenario-02-input-54-Mib",
-  "inputDataSizeMib": 54.2734375,
-  "sloMs": 12720,
   "workflowOutput": {
     "executionTimeMs": 11271,
     "totalCost": 0.000172,
