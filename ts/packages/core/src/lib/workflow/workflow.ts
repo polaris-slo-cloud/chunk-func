@@ -21,6 +21,18 @@ export interface ResourceConfigurationStrategy {
     readonly availableResourceProfiles: Record<string, ResourceProfile>
 
     /**
+     * (optional) Trains the resource configuration strategy on a specific SLO and input.
+     *
+     * If this method is implemented by a resource configuration strategy, it is called before the
+     * execution of the workflow.
+     *
+     * @param slo The SLO that should be used for training.
+     * @param trainingInput The WorkflowInput to be used for training. This may be different
+     * from the input to the actual workflow.
+     */
+    train?(slo: number, trainingInput: WorkflowInput<unknown>): any;
+
+    /**
      * Chooses the resource profile configuration for the specified function step, given the current state and input.
      */
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile;

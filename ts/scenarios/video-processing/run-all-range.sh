@@ -11,7 +11,6 @@ RESULTS_CSV="./simulation-results.csv"
 SLAM_SCENARIO_PATH="slam-scenario.yaml"
 
 CHUNK_FUNC_SIM_JS="../../dist/packages/chunk-func-sim/main.js"
-SLAM_SIM_JS="../../dist/packages/slam/main.js"
 RESULTS_CONVERTER_JS="../../dist/packages/results-converter/main.js"
 
 declare -A SCENARIOS=(
@@ -55,7 +54,7 @@ function runSloStrategies() {
     done
 
     echo "Running SLAM with SLO: $sloMs"
-    node "$SLAM_SIM_JS" "$WORKFLOW_PATH" "$SLAM_SCENARIO_PATH" "$scenarioFinalYamlFile" > "${OUTPUT_DIR}/${scenarioName}-slam-${sloMs}.json"
+    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "SlamConfigStrategy" "$SLAM_SCENARIO_PATH" > "${OUTPUT_DIR}/${scenarioName}-slam-${sloMs}.json"
 
     rm "$scenarioFinalYamlFile"
 }

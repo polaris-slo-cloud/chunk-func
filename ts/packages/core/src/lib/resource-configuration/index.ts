@@ -9,6 +9,7 @@ export * from './proportional-critical-path-slo-config-strategy.base';
 export * from './proportional-critical-path-slo-config-strategy';
 export * from './proportional-slo-config-strategy';
 export * from './resource-configuration-strategy.base';
+export * from './slam-config-strategy';
 export * from './slo-compliant-config-strategy.base';
 export * from './slo-compliant-config-strategy';
 export * from './slowest-config-strategy';

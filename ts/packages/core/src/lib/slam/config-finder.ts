@@ -15,7 +15,7 @@ import {
     WorkflowOutput,
     WorkflowStep,
 } from '../workflow';
-import { PreconfiguredConfigStrategy } from '../resource-configuration';
+import { PreconfiguredConfigStrategy } from '../resource-configuration/preconfigured-config-strategy';
 import { SlamFunctionInfo, slamFunctionInfoMaxHeapComparator } from './slam-function-info';
 
 interface SlamState {

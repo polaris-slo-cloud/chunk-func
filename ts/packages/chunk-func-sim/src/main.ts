@@ -30,6 +30,8 @@ import {
     FixedOutputProportionalCPSloConfigStrategy,
     createFixedOutputProportionalCPSloConfigStrategy,
     WorkflowOutput,
+    SlamConfigStrategy,
+    createSlamConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -44,19 +46,27 @@ const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactor
     [InputHeuristicSloCompliantConfigStrategy.strategyName]: createInputHeuristicSloCompliantConfigStrategy,
     [FixedOutputSloCompliantConfigStrategy.strategyName]: createFixedOutputSloCompliantConfigStrategy,
     [StepConfConfigStrategy.strategyName]: createStepConfConfigStrategy,
+    [SlamConfigStrategy.strategyName]: createSlamConfigStrategy,
 };
 
 if (process.argv.length < 5) {
     console.log('Usage:');
-    console.log('node main.js <workflow.yaml> <scenario.yaml> <ResourceConfigurationStrategy>');
+    console.log('node main.js <workflow.yaml> <scenario.yaml> <ResourceConfigurationStrategy> (<training-scenario.yaml>)');
     console.log('Available ResourceConfigurationStrategies:', Object.keys(resourceConfigStrategies));
     process.exit(1);
 }
 
-const workflowStr = fs.readFileSync(process.argv[2], { encoding: 'utf8' });
-const scenarioStr = fs.readFileSync(process.argv[3], { encoding: 'utf8' });
-const workflowDesc = Yaml.load(workflowStr) as WorkflowDescription;
-const execDesc = Yaml.load(scenarioStr) as WorkflowExecutionDescription;
+function loadYamlFile<T>(path: string): T {
+    const contents = fs.readFileSync(path, { encoding: 'utf8' });
+    return Yaml.load(contents) as T;
+}
+
+const workflowDesc = loadYamlFile<WorkflowDescription>(process.argv[2]);
+const execDesc =  loadYamlFile<WorkflowExecutionDescription>(process.argv[3]);
+let trainingScenarioDesc: WorkflowExecutionDescription | undefined;
+if (process.argv[5]) {
+    trainingScenarioDesc = loadYamlFile<WorkflowExecutionDescription>(process.argv[5]);
+}
 
 const resourceConfigStratName = process.argv[4];
 const resConfigStratFactory = resourceConfigStrategies[resourceConfigStratName];
@@ -70,12 +80,22 @@ const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
 const slo = execDesc.maxResponseTimeMs;
 
+let strategyTrainingOutput: any;
 let output: WorkflowOutput<unknown>;
 let error: Error;
 
 try {
-    const input = buildWorkflowInput(execDesc);
     const resConfigStrat = resConfigStratFactory(workflow);
+
+    if (resConfigStrat.train) {
+        if (!trainingScenarioDesc) {
+            throw new Error(`${resConfigStrat.name} requires a training-scenario.yaml to be specified as the last argument.`);
+        }
+        const trainingInput = buildWorkflowInput(trainingScenarioDesc);
+        strategyTrainingOutput = resConfigStrat.train(slo, trainingInput);
+    }
+
+    const input = buildWorkflowInput(execDesc);
     output = workflow.execute(input, resConfigStrat);
 } catch (err) {
     output = {
@@ -90,6 +110,7 @@ const simOutput: SimulatorOutput = {
     resourceConfigStrategy: resourceConfigStratName,
     inputDataSizeMib: execDesc.inputSizeBytes / 1024 / 1024,
     sloMs: slo,
+    strategyTrainingOutput,
     workflowOutput: output,
     sloFulfilled: output.executionTimeMs <= slo,
 };

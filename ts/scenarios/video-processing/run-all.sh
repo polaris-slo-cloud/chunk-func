@@ -91,15 +91,15 @@ node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-11.5s.
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-14s.yaml StepConfConfigStrategy > ./simulation-logs/scenario-03-14s-step-conf.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-16s.yaml StepConfConfigStrategy > ./simulation-logs/scenario-03-16s-step-conf.json
 
-node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-01-56s.yaml > ./simulation-logs/scenario-01-56s-slam.json
-node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-01-67.5s.yaml > ./simulation-logs/scenario-01-67.5s-slam.json
-node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-01-78.5s.yaml > ./simulation-logs/scenario-01-78.5s-slam.json
-node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-02-37s.yaml > ./simulation-logs/scenario-02-37s-slam.json
-node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-02-44s.yaml > ./simulation-logs/scenario-02-44s-slam.json
-node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-02-51.5s.yaml > ./simulation-logs/scenario-02-51.5s-slam.json
-node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-03-11.5s.yaml > ./simulation-logs/scenario-03-11.5s-slam.json
-node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-03-14s.yaml > ./simulation-logs/scenario-03-14s-slam.json
-node ../../dist/packages/slam/main.js workflow.yaml slam-scenario.yaml scenario-03-16s.yaml > ./simulation-logs/scenario-03-16s-slam.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-56s.yaml SlamConfigStrategy slam-scenario.yaml > ./simulation-logs/scenario-01-56s-slam.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-67.5s.yaml SlamConfigStrategy slam-scenario.yaml > ./simulation-logs/scenario-01-67.5s-slam.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-78.5s.yaml SlamConfigStrategy slam-scenario.yaml > ./simulation-logs/scenario-01-78.5s-slam.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-37s.yaml SlamConfigStrategy slam-scenario.yaml > ./simulation-logs/scenario-02-37s-slam.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-44s.yaml SlamConfigStrategy slam-scenario.yaml > ./simulation-logs/scenario-02-44s-slam.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-51.5s.yaml SlamConfigStrategy slam-scenario.yaml > ./simulation-logs/scenario-02-51.5s-slam.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-11.5s.yaml SlamConfigStrategy slam-scenario.yaml > ./simulation-logs/scenario-03-11.5s-slam.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-14s.yaml SlamConfigStrategy slam-scenario.yaml > ./simulation-logs/scenario-03-14s-slam.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-16s.yaml SlamConfigStrategy slam-scenario.yaml > ./simulation-logs/scenario-03-16s-slam.json
 
 # # Convert the results to CSV
 node ../../dist/packages/results-converter/main.js ./simulation-logs ./simulation-results.csv
