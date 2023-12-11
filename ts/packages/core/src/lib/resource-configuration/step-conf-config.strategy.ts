@@ -1,9 +1,9 @@
 import { ProfilingResultWithProfileId, ProfilingSessionResults, ResourceProfile, WorkflowStepType, isSuccessStatusCode } from '../model';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, WorkflowStepWeight, WorkflowPath } from '../workflow';
+import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, WorkflowStepWeight, WorkflowPath, Workflow } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 export const createStepConfConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new StepConfConfigStrategy(graph, availableResProfiles);
+    (workflow: Workflow) => new StepConfConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
 
 /**
  * ResourceConfigurationStrategy that picks the configuration according to the Global-cached Most Cost-effective Critical Path Algorithm

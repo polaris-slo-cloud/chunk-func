@@ -8,11 +8,12 @@ import {
     GetStepWeightFn,
     getCheapestExecutionTimeForInput,
     getFastestExecutionTimeForInput,
+    Workflow,
 } from '../workflow';
 import { SloCompliantConfigStrategyBase } from './slo-compliant-config-strategy.base';
 
 export const createSloCompliantConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new SloCompliantConfigStrategy(graph, availableResProfiles);
+    (workflow: Workflow) => new SloCompliantConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
 
 /**
  * ResourceConfigurationStrategy that always picks the cheapest profile that allows fulfilling the SLO.

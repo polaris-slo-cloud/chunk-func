@@ -3,6 +3,7 @@ import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
     ResourceConfigurationStrategy,
+    Workflow,
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
@@ -11,7 +12,7 @@ import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 export const createProportionalSloConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new ProportionalSloConfigStrategy(graph, availableResProfiles);
+    (workflow: Workflow) => new ProportionalSloConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
 
 /**
  * ResourceConfigurationStrategy that divides the SLO into parts according to the distribution of the execution times of the profiled functions.

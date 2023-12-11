@@ -1,9 +1,9 @@
 import { ResourceProfile, getResultsForInput } from '../model';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep } from '../workflow';
+import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, Workflow } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 export const createSlowestConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new SlowestConfigStrategy(graph, availableResProfiles);
+    (workflow: Workflow) => new SlowestConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
 
 /**
  * ResourceConfigurationStrategy that always picks the slowest resource configuration, irrespective of the SLO.

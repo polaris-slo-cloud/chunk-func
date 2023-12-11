@@ -2,6 +2,7 @@ import { ResourceProfile, WorkflowExecutionDescription, WorkflowStepType, getRes
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
+    Workflow,
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
@@ -9,7 +10,7 @@ import {
 import { ProportionalCriticalPathSloConfigStrategyBase } from './proportional-critical-path-slo-config-strategy.base';
 
 export const createFixedOutputProportionalCPSloConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new FixedOutputProportionalCPSloConfigStrategy(graph, availableResProfiles);
+    (workflow: Workflow) => new FixedOutputProportionalCPSloConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
 
 /**
  * ProportionalCriticalPathSlo ResourceConfigStrategy that knows all input sizes and uses them for computing the average weights for the critical path.

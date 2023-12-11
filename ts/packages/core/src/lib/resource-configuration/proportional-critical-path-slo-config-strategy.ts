@@ -2,6 +2,7 @@ import { ResourceProfile, WorkflowStepType, isSuccessStatusCode } from '../model
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
+    Workflow,
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
@@ -9,7 +10,7 @@ import {
 import { ProportionalCriticalPathSloConfigStrategyBase } from './proportional-critical-path-slo-config-strategy.base';
 
 export const createProportionalCriticalPathSloConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new ProportionalCriticalPathSloConfigStrategy(graph, availableResProfiles);
+    (workflow: Workflow) => new ProportionalCriticalPathSloConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
 
 /**
  * ResourceConfigurationStrategy that divides the SLO into parts according to the distribution of the execution times of the profiled functions.

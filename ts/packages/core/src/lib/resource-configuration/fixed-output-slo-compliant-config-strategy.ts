@@ -7,11 +7,12 @@ import {
     WorkflowFunctionStep,
     GetStepWeightFn,
     getCheapestExecutionTimeForInput,
+    Workflow,
 } from '../workflow';
 import { SloCompliantConfigStrategyBase } from './slo-compliant-config-strategy.base';
 
 export const createFixedOutputSloCompliantConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new FixedOutputSloCompliantConfigStrategy(graph, availableResProfiles);
+    (workflow: Workflow) => new FixedOutputSloCompliantConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
 
 /**
  * ResourceConfigurationStrategy that always picks the cheapest profile that allows fulfilling the SLO,

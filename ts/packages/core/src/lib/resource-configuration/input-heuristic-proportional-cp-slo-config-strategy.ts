@@ -2,6 +2,7 @@ import { ResourceProfile, WorkflowStepType, getResultsForInput } from '../model'
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
+    Workflow,
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
@@ -9,7 +10,7 @@ import {
 import { ProportionalCriticalPathSloConfigStrategyBase } from './proportional-critical-path-slo-config-strategy.base';
 
 export const createInputHeuristicProportionalCPSloConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new InputHeuristicProportionalCPSloConfigStrategy(graph, availableResProfiles);
+    (workflow: Workflow) => new InputHeuristicProportionalCPSloConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
 
 /**
  * ProportionalCriticalPathSlo ResourceConfigStrategy that recomputes the average step weights every time using only profiling results for the current step's input size,

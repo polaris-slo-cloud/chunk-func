@@ -75,7 +75,7 @@ let error: Error;
 
 try {
     const input = buildWorkflowInput(execDesc);
-    const resConfigStrat = resConfigStratFactory(workflow.graph, workflow.availableResourceProfiles);
+    const resConfigStrat = resConfigStratFactory(workflow);
     output = workflow.execute(input, resConfigStrat);
 } catch (err) {
     output = {
