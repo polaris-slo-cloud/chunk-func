@@ -95,11 +95,6 @@ export interface Workflow {
     readonly availableResourceProfiles: Record<string, ResourceProfile>
 
     /**
-     * The maximum execution time SLO in milliseconds.
-     */
-    maxExecutionTimeMs: number;
-
-    /**
      * Simulates the execution of the workflow using the specified input.
      */
     execute<I, O>(input: WorkflowInput<I>, resourceConfigStrat: ResourceConfigurationStrategy): WorkflowOutput<O>;

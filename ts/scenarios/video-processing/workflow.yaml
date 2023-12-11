@@ -1,7 +1,6 @@
 # Note that for cut-video, the inputs have been reordered: 500 MiB * 2m segment is smaller than 227 MiB * 8m segment
 
 name: video-processing
-maxResponseTimeMs: 16000
 startStep: validate-video
 endStep: merge-videos
 availableResourceProfiles:

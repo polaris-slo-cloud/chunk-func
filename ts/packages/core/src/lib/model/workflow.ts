@@ -12,11 +12,6 @@ export interface WorkflowDescription {
     name: string;
 
     /**
-     * The SLO that describes the maximum allowed response time (in milliseconds) for the entire workflow.
-     */
-    maxResponseTimeMs: number;
-
-    /**
      * The steps of this workflow.
      */
     steps: WorkflowStepDescription[];
@@ -105,9 +100,9 @@ export interface WorkflowExecutionDescription {
     inputSizeBytes: number;
 
     /**
-     * This allows overriding the max response time SLO of the workflow.
+     * The max response time SLO of the workflow.
      */
-    maxResponseTimeMsOverride?: number;
+    maxResponseTimeMs: number;
 
     /**
      * The execution descriptions of the steps of the workflow.

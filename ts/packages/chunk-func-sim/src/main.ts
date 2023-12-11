@@ -68,7 +68,7 @@ if (!resConfigStratFactory) {
 
 const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
-const slo = execDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs;
+const slo = execDesc.maxResponseTimeMs;
 
 let output: WorkflowOutput<unknown>;
 let error: Error;

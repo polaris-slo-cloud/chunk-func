@@ -1,4 +1,4 @@
-import { ResourceProfile, WorkflowExecutionDescription, WorkflowStepType } from '../../model';
+import { WorkflowExecutionDescription, WorkflowStepType } from '../../model';
 import { InputOutputData } from '../data';
 import { StepState, WorkflowState } from '../state';
 import { AccumulatedStepInput, StepInput, StepOutput, WorkflowFunctionStep, WorkflowStep, WorkflowStepExecutionLog } from '../step';
@@ -26,7 +26,7 @@ export class WorkflowExecution {
     run<I, O>(input: WorkflowInput<I>): WorkflowOutput<O> {
         this.executionDescription = input.executionDescription;
         this.state = new WorkflowStateImpl({
-            maxExecutionTimeMs: this.workflow.maxExecutionTimeMs,
+            maxExecutionTimeMs: input.executionDescription.maxResponseTimeMs,
             executionDescription: input.executionDescription,
         });
 

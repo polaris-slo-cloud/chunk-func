@@ -2,7 +2,7 @@
 scenarioName: slam-scenario
 inputSizeBytes: 238915345
 
-maxResponseTimeMsOverride: 120000 # The SLO of the SLAM scenario is ignored and replaced by the SLO of the eval scenario.
+maxResponseTimeMs: 120000 # The SLO of the SLAM scenario is ignored and replaced by the SLO of the eval scenario.
 stepExecutions:
   validate-video:
     outputSizeBytes: 95566138 # 227 MiB, 4m segment

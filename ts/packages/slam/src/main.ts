@@ -28,7 +28,7 @@ const evalExecDesc = Yaml.load(evalScenarioStr) as WorkflowExecutionDescription;
 
 const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
-const evalSlo = evalExecDesc.maxResponseTimeMsOverride || workflow.maxExecutionTimeMs;
+const evalSlo = evalExecDesc.maxResponseTimeMs;
 
 const slamInput = buildWorkflowInput(slamExecDesc);
 const configFinder = new SlamConfigFinder(workflow);

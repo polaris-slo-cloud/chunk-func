@@ -8,7 +8,6 @@ describe('WorkflowBuilder', () => {
     function getLinearWorkflow(): WorkflowDescription {
         return {
             name: 'test',
-            maxResponseTimeMs: 4000,
             startStep: 'one',
             endStep: 'four',
             steps: [
@@ -16,24 +15,24 @@ describe('WorkflowBuilder', () => {
                     name: 'one',
                     type: WorkflowStepType.Function,
                     successors: [ 'two' ],
-                    profilingResults: {} as any,
+                    profilingResults: { results: [] } as any,
                 },
                 {
                     name: 'two',
                     type: WorkflowStepType.Function,
                     successors: [ 'three' ],
-                    profilingResults: {} as any,
+                    profilingResults: { results: [] } as any,
                 },
                 {
                     name: 'three',
                     type: WorkflowStepType.Function,
                     successors: [ 'four' ],
-                    profilingResults: {} as any,
+                    profilingResults: { results: [] } as any,
                 },
                 {
                     name: 'four',
                     type: WorkflowStepType.Function,
-                    profilingResults: {} as any,
+                    profilingResults: { results: [] } as any,
                 },
             ],
             availableResourceProfiles: [],
@@ -43,7 +42,6 @@ describe('WorkflowBuilder', () => {
     function getParallelWorkflow(): WorkflowDescription {
         return {
             name: 'test',
-            maxResponseTimeMs: 4000,
             startStep: 'one',
             endStep: 'four',
             steps: [
@@ -51,24 +49,24 @@ describe('WorkflowBuilder', () => {
                     name: 'one',
                     type: WorkflowStepType.Function,
                     successors: [ 'two', 'three' ],
-                    profilingResults: {} as any,
+                    profilingResults: { results: [] } as any,
                 },
                 {
                     name: 'two',
                     type: WorkflowStepType.Function,
                     successors: [ 'four' ],
-                    profilingResults: {} as any,
+                    profilingResults: { results: [] } as any,
                 },
                 {
                     name: 'three',
                     type: WorkflowStepType.Function,
                     successors: [ 'four' ],
-                    profilingResults: {} as any,
+                    profilingResults: { results: [] } as any,
                 },
                 {
                     name: 'four',
                     type: WorkflowStepType.Function,
-                    profilingResults: {} as any,
+                    profilingResults: { results: [] } as any,
                 },
             ],
             availableResourceProfiles: [],
@@ -86,7 +84,6 @@ describe('WorkflowBuilder', () => {
         const workflowGraph = workflow.graph;
 
         expect(workflow.name).toEqual(workflowDesc.name);
-        expect(workflow.maxExecutionTimeMs).toEqual(workflowDesc.maxResponseTimeMs);
 
         expect(workflowGraph.start.name).toEqual(workflowDesc.startStep);
         expect(workflowGraph.end.name).toEqual(workflowDesc.endStep);
@@ -163,7 +160,6 @@ describe('WorkflowBuilder', () => {
         const workflowGraph = workflow.graph;
 
         expect(workflow.name).toEqual(workflowDesc.name);
-        expect(workflow.maxExecutionTimeMs).toEqual(workflowDesc.maxResponseTimeMs);
 
         expect(workflowGraph.start.name).toEqual(workflowDesc.startStep);
         expect(workflowGraph.end.name).toEqual(workflowDesc.endStep);

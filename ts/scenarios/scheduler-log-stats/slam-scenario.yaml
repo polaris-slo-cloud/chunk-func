@@ -1,7 +1,7 @@
 # This is a WorkflowExecutionDescription that uses the median input sizes for the SLAM algorithm.
 scenarioName: slam-scenario
 inputSizeBytes: 56909824 # 54.2 MiB
-maxResponseTimeMsOverride: 7500 # The SLO of the SLAM scenario is ignored and replaced by the SLO of the eval scenario.
+maxResponseTimeMs: 7500 # The SLO of the SLAM scenario is ignored and replaced by the SLO of the eval scenario.
 stepExecutions:
   validate-log:
     outputSizeBytes: 56909824
