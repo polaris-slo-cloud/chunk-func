@@ -1,4 +1,5 @@
 import { ResourceProfile, WorkflowDescription } from '../../model';
+import { WorkflowStep } from '../step';
 import { ResourceConfigurationStrategy, Workflow, WorkflowInput, WorkflowOutput } from '../workflow';
 import { WorkflowGraph } from '../workflow-graph';
 import { WorkflowExecution } from './execution';
@@ -17,9 +18,9 @@ export class WorkflowImpl implements Workflow {
         this.availableResourceProfiles = availableResProfiles;
     }
 
-    execute<I, O>(input: WorkflowInput<I>, resourceConfigStrat: ResourceConfigurationStrategy): WorkflowOutput<O> {
+    execute<I, O>(input: WorkflowInput<I>, resourceConfigStrat: ResourceConfigurationStrategy, startStep?: WorkflowStep): WorkflowOutput<O> {
         const execution = new WorkflowExecution(this, resourceConfigStrat);
-        const output = execution.run<I, O>(input);
+        const output = execution.run<I, O>(input, startStep);
         return output;
     }
 
