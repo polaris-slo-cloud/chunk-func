@@ -43,6 +43,11 @@ export interface WorkflowStep {
      */
     execute(input: AccumulatedStepInput, resourceProfile: ResourceProfile | undefined, executionDescription: WorkflowExecutionDescription): StepOutput;
 
+    /**
+     * Creates a deep clone of this `WorkflowStep`.
+     */
+    clone(): WorkflowStep;
+
 }
 
 // Normally, there should be an interface and impl class for each WorkflowStep type,

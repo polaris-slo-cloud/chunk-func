@@ -26,7 +26,7 @@ export class WorkflowBuilder {
     buildWorkflow(description: WorkflowDescription): Workflow {
         const graph = this.buildGraph(description);
         const availableProfiles = this.buildResourceProfilesMap(description);
-        return new WorkflowImpl(description, graph, availableProfiles);
+        return new WorkflowImpl(description.name, graph, availableProfiles);
     }
 
     /**

@@ -1,7 +1,7 @@
 import { ResourceProfile, WorkflowExecutionDescription } from '../model';
 import { InputOutputData } from './data';
 import { WorkflowState } from './state';
-import { AccumulatedStepInput, WorkflowFunctionStep, WorkflowStepExecutionLog } from './step';
+import { AccumulatedStepInput, WorkflowFunctionStep, WorkflowStep, WorkflowStepExecutionLog } from './step';
 import { WorkflowGraph } from './workflow-graph';
 
 /**
@@ -110,6 +110,11 @@ export interface Workflow {
      * Simulates the execution of the workflow using the specified input.
      */
     execute<I, O>(input: WorkflowInput<I>, resourceConfigStrat: ResourceConfigurationStrategy): WorkflowOutput<O>;
+
+    /**
+     * Creates a subset of this workflow (as a deep clone) that starts with the `startStep`.
+     */
+    createSubWorkflow(startStep: WorkflowStep): Workflow;
 
 }
 

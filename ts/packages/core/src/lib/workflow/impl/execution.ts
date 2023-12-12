@@ -23,6 +23,12 @@ export class WorkflowExecution {
         this.resourceConfigStrat = resourceConfigStrat;
     }
 
+    /**
+     * Executes the workflow using the specified input.
+     *
+     * @param input The input for the workflow execution.
+     * `input.data` is used as the input to the first step.
+     */
     run<I, O>(input: WorkflowInput<I>): WorkflowOutput<O> {
         this.executionDescription = input.executionDescription;
         this.state = new WorkflowStateImpl({

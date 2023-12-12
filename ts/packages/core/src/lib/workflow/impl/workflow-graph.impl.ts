@@ -1,8 +1,10 @@
 import { DirectedGraph } from 'graphology';
+import { subgraph } from 'graphology-operators';
 import { dijkstra } from 'graphology-shortest-path';
+import { bfsFromNode } from 'graphology-traversal';
+import { WorkflowDescription, WorkflowStepType } from '../../model';
 import { WorkflowFunctionStep, WorkflowStep } from '../step';
 import { GetStepWeightFn, WorkflowGraph, WorkflowNodeAttributes, WorkflowPath } from '../workflow-graph';
-import { WorkflowDescription, WorkflowStepType } from '../../model';
 
 export class WorkflowGraphImpl implements WorkflowGraph {
 
@@ -11,7 +13,11 @@ export class WorkflowGraphImpl implements WorkflowGraph {
     steps: Record<string, WorkflowStep>;
     graph: DirectedGraph<WorkflowNodeAttributes>;
 
-    constructor(steps: Record<string, WorkflowStep>, graph: DirectedGraph<WorkflowNodeAttributes>, workflowDescription: WorkflowDescription) {
+    constructor(
+        steps: Record<string, WorkflowStep>,
+        graph: DirectedGraph<WorkflowNodeAttributes>,
+        workflowDescription: Pick<WorkflowDescription, 'startStep' | 'endStep'>,
+    ) {
         this.steps = steps;
         this.graph = graph;
 
@@ -60,6 +66,37 @@ export class WorkflowGraphImpl implements WorkflowGraph {
         }
 
         return workflowPath;
+    }
+
+    createSubgraph(startStep: WorkflowStep): WorkflowGraph {
+        const subgraphSteps = this.getSubgraphSteps(startStep);
+        const workflowSubgraph = subgraph(
+            this.graph,
+            (key) => !!subgraphSteps[key],
+        ) as DirectedGraph<WorkflowNodeAttributes>;
+
+        for (const key in subgraphSteps) {
+            const step = subgraphSteps[key];
+            step.requiredInputs = workflowSubgraph.mapInNeighbors(key, (neighborKey) => neighborKey);
+            if (step.requiredInputs.length === 0) {
+                step.requiredInputs = undefined;
+            }
+            workflowSubgraph.setNodeAttribute(key, 'step', step);
+        }
+
+        return new WorkflowGraphImpl(subgraphSteps, workflowSubgraph, { startStep: startStep.name, endStep: this.end.name });
+    }
+
+    private getSubgraphSteps(startStep: WorkflowStep): Record<string, WorkflowStep> {
+        const subgraphSteps: Record<string, WorkflowStep> = {};
+        bfsFromNode(
+            this.graph,
+            startStep.name,
+            (key, attributes) => {
+                subgraphSteps[key] = attributes.step.clone();
+            },
+        );
+        return subgraphSteps;
     }
 
 }

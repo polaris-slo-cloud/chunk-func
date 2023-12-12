@@ -38,6 +38,11 @@ export interface WorkflowGraph {
      */
     findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn): WorkflowPath;
 
+    /**
+     * Creates a subgraph starting from the `start` step.
+     */
+    createSubgraph(start: WorkflowStep): WorkflowGraph;
+
 }
 
 /**

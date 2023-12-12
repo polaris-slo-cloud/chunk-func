@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import { ProfilingSessionResults, ResourceProfile, WorkflowExecutionDescription, WorkflowStepDescription, WorkflowStepType, findResourceProfileResults, findResultForInput, getResourceProfileId } from '../../model';
 import { AccumulatedStepInput, StepOutput, WorkflowFunctionStep, WorkflowStep } from '../step';
 
@@ -14,11 +15,21 @@ export abstract class WorkflowStepBase implements WorkflowStep {
     requiredInputs?: string[];
     possibleSuccessors?: string[];
 
-    constructor(config: WorkflowStepDescription) {
+    constructor (config: WorkflowStepDescription);
+    constructor(cloneSrc: WorkflowStepBase);
+    constructor(config: WorkflowStepDescription | WorkflowStepBase) {
         this.type = config.type;
         this.name = config.name;
-        this.possibleSuccessors = config.successors;
+
+        if (config instanceof WorkflowStepBase) {
+            this.possibleSuccessors = cloneDeep(config.possibleSuccessors);
+            this.requiredInputs = cloneDeep(config.requiredInputs);
+        } else {
+            this.possibleSuccessors = config.successors;
+        }
     }
+
+    abstract clone(): WorkflowStep;
 
     execute(input: AccumulatedStepInput, resourceProfile: ResourceProfile | undefined, executionDescription: WorkflowExecutionDescription): StepOutput {
         const stepExecDesc = executionDescription.stepExecutions[this.name];
@@ -46,7 +57,9 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
     profilingResults: ProfilingSessionResults;
     maxExecutionTimeMs?: number;
 
-    constructor(config: WorkflowStepDescription) {
+    constructor (config: WorkflowStepDescription);
+    constructor(cloneSrc: WorkflowFunctionStepImpl);
+    constructor(config: WorkflowStepDescription | WorkflowFunctionStepImpl) {
         super(config);
         if (config.type !== WorkflowStepType.Function) {
             throw new Error(`Incorrect WorkflowStepType: ${this.type}`);
@@ -54,7 +67,11 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
         if (!config.profilingResults) {
             throw new Error('A WorkflowFunctionStep must have profilingResults set.');
         }
-        this.profilingResults = config.profilingResults;
+        if (config instanceof WorkflowFunctionStepImpl) {
+            this.profilingResults = cloneDeep(config.profilingResults);
+        } else {
+            this.profilingResults = config.profilingResults;
+        }
         this.maxExecutionTimeMs = config.maxExecutionTimeMs;
     }
 
@@ -78,6 +95,10 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
         return output;
     }
 
+    override clone(): WorkflowStep {
+        return new WorkflowFunctionStepImpl(this);
+    }
+
 }
 
 /**
@@ -85,11 +106,17 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
  */
 export class GenericWorkflowStepImpl extends WorkflowStepBase {
 
-    constructor(config: WorkflowStepDescription) {
+    constructor (config: WorkflowStepDescription);
+    constructor(cloneSrc: GenericWorkflowStepImpl);
+    constructor(config: WorkflowStepDescription | GenericWorkflowStepImpl) {
         super(config);
         if (config.type === WorkflowStepType.Function) {
             throw new Error('GenericWorkflowStepImpl must not be used for WorkflowStepType.Function.');
         }
+    }
+
+    override clone(): WorkflowStep {
+        return new GenericWorkflowStepImpl(this);
     }
 
 }
