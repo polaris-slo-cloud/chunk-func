@@ -23,29 +23,16 @@ export class WorkflowExecution {
         this.resourceConfigStrat = resourceConfigStrat;
     }
 
-    /**
-     * Executes the workflow using the specified input.
-     *
-     * @param input The input for the workflow execution.
-     * @param startStep Optional starting node for the execution. If this is not set, workflow.graph.start will be used.
-     */
-    run<I, O>(input: WorkflowInput<I>, startStep?: WorkflowStep): WorkflowOutput<O> {
+    run<I, O>(input: WorkflowInput<I>): WorkflowOutput<O> {
         this.executionDescription = input.executionDescription;
         this.state = new WorkflowStateImpl({
             maxExecutionTimeMs: input.executionDescription.maxResponseTimeMs,
             executionDescription: input.executionDescription,
         });
 
-        if (!startStep) {
-            startStep = this.workflow.graph.start;
-        }
-        if (!this.workflow.graph.steps[startStep.name]) {
-            throw new Error(`The startStep ${startStep.name} does not exist in the workflow.`)
-        }
-
         const mainThread = WorkflowThreadImpl.createWorkflowThread();
         this.addThread(mainThread);
-        this.triggerStep(startStep, { data: input.data, thread: mainThread });
+        this.triggerStep(this.workflow.graph.start, { data: input.data, thread: mainThread });
 
         let stepOutput: StepOutput | undefined;
         let currStep: WorkflowStep | undefined;

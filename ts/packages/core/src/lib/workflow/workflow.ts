@@ -1,7 +1,7 @@
 import { ResourceProfile, WorkflowExecutionDescription } from '../model';
 import { InputOutputData } from './data';
 import { WorkflowState } from './state';
-import { AccumulatedStepInput, WorkflowStep, WorkflowFunctionStep, WorkflowStepExecutionLog } from './step';
+import { AccumulatedStepInput, WorkflowFunctionStep, WorkflowStepExecutionLog } from './step';
 import { WorkflowGraph } from './workflow-graph';
 
 /**
@@ -107,14 +107,9 @@ export interface Workflow {
     readonly availableResourceProfiles: Record<string, ResourceProfile>
 
     /**
-     * Simulates the execution of the workflow from the graph's start node using the specified input.
+     * Simulates the execution of the workflow using the specified input.
      */
     execute<I, O>(input: WorkflowInput<I>, resourceConfigStrat: ResourceConfigurationStrategy): WorkflowOutput<O>;
-
-    /**
-     * Simulates the execution of the workflow from the specified startStep using the specified input.
-     */
-    execute<I, O>(input: WorkflowInput<I>, resourceConfigStrat: ResourceConfigurationStrategy, startStep: WorkflowStep): WorkflowOutput<O>;
 
 }
 
