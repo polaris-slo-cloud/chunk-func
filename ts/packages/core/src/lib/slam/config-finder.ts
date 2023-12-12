@@ -62,16 +62,15 @@ export class SlamConfigFinder {
      * Finds a config optimized for the specified SLO using the input sizes defined in the workflowInput (these input sizes
      * should be the medians of the possible inputs, as normally used by SLAM).
      *
-     * @returns The resource profile configurations determined for each step and the output of the workflow simulation using the specified input.
+     * @param maxExecutionTimeMs The SLO in milliseconds.
+     * @param workflowInput The input to the workflow. The input to the first step is `workflowInput.data`.
+     * @returns The resource profile configurations determined for each step and the output of the workflow simulation using the specified input
+     * or `undefined` if no configuration can be found that fulfills the SLO.
      */
-    optimizeForSlo(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamOutput{
+    optimizeForSlo(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamOutput | undefined {
         // In the base version of the algorithm we always return a function to the heap if it hasn't exhausted all available profiles.
         const alwaysReturnToHeap: CheckReturnToHeapFn = () => true;
-        const result = this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, alwaysReturnToHeap);
-        if (!result) {
-            throw new Error(`There is no configuration that satisfies the SLO of ${maxExecutionTimeMs}`);
-        }
-        return result;
+        return this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, alwaysReturnToHeap);
     }
 
     /**
@@ -80,9 +79,12 @@ export class SlamConfigFinder {
      *
      * If no cheaper config than `optimizeForSlo()` can be found, that config is returned.
      *
-     * @returns The resource profile configurations determined for each step and the output of the workflow simulation using the specified input.
+     * @param maxExecutionTimeMs The SLO in milliseconds.
+     * @param workflowInput The input to the workflow. The input to the first step is `workflowInput.data`.
+     * @returns The resource profile configurations determined for each step and the output of the workflow simulation using the specified input
+     * or `undefined` if no configuration can be found that fulfills the SLO.
      */
-    optimizeForSloAndCost(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamOutput {
+    optimizeForSloAndCost(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamOutput | undefined {
         const baseResult = this.optimizeForSlo(maxExecutionTimeMs, workflowInput);
 
         const returnToHeapIfCostEfficient: CheckReturnToHeapFn = (oldResult: ProfilingResult, newResult: ProfilingResult) => {
@@ -103,7 +105,7 @@ export class SlamConfigFinder {
             }
         }
 
-        throw new Error(`There is no configuration that satisfies the SLO of ${maxExecutionTimeMs}`);
+        return undefined;
     }
 
     /**

@@ -32,6 +32,9 @@ export class SlamConfigStrategy extends ResourceConfigurationStrategyBase {
 
         // To realistically compare to the other approaches we need to use the eval SLO with the SLAM profiling data.
         const slamResult = configFinder.optimizeForSloAndCost(slo, trainingInput);
+        if (!slamResult) {
+            throw new Error(`There is no configuration that satisfies the SLO of ${slo}`);
+        }
 
         this.preconfiguredStrategy = new PreconfiguredConfigStrategy(this.workflowGraph, this.availableResourceProfiles, slamResult.stepConfigs);
         return slamResult;

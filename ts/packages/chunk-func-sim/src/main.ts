@@ -32,6 +32,8 @@ import {
     WorkflowOutput,
     SlamConfigStrategy,
     createSlamConfigStrategy,
+    OnlineSlamConfigStrategy,
+    createOnlineSlamConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -47,6 +49,7 @@ const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactor
     [FixedOutputSloCompliantConfigStrategy.strategyName]: createFixedOutputSloCompliantConfigStrategy,
     [StepConfConfigStrategy.strategyName]: createStepConfConfigStrategy,
     [SlamConfigStrategy.strategyName]: createSlamConfigStrategy,
+    [OnlineSlamConfigStrategy.strategyName]: createOnlineSlamConfigStrategy,
 };
 
 if (process.argv.length < 5) {

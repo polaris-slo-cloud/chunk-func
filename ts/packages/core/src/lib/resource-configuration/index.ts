@@ -4,6 +4,7 @@ export * from './fixed-output-proportional-cp-slo-config-strategy';
 export * from './fixed-output-slo-compliant-config-strategy';
 export * from './input-heuristic-proportional-cp-slo-config-strategy';
 export * from './input-heuristic-slo-compliant-config-strategy';
+export * from './online-slam-config-strategy';
 export * from './preconfigured-config-strategy';
 export * from './proportional-critical-path-slo-config-strategy.base';
 export * from './proportional-critical-path-slo-config-strategy';

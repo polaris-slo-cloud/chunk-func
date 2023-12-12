@@ -8,7 +8,7 @@ SLO_STEP_PERCENT=1
 WORKFLOW_PATH="workflow.yaml"
 OUTPUT_DIR="./simulation-logs"
 RESULTS_CSV="./simulation-results.csv"
-SLAM_SCENARIO_PATH="slam-scenario.yaml"
+TRAINING_SCENARIO_PATH="slam-scenario.yaml"
 
 CHUNK_FUNC_SIM_JS="../../dist/packages/chunk-func-sim/main.js"
 RESULTS_CONVERTER_JS="../../dist/packages/results-converter/main.js"
@@ -22,6 +22,11 @@ declare -A SCENARIOS=(
 declare -A CONFIG_STRATEGIES=(
     ["proportional-critical-path-slo"]="ProportionalCriticalPathSloConfigStrategy"
     ["step-conf"]="StepConfConfigStrategy"
+)
+
+declare -A CONFIG_STRATEGIES_WITH_TRAINING=(
+    ["slam"]="SlamConfigStrategy"
+    ["online-slam"]="OnlineSlamConfigStrategy"
 )
 
 # Executes simulations for the SLO-independent strategies, i.e., fastest and cheapest.
@@ -53,8 +58,11 @@ function runSloStrategies() {
         node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloMs}.json"
     done
 
-    echo "Running SLAM with SLO: $sloMs"
-    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "SlamConfigStrategy" "$SLAM_SCENARIO_PATH" > "${OUTPUT_DIR}/${scenarioName}-slam-${sloMs}.json"
+    for configStratKey in "${!CONFIG_STRATEGIES_WITH_TRAINING[@]}"; do
+        local configStrat=${CONFIG_STRATEGIES_WITH_TRAINING[$configStratKey]}
+        echo "Running $configStrat with SLO: $sloMs"
+        node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" "$TRAINING_SCENARIO_PATH" > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloMs}.json"
+    done
 
     rm "$scenarioFinalYamlFile"
 }
