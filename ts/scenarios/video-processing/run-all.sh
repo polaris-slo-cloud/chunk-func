@@ -21,16 +21,6 @@ node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-11.5s.
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-14s.yaml SloCompliantConfigStrategy > ./simulation-logs/scenario-03-14s-slo-compliant.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-16s.yaml SloCompliantConfigStrategy > ./simulation-logs/scenario-03-16s-slo-compliant.json
 
-node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-56s.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-01-56s-proportional-slo.json
-node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-67.5s.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-01-67.5s-proportional-slo.json
-node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-78.5s.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-01-78.5s-proportional-slo.json
-node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-37s.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-02-37s-proportional-slo.json
-node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-44s.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-02-44s-proportional-slo.json
-node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-51.5s.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-02-51.5s-proportional-slo.json
-node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-11.5s.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-03-11.5s-proportional-slo.json
-node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-14s.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-03-14s-proportional-slo.json
-node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-16s.yaml ProportionalSloConfigStrategy > ./simulation-logs/scenario-03-16s-proportional-slo.json
-
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-56s.yaml ProportionalCriticalPathSloConfigStrategy > ./simulation-logs/scenario-01-56s-proportional-critical-path-slo.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-67.5s.yaml ProportionalCriticalPathSloConfigStrategy > ./simulation-logs/scenario-01-67.5s-proportional-critical-path-slo.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-78.5s.yaml ProportionalCriticalPathSloConfigStrategy > ./simulation-logs/scenario-01-78.5s-proportional-critical-path-slo.json
