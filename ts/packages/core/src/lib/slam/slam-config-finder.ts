@@ -15,7 +15,19 @@ import {
     computeStepInputSize,
 } from '../workflow';
 import { PreconfiguredConfigStrategy } from '../resource-configuration/preconfigured-config-strategy';
-import { SlamFunctionInfo, slamFunctionInfoMaxHeapComparator } from './slam-function-info';
+import { SlamFunctionInfo, SlamFunctionInfoComparator, slamFuncInfoExecTimeMaxHeapComparator } from './slam-function-info';
+
+/**
+ * Allows configuring the `SlamConfigFinder`.
+ */
+export interface SlamConfigFinderSettings {
+    /**
+     * The comparator that determines the order of the functions in the heap.
+     *
+     * Default: `slamFuncInfoExecTimeMaxHeapComparator`
+     */
+    funcInfoComparator?: SlamFunctionInfoComparator;
+}
 
 interface SlamState {
     /** The max-heap with functions, whose configurations can still be increased. */
@@ -73,10 +85,12 @@ export class SlamConfigFinder {
 
     private workflow: Workflow;
     private availableProfiles: ResourceProfile[];
+    private settings: Required<SlamConfigFinderSettings>;
 
-    constructor(workflow: Workflow) {
+    constructor(workflow: Workflow, settings?: SlamConfigFinderSettings) {
         this.workflow = workflow;
         this.availableProfiles = this.getResourceProfiles(workflow);
+        this.settings = this.fillSettingsWithDefaults(settings);
     }
 
     /**
@@ -177,7 +191,7 @@ export class SlamConfigFinder {
         const state: SlamState = {
             stepInputSizes: this.computeStepInputSizes(workflowInput),
             funcSteps: [],
-            funcHeap: new Heap(slamFunctionInfoMaxHeapComparator),
+            funcHeap: new Heap(this.settings.funcInfoComparator),
             maxExecutionTimeMs,
             workflowInput,
         };
@@ -272,6 +286,16 @@ export class SlamConfigFinder {
             configs[funcInfo.step.name] = this.availableProfiles[funcInfo.selectedProfileIndex];
         }
         return configs;
+    }
+
+    private fillSettingsWithDefaults(settings?: SlamConfigFinderSettings): Required<SlamConfigFinderSettings> {
+        if (!settings) {
+            settings = {};
+        }
+        if (!settings.funcInfoComparator) {
+            settings.funcInfoComparator = slamFuncInfoExecTimeMaxHeapComparator;
+        }
+        return settings as Required<SlamConfigFinderSettings>;
     }
 
 }

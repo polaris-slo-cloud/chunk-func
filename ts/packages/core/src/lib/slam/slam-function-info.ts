@@ -19,5 +19,24 @@ export interface SlamFunctionInfo {
 
 }
 
-export const slamFunctionInfoMaxHeapComparator: Comparator<SlamFunctionInfo> =
+/**
+ * Comparator used to determine the order of the functions in the SLAM heap.
+ *
+ * The function should return the following values:
+ * - positive number if `b` goes up in the heap (e.g., `b > a` in a max-heap)
+ * - 0 if `a == b`
+ * - negative number if `a` goes up in the heap (e.g., `b < a` in a max-heap)
+ */
+export type SlamFunctionInfoComparator = Comparator<SlamFunctionInfo>;
+
+/**
+ * Comparator for establishing a max-heap using the profiling results' `executionTimeMs`.
+ */
+export const slamFuncInfoExecTimeMaxHeapComparator: SlamFunctionInfoComparator =
     (a: SlamFunctionInfo, b: SlamFunctionInfo) => b.profilingResult.executionTimeMs - a.profilingResult.executionTimeMs;
+
+/**
+ * Comparator for establishing a min-heap using the costs.
+ */
+export const slamFuncInfoCostsMinHeapComparator: SlamFunctionInfoComparator =
+    (a: SlamFunctionInfo, b: SlamFunctionInfo) => a.profilingResult.executionCost - b.profilingResult.executionCost;
