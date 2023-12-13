@@ -1,4 +1,4 @@
-import { ResourceProfile, WorkflowExecutionDescription, WorkflowStepType, getResultsForInput } from '../model';
+import { ResourceProfile, WorkflowExecutionDescription } from '../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -6,6 +6,9 @@ import {
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
+    computeStepInputSize,
+    computeStepMeanExecTimeForInputSize,
+    computeStepsAvgExecTimes,
 } from '../workflow';
 import { ProportionalCriticalPathSloConfigStrategyBase } from './proportional-critical-path-slo-config-strategy.base';
 
@@ -46,48 +49,14 @@ export class FixedOutputProportionalCPSloConfigStrategy extends ProportionalCrit
      * @returns A map that maps each function step name to its average execution time.
      */
     private computeAvgExecTimes(executionDescription: WorkflowExecutionDescription): Record<string, number> {
-        const avgExecTimes: Record<string, number> = {};
-
-        for (const stepName in this.workflowGraph.steps) {
-            const step = this.workflowGraph.steps[stepName];
-            if (step.type === WorkflowStepType.Function) {
-                const funcStep = step as WorkflowFunctionStep;
-                const stepInputSize = this.computeStepInputSize(funcStep, executionDescription);
-                const stepExecTime = this.computeAvgExecTime(funcStep, stepInputSize);
-                avgExecTimes[stepName] = stepExecTime;
-            }
-        }
-
+        const avgExecTimes = computeStepsAvgExecTimes(
+            this.workflowGraph.steps,
+            (funcStep) => {
+                const stepInputSize = computeStepInputSize(funcStep, executionDescription);
+                return computeStepMeanExecTimeForInputSize(funcStep, stepInputSize);
+            },
+        );
         return avgExecTimes;
-    }
-
-    /**
-     * Computes the average exec time of all profiles for the specified input size.
-     */
-    private computeAvgExecTime(step: WorkflowFunctionStep, inputSize: number): number {
-        let totalExecTime = 0;
-        let measurementsCount = 0;
-        for (const resultForInput of getResultsForInput(step.profilingResults, inputSize)) {
-            totalExecTime += resultForInput.result.executionTimeMs;
-            ++measurementsCount;
-        }
-
-        return totalExecTime / measurementsCount;
-    }
-
-    private computeStepInputSize(step: WorkflowFunctionStep, executionDescription: WorkflowExecutionDescription): number {
-        if (!step.requiredInputs) {
-            // If there are no required inputs, this is the first step of the workflow.
-            return executionDescription.inputSizeBytes;
-        }
-
-        let inputSize = 0;
-        for (const stepName of step.requiredInputs) {
-            const stepExec = executionDescription.stepExecutions[stepName];
-            inputSize += stepExec.outputSizeBytes;
-        }
-
-        return inputSize;
     }
 
 }

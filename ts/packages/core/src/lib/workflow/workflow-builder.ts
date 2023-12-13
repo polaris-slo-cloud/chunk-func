@@ -12,7 +12,7 @@ import {
 import { WorkflowImpl } from './impl';
 import { GenericWorkflowStepImpl, WorkflowFunctionStepImpl } from './impl/step.impl';
 import { WorkflowGraphImpl } from './impl/workflow-graph.impl';
-import { WorkflowStep } from './step';
+import { WorkflowStep, WorkflowStepsMap } from './step';
 import { Workflow, WorkflowInput } from './workflow';
 import { WorkflowGraph, WorkflowNodeAttributes } from './workflow-graph';
 
@@ -61,7 +61,7 @@ export class WorkflowBuilder {
      * but does not set the required inputs or edges yet.
      */
     private buildSteps(description: WorkflowDescription): StepsAndGraphPair {
-        const steps: Record<string, WorkflowStep> = {};
+        const steps: WorkflowStepsMap = {};
         const graph = new DirectedGraph<WorkflowNodeAttributes>({ allowSelfLoops: false, multi: false, type: 'directed' });
 
         description.steps.forEach(stepDesc => {

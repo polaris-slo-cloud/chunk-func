@@ -3,18 +3,18 @@ import { subgraph } from 'graphology-operators';
 import { dijkstra } from 'graphology-shortest-path';
 import { bfsFromNode } from 'graphology-traversal';
 import { WorkflowDescription, WorkflowStepType } from '../../model';
-import { WorkflowFunctionStep, WorkflowStep } from '../step';
+import { WorkflowFunctionStep, WorkflowStep, WorkflowStepsMap } from '../step';
 import { GetStepWeightFn, WorkflowGraph, WorkflowNodeAttributes, WorkflowPath } from '../workflow-graph';
 
 export class WorkflowGraphImpl implements WorkflowGraph {
 
     start: WorkflowStep;
     end: WorkflowStep;
-    steps: Record<string, WorkflowStep>;
+    steps: WorkflowStepsMap;
     graph: DirectedGraph<WorkflowNodeAttributes>;
 
     constructor(
-        steps: Record<string, WorkflowStep>,
+        steps: WorkflowStepsMap,
         graph: DirectedGraph<WorkflowNodeAttributes>,
         workflowDescription: Pick<WorkflowDescription, 'startStep' | 'endStep'>,
     ) {
@@ -87,8 +87,8 @@ export class WorkflowGraphImpl implements WorkflowGraph {
         return new WorkflowGraphImpl(subgraphSteps, workflowSubgraph, { startStep: startStep.name, endStep: this.end.name });
     }
 
-    private getSubgraphSteps(startStep: WorkflowStep): Record<string, WorkflowStep> {
-        const subgraphSteps: Record<string, WorkflowStep> = {};
+    private getSubgraphSteps(startStep: WorkflowStep): WorkflowStepsMap {
+        const subgraphSteps: WorkflowStepsMap = {};
         bfsFromNode(
             this.graph,
             startStep.name,

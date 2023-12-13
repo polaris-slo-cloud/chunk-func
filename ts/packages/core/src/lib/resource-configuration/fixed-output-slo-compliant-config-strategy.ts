@@ -1,4 +1,4 @@
-import { ResourceProfile, WorkflowExecutionDescription } from '../model';
+import { ResourceProfile } from '../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -8,6 +8,7 @@ import {
     GetStepWeightFn,
     getCheapestExecutionTimeForInput,
     Workflow,
+    computeStepInputSize,
 } from '../workflow';
 import { SloCompliantConfigStrategyBase } from './slo-compliant-config-strategy.base';
 
@@ -28,25 +29,10 @@ export class FixedOutputSloCompliantConfigStrategy extends SloCompliantConfigStr
 
     protected override getCriticalPathWeightFn(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): GetStepWeightFn {
         return (currStep: WorkflowFunctionStep) => {
-            const inputSize = this.computeStepInputSize(currStep, workflowState.executionDescription);
+            const inputSize = computeStepInputSize(currStep, workflowState.executionDescription);
             const currStepWeightFn = getCheapestExecutionTimeForInput(inputSize);
             return currStepWeightFn(currStep);
         };
-    }
-
-    private computeStepInputSize(step: WorkflowFunctionStep, executionDescription: WorkflowExecutionDescription): number {
-        if (!step.requiredInputs) {
-            // If there are no required inputs, this is the first step of the workflow.
-            return executionDescription.inputSizeBytes;
-        }
-
-        let inputSize = 0;
-        for (const stepName of step.requiredInputs) {
-            const stepExec = executionDescription.stepExecutions[stepName];
-            inputSize += stepExec.outputSizeBytes;
-        }
-
-        return inputSize;
     }
 
 }

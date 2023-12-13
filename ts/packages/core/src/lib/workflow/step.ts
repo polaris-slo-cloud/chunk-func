@@ -3,6 +3,11 @@ import { InputOutputData } from './data';
 import { WorkflowThread } from './thread';
 
 /**
+ * Maps the names of WorkflowSteps to the actual objects.
+ */
+export type WorkflowStepsMap = Record<string, WorkflowStep>;
+
+/**
  * Describes a single step in a workflow.
  */
 export interface WorkflowStep {

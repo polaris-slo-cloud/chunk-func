@@ -3,7 +3,6 @@ import {
     ProfilingResult,
     ProfilingResultWithProfileId,
     ResourceProfile,
-    WorkflowExecutionDescription,
     WorkflowStepType,
     getResourceProfileId,
     getResultsForInput,
@@ -13,7 +12,7 @@ import {
     WorkflowFunctionStep,
     WorkflowInput,
     WorkflowOutput,
-    WorkflowStep,
+    computeStepInputSize,
 } from '../workflow';
 import { PreconfiguredConfigStrategy } from '../resource-configuration/preconfigured-config-strategy';
 import { SlamFunctionInfo, slamFunctionInfoMaxHeapComparator } from './slam-function-info';
@@ -219,25 +218,11 @@ export class SlamConfigFinder {
 
         for (const stepName in this.workflow.graph.steps) {
             const step = this.workflow.graph.steps[stepName];
-            inputSizes[stepName] = this.computeStepInputSize(step, workflowInput.executionDescription);
+            inputSizes[stepName] = computeStepInputSize(step, workflowInput.executionDescription);
         }
         inputSizes[this.workflow.graph.start.name] = workflowInput.data.sizeBytes;
 
         return inputSizes;
-    }
-
-    private computeStepInputSize(step: WorkflowStep, executionDescription: WorkflowExecutionDescription): number {
-        if (!step.requiredInputs) {
-            return 0;
-        }
-
-        let inputSize = 0;
-        for (const stepName of step.requiredInputs) {
-            const stepExec = executionDescription.stepExecutions[stepName];
-            inputSize += stepExec.outputSizeBytes;
-        }
-
-        return inputSize;
     }
 
     private checkSlo(state: SlamState): SloCheckResult {

@@ -1,4 +1,4 @@
-import { ResourceProfile, WorkflowStepType, getResultsForInput } from '../model';
+import { ResourceProfile } from '../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -6,6 +6,8 @@ import {
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
+    computeStepMeanExecTimeForInputSize,
+    computeStepsAvgExecTimes,
 } from '../workflow';
 import { ProportionalCriticalPathSloConfigStrategyBase } from './proportional-critical-path-slo-config-strategy.base';
 
@@ -32,31 +34,11 @@ export class InputHeuristicProportionalCPSloConfigStrategy extends ProportionalC
      * @returns A map that maps each function step name to its average execution time.
      */
     protected override computeAvgExecTimesUntilEnd(workflowState: WorkflowState, currStep: WorkflowFunctionStep, currStepInput: AccumulatedStepInput): Record<string, number> {
-        const avgExecTimes: Record<string, number> = {};
-
-        for (const stepName in this.workflowGraph.steps) {
-            const step = this.workflowGraph.steps[stepName];
-            if (step.type === WorkflowStepType.Function) {
-                const stepExecTime = this.computeAvgExecTime(step as WorkflowFunctionStep, currStepInput.totalDataSizeBytes);
-                avgExecTimes[stepName] = stepExecTime;
-            }
-        }
-
+        const avgExecTimes = computeStepsAvgExecTimes(
+            this.workflowGraph.steps,
+            (stepToEstimate) => computeStepMeanExecTimeForInputSize(stepToEstimate, currStepInput.totalDataSizeBytes),
+        );
         return avgExecTimes;
-    }
-
-    /**
-     * Computes the average exec time of all profiles for the specified input size.
-     */
-    private computeAvgExecTime(step: WorkflowFunctionStep, inputSize: number): number {
-        let totalExecTime = 0;
-        let measurementsCount = 0;
-        for (const resultForInput of getResultsForInput(step.profilingResults, inputSize)) {
-            totalExecTime += resultForInput.result.executionTimeMs;
-            ++measurementsCount;
-        }
-
-        return totalExecTime / measurementsCount;
     }
 
 }

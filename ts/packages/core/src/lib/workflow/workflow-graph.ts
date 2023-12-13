@@ -1,5 +1,5 @@
 import { DirectedGraph } from 'graphology';
-import { WorkflowFunctionStep, WorkflowStep } from './step';
+import { WorkflowFunctionStep, WorkflowStep, WorkflowStepsMap } from './step';
 import { ProfilingResult } from '../model';
 
 /**
@@ -22,7 +22,7 @@ export interface WorkflowGraph {
     /**
      * Map of all steps in the workflow, indexed by their names.
      */
-    steps: Record<string, WorkflowStep>;
+    steps: WorkflowStepsMap;
 
     /**
      * The graphology graph that represents this workflow.
