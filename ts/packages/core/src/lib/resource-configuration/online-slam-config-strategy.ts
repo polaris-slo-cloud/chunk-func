@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
 import { ResourceProfile } from '../model';
-import { SlamConfigFinder } from '../slam';
+import { SlamConfigFinder, slamFuncInfoCostsMinHeapComparator, slamFuncInfoExecTimeMaxHeapComparator } from '../slam';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -56,7 +56,8 @@ export class OnlineSlamConfigStrategy extends ResourceConfigurationStrategyBase 
         slamInput.executionDescription.maxResponseTimeMs = remainingTime;
 
         const subWorkflow = this.workflow.createSubWorkflow(step);
-        const slamConfigFinder = new SlamConfigFinder(subWorkflow);
+        const slamConfigFinder = new SlamConfigFinder(subWorkflow, { funcInfoComparator: slamFuncInfoCostsMinHeapComparator });
+        // const slamConfigFinder = new SlamConfigFinder(subWorkflow, { funcInfoComparator: slamFuncInfoExecTimeMaxHeapComparator });
 
         const slamOutput = slamConfigFinder.optimizeForSloAndCost(remainingTime, slamInput);
         if (slamOutput) {
