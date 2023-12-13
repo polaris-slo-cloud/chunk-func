@@ -1,5 +1,5 @@
 import { SimulatorOutput } from '../simulator';
-import { SlamOutput } from './config-finder';
+import { SlamOutput } from './slam-config-finder';
 
 export interface SlamSimulatorOutput extends SimulatorOutput {
 

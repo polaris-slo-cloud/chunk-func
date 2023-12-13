@@ -18,11 +18,33 @@ import { PreconfiguredConfigStrategy } from '../resource-configuration/preconfig
 import { SlamFunctionInfo, slamFunctionInfoMaxHeapComparator } from './slam-function-info';
 
 interface SlamState {
+    /** The max-heap with functions, whose configurations can still be increased. */
     funcHeap: Heap<SlamFunctionInfo>;
+
+    /** All function steps with their current configurations. */
     funcSteps: SlamFunctionInfo[];
-    stepInputSizes: Record<string, number>;
-    maxExecutionTimeMs: number;
+
+    /**
+     * The input, for which the configurations should be optimized.
+     *
+     * Typically, this will contain the median input sizes, not the ones from the
+     * actual evaluation execution description.
+     */
     workflowInput: WorkflowInput<any>;
+
+    /**
+     * The input sizes for all function steps, based on the `workflowInput`.
+     *
+     * Note: This does not automatically make the algorithm input size-aware, because normally the supplied
+     * `WorkflowInput` contains the median input sizes and not the sizes from the final execution description
+     * used for evaluation.
+     */
+    stepInputSizes: Record<string, number>;
+
+    /**
+     * The SLO in milliseconds.
+     */
+    maxExecutionTimeMs: number;
 }
 
 export interface SlamOutput {
@@ -213,6 +235,13 @@ export class SlamConfigFinder {
         throw new Error(`Could not find a successful ProfilingResult for ${profileId}.`);
     }
 
+    /**
+     * Computes the input sizes to all steps, based on the `workflowInput`.
+     *
+     * Note: This does not automatically make the algorithm input size-aware, because normally the supplied
+     * `WorkflowInput` contains the median input sizes and not the sizes from the final execution description
+     * used for evaluation.
+     */
     private computeStepInputSizes(workflowInput: WorkflowInput<any>): Record<string, number> {
         const inputSizes: Record<string, number> = {};
 

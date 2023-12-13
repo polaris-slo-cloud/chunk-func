@@ -44,12 +44,15 @@ export class OnlineSlamConfigStrategy extends ResourceConfigurationStrategyBase 
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        const remainingTime = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
+        // Clone the training input (median input sizes) and set the input of the current step
+        // to the actual, known input to make the current step input size-aware.
         const slamInput = cloneDeep(this.trainingInput!);
         slamInput.data = {
             sizeBytes: input.totalDataSizeBytes,
         }
         slamInput.executionDescription.inputSizeBytes = input.totalDataSizeBytes;
+
+        const remainingTime = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
         slamInput.executionDescription.maxResponseTimeMs = remainingTime;
 
         const subWorkflow = this.workflow.createSubWorkflow(step);
