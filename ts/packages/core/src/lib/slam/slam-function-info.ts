@@ -1,5 +1,5 @@
 import { Comparator } from 'heap-js';
-import { ProfilingResult } from '../model';
+import { ProfilingResult, ResourceProfile, getProfilingResultForProfile } from '../model';
 import { WorkflowFunctionStep } from '../workflow';
 
 export interface SlamFunctionInfo {
@@ -40,3 +40,36 @@ export const slamFuncInfoExecTimeMaxHeapComparator: SlamFunctionInfoComparator =
  */
 export const slamFuncInfoCostsMinHeapComparator: SlamFunctionInfoComparator =
     (a: SlamFunctionInfo, b: SlamFunctionInfo) => a.profilingResult.executionCost - b.profilingResult.executionCost;
+
+/**
+ * Creates a comparator for establishing a max-heap using the potential execution time improvements when switching
+ * to the next higher profile.
+ */
+export function createExecTimeImprovementMaxHeapComparator(
+    availableProfiles: ResourceProfile[],
+    stepInputSizes: Record<string, number>,
+): SlamFunctionInfoComparator {
+    return (a: SlamFunctionInfo, b: SlamFunctionInfo) => {
+        const aImprovement = getPotentialExecTimeImprovement(a, availableProfiles, stepInputSizes[a.step.name]);
+        const bImprovement = getPotentialExecTimeImprovement(b, availableProfiles, stepInputSizes[b.step.name]);
+        return bImprovement - aImprovement;
+    };
+}
+
+/**
+ * Computes the potential execution time improvement when using the next higher profile for the specified function.
+ */
+function getPotentialExecTimeImprovement(func: SlamFunctionInfo, availableProfiles: ResourceProfile[], stepInputSize: number): number {
+    const nextProfileIndex = func.selectedProfileIndex + 1;
+    if (nextProfileIndex === availableProfiles.length) {
+        throw new Error(`Cannot compute exec time improvement for ${func.step.name}, because it is already using the highest profile.`);
+    }
+
+    const nextHigherProfilingResult = getProfilingResultForProfile(
+        func.step.profilingResults,
+        stepInputSize,
+        availableProfiles[nextProfileIndex],
+    );
+    const currExecTime = func.profilingResult.executionTimeMs;
+    return currExecTime - nextHigherProfilingResult.executionTimeMs;
+}

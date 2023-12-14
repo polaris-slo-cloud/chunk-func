@@ -1,4 +1,4 @@
-import { ResourceProfile, getResourceProfileId } from "./resource-profile";
+import { ResourceProfile, getResourceProfileId } from './resource-profile';
 
 /** Pseudo StatusCode to indicate that the function did not respond before the timeout. */
 export const timeoutStatusCode = -1;
@@ -184,4 +184,17 @@ export function* getAllResults(profilingSessionResults: ProfilingSessionResults)
             }
         }
     }
+}
+
+/**
+ * Gets the `ProfilingResult` for a specific profile and input size.
+ */
+export function getProfilingResultForProfile(profilingSessionResults: ProfilingSessionResults, inputSize:number, profile: ResourceProfile): ProfilingResult {
+    const profileId = getResourceProfileId(profile);
+    for (const result of getResultsForInput(profilingSessionResults, inputSize)) {
+        if (result.resourceProfileId === profileId) {
+            return result.result;
+        }
+    }
+    throw new Error(`Could not find a successful ProfilingResult for ${profileId}.`);
 }

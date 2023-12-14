@@ -1,5 +1,6 @@
+import { ResourceProfile } from '../model';
 import { computeStepInputSize } from './step.util';
-import { WorkflowInput } from './workflow';
+import { Workflow, WorkflowInput } from './workflow';
 import { WorkflowGraph } from './workflow-graph';
 
 /**
@@ -17,4 +18,13 @@ export function computeWorkflowStepsInputSizes(workflowGraph: WorkflowGraph, wor
     inputSizes[workflowGraph.start.name] = workflowInput.data.sizeBytes;
 
     return inputSizes;
+}
+
+/**
+ * @returns An array of ResourceProfiles sorted by ascending memory.
+ */
+export function getResourceProfilesSortedByMemory(workflow: Workflow): ResourceProfile[] {
+    const profileNames = Object.keys(workflow.availableResourceProfiles);
+    const profiles = profileNames.map(name => workflow.availableResourceProfiles[name]);
+    return profiles.sort((a, b) => a.memoryMiB - b.memoryMiB);
 }

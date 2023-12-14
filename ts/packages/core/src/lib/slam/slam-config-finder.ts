@@ -4,6 +4,7 @@ import {
     ProfilingResultWithProfileId,
     ResourceProfile,
     WorkflowStepType,
+    getProfilingResultForProfile,
     getResourceProfileId,
     getResultsForInput,
 } from '../model';
@@ -13,6 +14,7 @@ import {
     WorkflowInput,
     WorkflowOutput,
     computeWorkflowStepsInputSizes,
+    getResourceProfilesSortedByMemory,
 } from '../workflow';
 import { PreconfiguredConfigStrategy } from '../resource-configuration/preconfigured-config-strategy';
 import { SlamFunctionInfo, SlamFunctionInfoComparator, slamFuncInfoExecTimeMaxHeapComparator } from './slam-function-info';
@@ -89,7 +91,7 @@ export class SlamConfigFinder {
 
     constructor(workflow: Workflow, settings?: SlamConfigFinderSettings) {
         this.workflow = workflow;
-        this.availableProfiles = this.getResourceProfiles(workflow);
+        this.availableProfiles = getResourceProfilesSortedByMemory(workflow);
         this.settings = this.fillSettingsWithDefaults(settings);
     }
 
@@ -164,8 +166,8 @@ export class SlamConfigFinder {
             if (longestFunc.selectedProfileIndex < this.availableProfiles.length - 1) {
                 const oldProfileResult = longestFunc.profilingResult;
                 longestFunc.selectedProfileIndex++;
-                longestFunc.profilingResult = this.getProfilingResultForProfile(
-                    longestFunc.step,
+                longestFunc.profilingResult = getProfilingResultForProfile(
+                    longestFunc.step.profilingResults,
                     state.stepInputSizes[longestFunc.step.name],
                     this.availableProfiles[longestFunc.selectedProfileIndex],
                 );
@@ -178,12 +180,6 @@ export class SlamConfigFinder {
 
         // There is no configuration that satisfies the SLO.
         return undefined;
-    }
-
-    private getResourceProfiles(workflow: Workflow): ResourceProfile[] {
-        const profileNames = Object.keys(workflow.availableResourceProfiles);
-        const profiles = profileNames.map(name => workflow.availableResourceProfiles[name]);
-        return profiles.sort((a, b) => a.memoryMiB - b.memoryMiB);
     }
 
     private initSlamState(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamState {
@@ -236,16 +232,6 @@ export class SlamConfigFinder {
             throw new Error(`Could not find profile ${profileId} in the list of available profiles`);
         }
         return index;
-    }
-
-    private getProfilingResultForProfile(step: WorkflowFunctionStep, inputSize:number, profile: ResourceProfile): ProfilingResult {
-        const profileId = getResourceProfileId(profile);
-        for (const result of getResultsForInput(step.profilingResults, inputSize)) {
-            if (result.resourceProfileId === profileId) {
-                return result.result;
-            }
-        }
-        throw new Error(`Could not find a successful ProfilingResult for ${profileId}.`);
     }
 
     private checkSlo(state: SlamState): SloCheckResult {
