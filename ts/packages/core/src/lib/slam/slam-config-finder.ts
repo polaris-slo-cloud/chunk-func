@@ -12,7 +12,7 @@ import {
     WorkflowFunctionStep,
     WorkflowInput,
     WorkflowOutput,
-    computeStepInputSize,
+    computeWorkflowStepsInputSizes,
 } from '../workflow';
 import { PreconfiguredConfigStrategy } from '../resource-configuration/preconfigured-config-strategy';
 import { SlamFunctionInfo, SlamFunctionInfoComparator, slamFuncInfoExecTimeMaxHeapComparator } from './slam-function-info';
@@ -149,7 +149,6 @@ export class SlamConfigFinder {
      * @returns the workflowOutput and the stepConfigs on success or `undefined` if no configuration to satisfy the SLO can be found.
      */
     private optimizeForSloInternal(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>, checkReturnToHeap: CheckReturnToHeapFn): SlamOutput | undefined {
-        const stepInputSizes = this.computeStepInputSizes(workflowInput);
         const state = this.initSlamState(maxExecutionTimeMs, workflowInput);
 
         do {
@@ -167,7 +166,7 @@ export class SlamConfigFinder {
                 longestFunc.selectedProfileIndex++;
                 longestFunc.profilingResult = this.getProfilingResultForProfile(
                     longestFunc.step,
-                    stepInputSizes[longestFunc.step.name],
+                    state.stepInputSizes[longestFunc.step.name],
                     this.availableProfiles[longestFunc.selectedProfileIndex],
                 );
 
@@ -189,7 +188,7 @@ export class SlamConfigFinder {
 
     private initSlamState(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamState {
         const state: SlamState = {
-            stepInputSizes: this.computeStepInputSizes(workflowInput),
+            stepInputSizes: computeWorkflowStepsInputSizes(this.workflow.graph, workflowInput),
             funcSteps: [],
             funcHeap: new Heap(this.settings.funcInfoComparator),
             maxExecutionTimeMs,
@@ -247,25 +246,6 @@ export class SlamConfigFinder {
             }
         }
         throw new Error(`Could not find a successful ProfilingResult for ${profileId}.`);
-    }
-
-    /**
-     * Computes the input sizes to all steps, based on the `workflowInput`.
-     *
-     * Note: This does not automatically make the algorithm input size-aware, because normally the supplied
-     * `WorkflowInput` contains the median input sizes and not the sizes from the final execution description
-     * used for evaluation.
-     */
-    private computeStepInputSizes(workflowInput: WorkflowInput<any>): Record<string, number> {
-        const inputSizes: Record<string, number> = {};
-
-        for (const stepName in this.workflow.graph.steps) {
-            const step = this.workflow.graph.steps[stepName];
-            inputSizes[stepName] = computeStepInputSize(step, workflowInput.executionDescription);
-        }
-        inputSizes[this.workflow.graph.start.name] = workflowInput.data.sizeBytes;
-
-        return inputSizes;
     }
 
     private checkSlo(state: SlamState): SloCheckResult {

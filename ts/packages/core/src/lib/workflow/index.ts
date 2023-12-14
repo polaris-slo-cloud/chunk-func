@@ -7,3 +7,4 @@ export * from './workflow-builder';
 export * from './workflow-graph';
 export * from './workflow-path.util';
 export * from './workflow';
+export * from './workflow.util';
