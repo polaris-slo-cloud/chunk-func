@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
 import { ResourceProfile } from '../model';
-import { SlamConfigFinder, slamFuncInfoCostsMinHeapComparator, slamFuncInfoExecTimeMaxHeapComparator } from '../slam';
+import { SlamConfigFinder, createExecTimeImprovementMaxHeapComparator, slamFuncInfoCostsMinHeapComparator, slamFuncInfoExecTimeMaxHeapComparator } from '../slam';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -9,6 +9,8 @@ import {
     WorkflowFunctionStep,
     WorkflowInput,
     WorkflowState,
+    computeWorkflowStepsInputSizes,
+    getResourceProfilesSortedByMemory,
 } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 import { FastestConfigStrategy } from './fastest-config-strategy';
@@ -31,11 +33,13 @@ export class OnlineSlamConfigStrategy extends ResourceConfigurationStrategyBase 
     private fallbackStrategy: ResourceConfigurationStrategy;
     private workflow: Workflow;
     private trainingInput: WorkflowInput<unknown> | undefined;
+    private resourceProfilesSortedByMem: ResourceProfile[];
 
     constructor(workflow: Workflow) {
         super(OnlineSlamConfigStrategy.strategyName, workflow.graph, workflow.availableResourceProfiles);
         this.fallbackStrategy = new FastestConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
         this.workflow = workflow;
+        this.resourceProfilesSortedByMem = getResourceProfilesSortedByMemory(workflow);
     }
 
     train(slo: number, trainingInput: WorkflowInput<unknown>): any {
@@ -56,8 +60,15 @@ export class OnlineSlamConfigStrategy extends ResourceConfigurationStrategyBase 
         slamInput.executionDescription.maxResponseTimeMs = remainingTime;
 
         const subWorkflow = this.workflow.createSubWorkflow(step);
-        const slamConfigFinder = new SlamConfigFinder(subWorkflow, { funcInfoComparator: slamFuncInfoCostsMinHeapComparator });
+        // const slamConfigFinder = new SlamConfigFinder(subWorkflow, { funcInfoComparator: slamFuncInfoCostsMinHeapComparator });
         // const slamConfigFinder = new SlamConfigFinder(subWorkflow, { funcInfoComparator: slamFuncInfoExecTimeMaxHeapComparator });
+        const stepInputSizes = computeWorkflowStepsInputSizes(subWorkflow.graph, slamInput);
+        const slamConfigFinder = new SlamConfigFinder(
+            subWorkflow,
+            {
+                funcInfoComparator: createExecTimeImprovementMaxHeapComparator(this.resourceProfilesSortedByMem, stepInputSizes),
+            },
+        );
 
         const slamOutput = slamConfigFinder.optimizeForSloAndCost(remainingTime, slamInput);
         if (slamOutput) {
