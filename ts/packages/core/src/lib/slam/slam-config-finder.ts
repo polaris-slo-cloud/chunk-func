@@ -32,7 +32,13 @@ export interface SlamConfigFinderSettings {
 }
 
 interface SlamState {
-    /** The max-heap with functions, whose configurations can still be increased. */
+    /**
+     * The heap with functions, whose configurations can still be increased.
+     *
+     * Contrary to the SLAM paper, we check if a function's resource profile can be increased before
+     * (re-)inserting the function into the heap. The result is equivalent, but it allows us
+     * to use heap comparators that make this assumption.
+     */
     funcHeap: Heap<SlamFunctionInfo>;
 
     /** All function steps with their current configurations. */
@@ -152,6 +158,7 @@ export class SlamConfigFinder {
      */
     private optimizeForSloInternal(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>, checkReturnToHeap: CheckReturnToHeapFn): SlamOutput | undefined {
         const state = this.initSlamState(maxExecutionTimeMs, workflowInput);
+        const maxProfileIndex = this.availableProfiles.length - 1;
 
         do {
             const sloCheckResult = this.checkSlo(state);
@@ -163,18 +170,17 @@ export class SlamConfigFinder {
             }
 
             const longestFunc = state.funcHeap.pop()!;
-            if (longestFunc.selectedProfileIndex < this.availableProfiles.length - 1) {
-                const oldProfileResult = longestFunc.profilingResult;
-                longestFunc.selectedProfileIndex++;
-                longestFunc.profilingResult = getProfilingResultForProfile(
-                    longestFunc.step.profilingResults,
-                    state.stepInputSizes[longestFunc.step.name],
-                    this.availableProfiles[longestFunc.selectedProfileIndex],
-                );
+            const oldProfileResult = longestFunc.profilingResult;
+            // The heap only contains functions, whose profile can still be increased.
+            longestFunc.selectedProfileIndex++;
+            longestFunc.profilingResult = getProfilingResultForProfile(
+                longestFunc.step.profilingResults,
+                state.stepInputSizes[longestFunc.step.name],
+                this.availableProfiles[longestFunc.selectedProfileIndex],
+            );
 
-                if (checkReturnToHeap(oldProfileResult, longestFunc.profilingResult)) {
-                    state.funcHeap.add(longestFunc);
-                }
+            if (longestFunc.selectedProfileIndex < maxProfileIndex && checkReturnToHeap(oldProfileResult, longestFunc.profilingResult)) {
+                state.funcHeap.add(longestFunc);
             }
         } while (!state.funcHeap.isEmpty());
 
@@ -196,6 +202,7 @@ export class SlamConfigFinder {
 
     private fillHeap(state: SlamState): void {
         const graph = this.workflow.graph;
+        const maxProfileIndex = this.availableProfiles.length - 1;
 
         for (const stepName in graph.steps) {
             const step = graph.steps[stepName];
@@ -208,7 +215,9 @@ export class SlamConfigFinder {
                     selectedProfileIndex: this.getProfileIndex(baseProfilingResult.resourceProfileId),
                     profilingResult: baseProfilingResult.result,
                 };
-                state.funcHeap.add(slamInfo);
+                if (slamInfo.selectedProfileIndex < maxProfileIndex) {
+                    state.funcHeap.add(slamInfo);
+                }
                 state.funcSteps.push(slamInfo);
             }
         }
