@@ -2,8 +2,12 @@ import { Comparator } from 'heap-js';
 import { ProfilingResult, ResourceProfile, getProfilingResultForProfile } from '../model';
 import { WorkflowFunctionStep } from '../workflow';
 
+/**
+ * Collects all SLAM-related information about a `WorkflowFunctionStep`.
+ */
 export interface SlamFunctionInfo {
 
+    /** The `WorkflowFunctionStep` that is described by this info object. */
     step: WorkflowFunctionStep;
 
     /**
@@ -72,4 +76,39 @@ function getPotentialExecTimeImprovement(func: SlamFunctionInfo, availableProfil
     );
     const currExecTime = func.profilingResult.executionTimeMs;
     return currExecTime - nextHigherProfilingResult.executionTimeMs;
+}
+
+/**
+ * Creates a comparator for establishing a min-heap using the potential cost increase when switching
+ * to the next higher profile.
+ */
+export function createCostIncreaseMinHeapComparator(
+    availableProfiles: ResourceProfile[],
+    stepInputSizes: Record<string, number>,
+): SlamFunctionInfoComparator {
+    return (a: SlamFunctionInfo, b: SlamFunctionInfo) => {
+        const aCostIncrease = getPotentialCostIncrease(a, availableProfiles, stepInputSizes[a.step.name]);
+        const bCostIncrease = getPotentialCostIncrease(b, availableProfiles, stepInputSizes[b.step.name]);
+        return aCostIncrease - bCostIncrease;
+    };
+}
+
+/**
+ * Computes the potential cost increase when using the next higher profile for the specified function.
+ *
+ * Note that the increase may also be a negative number, if the reduced exec time with a higher profile yields a lower cost.
+ */
+function getPotentialCostIncrease(func: SlamFunctionInfo, availableProfiles: ResourceProfile[], stepInputSize: number): number {
+    const nextProfileIndex = func.selectedProfileIndex + 1;
+    if (nextProfileIndex === availableProfiles.length) {
+        throw new Error(`Cannot cost increase for ${func.step.name}, because it is already using the highest profile.`);
+    }
+
+    const nextHigherProfilingResult = getProfilingResultForProfile(
+        func.step.profilingResults,
+        stepInputSize,
+        availableProfiles[nextProfileIndex],
+    );
+    const currCost = func.profilingResult.executionCost;
+    return nextHigherProfilingResult.executionCost - currCost;
 }

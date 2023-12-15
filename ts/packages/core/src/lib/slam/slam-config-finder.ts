@@ -142,13 +142,9 @@ export class SlamConfigFinder {
             return costOptimizedResult;
         } else {
             // Cost optimized result is not cheaper or it does not exist (i.e., could not fulfill the SLO).
-            // Ensure that baseResult exists.
-            if (baseResult) {
-                return baseResult;
-            }
+            // The baseResult may be undefined (if the SLO cannot be fulfilled by SLAM).
+            return baseResult;
         }
-
-        return undefined;
     }
 
     /**
