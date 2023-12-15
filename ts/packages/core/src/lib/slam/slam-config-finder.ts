@@ -4,7 +4,6 @@ import {
     ProfilingResultWithProfileId,
     ResourceProfile,
     WorkflowStepType,
-    getProfilingResultForProfile,
     getResourceProfileId,
     getResultsForInput,
 } from '../model';
@@ -18,6 +17,7 @@ import {
 } from '../workflow';
 import { PreconfiguredConfigStrategy } from '../resource-configuration/preconfigured-config-strategy';
 import { SlamFunctionInfo, SlamFunctionInfoComparator, slamFuncInfoExecTimeMaxHeapComparator } from './slam-function-info';
+import { SlamProfilingResultComputationStrategy, getExactInputSizeProfilingResult } from './slam-profile-computation-strategy';
 
 /**
  * Allows configuring the `SlamConfigFinder`.
@@ -29,6 +29,13 @@ export interface SlamConfigFinderSettings {
      * Default: `slamFuncInfoExecTimeMaxHeapComparator`
      */
     funcInfoComparator?: SlamFunctionInfoComparator;
+
+    /**
+     * Strategy used by SLAM to compute the `ProfilingResult` (i.e., exec time and cost) for a function under a specific `ResourceProfile`.
+     *
+     * Default: `getExactInputSizeProfilingResult`
+     */
+    profileComputationStrategy?: SlamProfilingResultComputationStrategy;
 }
 
 interface SlamState {
@@ -169,8 +176,8 @@ export class SlamConfigFinder {
             const oldProfileResult = longestFunc.profilingResult;
             // The heap only contains functions, whose profile can still be increased.
             longestFunc.selectedProfileIndex++;
-            longestFunc.profilingResult = getProfilingResultForProfile(
-                longestFunc.step.profilingResults,
+            longestFunc.profilingResult = this.settings.profileComputationStrategy(
+                longestFunc.step,
                 state.stepInputSizes[longestFunc.step.name],
                 this.availableProfiles[longestFunc.selectedProfileIndex],
             );
@@ -223,10 +230,16 @@ export class SlamConfigFinder {
      * Gets the ProfilingResult with the lowest memory configuration for the specified step.
      *
      * Each step may have a different base profile, because some may not work with the lower end resource profiles.
+     *
+     * We use the specified input size to find a profile that works, but we then use the SlamProfilingResultComputationStrategy to
+     * compute the values of the `ProfilingResult`.
      */
     private getProfilingResultForBaseProfile(step: WorkflowFunctionStep, inputSize: number): ProfilingResultWithProfileId {
         for (const result of getResultsForInput(step.profilingResults, inputSize)) {
-            return result;
+            return {
+                result: this.settings.profileComputationStrategy(step, inputSize, this.workflow.availableResourceProfiles[result.resourceProfileId]),
+                resourceProfileId: result.resourceProfileId,
+            };
         }
         throw new Error(`Could not find a successful ProfilingResult for step ${step.name}.`);
     }
@@ -265,6 +278,9 @@ export class SlamConfigFinder {
         }
         if (!settings.funcInfoComparator) {
             settings.funcInfoComparator = slamFuncInfoExecTimeMaxHeapComparator;
+        }
+        if (!settings.profileComputationStrategy) {
+            settings.profileComputationStrategy = getExactInputSizeProfilingResult;
         }
         return settings as Required<SlamConfigFinderSettings>;
     }
