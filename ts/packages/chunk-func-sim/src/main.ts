@@ -32,6 +32,8 @@ import {
     createSlamConfigStrategy,
     OnlineSlamConfigStrategy,
     createOnlineSlamConfigStrategy,
+    SpreadSearchConfigStrategy,
+    createSpreadSearchConfigStrategy,
 } from '@chunk-func/core';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
@@ -47,6 +49,7 @@ const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactor
     [StepConfConfigStrategy.strategyName]: createStepConfConfigStrategy,
     [SlamConfigStrategy.strategyName]: createSlamConfigStrategy,
     [OnlineSlamConfigStrategy.strategyName]: createOnlineSlamConfigStrategy,
+    [SpreadSearchConfigStrategy.strategyName]: createSpreadSearchConfigStrategy,
 };
 
 if (process.argv.length < 5) {

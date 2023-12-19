@@ -4,4 +4,5 @@ export * from './lib/resource-configuration';
 export * from './lib/workflow';
 export * from './lib/simulator';
 export * from './lib/slam';
+export * from './lib/spread-search';
 export * from './lib/workflow/impl';
