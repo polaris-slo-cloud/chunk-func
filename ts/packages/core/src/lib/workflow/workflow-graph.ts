@@ -103,4 +103,11 @@ export interface WorkflowPath {
      */
     executionTimeMs: number;
 
+    /**
+     * The expected cost of the path.
+     *
+     * The cost of the source node is NOT included.
+     */
+    cost: number;
+
 }
