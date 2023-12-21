@@ -39,7 +39,7 @@ export class WorkflowGraphImpl implements WorkflowGraph {
                 const targetNode = this.graph.getTargetAttributes(edge);
                 if (targetNode.step.type === WorkflowStepType.Function) {
                     const weight = weightFn(targetNode.step as WorkflowFunctionStep);
-                    return -weight.weight;
+                    return -weight.sloWeight;
                 }
                 return 0;
             },

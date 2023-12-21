@@ -72,7 +72,7 @@ export class WorkflowResourceConfigGraph {
                 const targetNode = this.resConfigGraph.getTargetAttributes(edgeKey);
                 if (targetNode.resourceProfile) {
                     const stepWeight = weightFn(targetNode as FunctionNodeResourceConfigAttributes);
-                    return stepWeight.weight;
+                    return stepWeight.sloWeight;
                 }
                 return 0;
             },

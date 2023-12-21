@@ -66,9 +66,9 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
     private computeStepSlo(step: WorkflowFunctionStep, remainingTimeMs: number, avgStepExecTimes: Record<string, number>): number {
         const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getAvgStepWeight(avgStepExecTimes, currStep));
         const avgStepWeight = this.getAvgStepWeight(avgStepExecTimes, step);
-        const criticalPathExecTimeWithSrc = criticalPath.executionTimeMs + avgStepWeight.weight;
+        const criticalPathExecTimeWithSrc = criticalPath.executionTimeMs + avgStepWeight.sloWeight;
 
-        const percentage = avgStepWeight.weight / criticalPathExecTimeWithSrc;
+        const percentage = avgStepWeight.sloWeight / criticalPathExecTimeWithSrc;
         if (percentage > 1) {
             throw new Error(`Current step percentage is ${percentage}`)
         }
@@ -86,7 +86,8 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
                 statusCode: 200,
             },
             resourceProfileId: '',
-            weight: avgExecTime,
+            sloWeight: avgExecTime,
+            optimizationWeight: -1,
         };
     }
 

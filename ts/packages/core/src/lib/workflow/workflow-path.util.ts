@@ -21,7 +21,8 @@ export const getLongestExecutionTime: GetStepWeightFn = (step: WorkflowFunctionS
     }
 
     return {
-        weight: longestExecTime,
+        sloWeight: longestExecTime,
+        optimizationWeight: selectedResult.result.executionCost,
         resourceProfileId: selectedResult.resourceProfileId,
         profilingResult: selectedResult.result,
     };
@@ -51,7 +52,8 @@ export function getLongestExecutionTimeForInput(inputSizeBytes: number): GetStep
         }
 
         return {
-            weight: longestExecTime,
+            sloWeight: longestExecTime,
+            optimizationWeight: longestExecTimeCost,
             resourceProfileId: selectedResult.resourceProfileId,
             profilingResult: selectedResult.result,
         };
@@ -82,7 +84,8 @@ export function getFastestExecutionTimeForInput(inputSizeBytes: number): GetStep
         }
 
         return {
-            weight: fastestExecTime,
+            sloWeight: fastestExecTime,
+            optimizationWeight: fastestExecTimeCost,
             resourceProfileId: selectedResult.resourceProfileId,
             profilingResult: selectedResult.result,
         };
@@ -113,7 +116,8 @@ export function getCheapestExecutionTimeForInput(inputSizeBytes: number): GetSte
         }
 
         return {
-            weight: selectedResult.result.executionTimeMs,
+            sloWeight: selectedResult.result.executionTimeMs,
+            optimizationWeight: selectedResult.result.executionCost,
             resourceProfileId: selectedResult.resourceProfileId,
             profilingResult: selectedResult.result,
         };

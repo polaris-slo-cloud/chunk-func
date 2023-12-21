@@ -55,7 +55,8 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
         return {
             profilingResult: costEffConfig.result,
             resourceProfileId: costEffConfig.resourceProfileId,
-            weight: costEffConfig.result.executionTimeMs,
+            sloWeight: costEffConfig.result.executionTimeMs,
+            optimizationWeight: costEffConfig.result.executionCost,
         };
     }
 
@@ -65,9 +66,9 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
     private computeStepSlo(step: WorkflowFunctionStep, remainingTimeMs: number): number {
         const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getMostCostEffStepWeight(currStep));
         const costEffStepWeight = this.getMostCostEffStepWeight(step);
-        const criticalPathExecTimeWithSrc = criticalPath.executionTimeMs + costEffStepWeight.weight;
+        const criticalPathExecTimeWithSrc = criticalPath.executionTimeMs + costEffStepWeight.sloWeight;
 
-        const percentage = costEffStepWeight.weight / criticalPathExecTimeWithSrc;
+        const percentage = costEffStepWeight.sloWeight / criticalPathExecTimeWithSrc;
         if (percentage > 1) {
             throw new Error(`Current step percentage is ${percentage}`)
         }

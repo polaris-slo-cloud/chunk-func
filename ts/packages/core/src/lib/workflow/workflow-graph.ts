@@ -63,9 +63,22 @@ export interface WorkflowNodeAttributes {
 export interface WorkflowStepWeight {
 
     /**
-     * The weight that should be used for computing the critical path.
+     * The weight that should be used for computing the critical path or the shortest path.
+     *
+     * The sum of these weights on the path are constrained by the SLO.
+     *
+     * Example: the `sloWeight` could be the execution time and the `optimizationWeight` could be the cost.
      */
-    weight: number;
+    sloWeight: number;
+
+    /**
+     * The weight that should be optimized (typically minimized).
+     * This weight is not used for computing the critical or shortest path.
+     * It needs to be optimized, while the sum of the sloWeights meet the SLO constraint.
+     *
+     * Example: the `sloWeight` could be the execution time and the `optimizationWeight` could be the cost.
+     */
+    optimizationWeight: number;
 
     /**
      * The ID of the resource profile that was used to compute the weight.
