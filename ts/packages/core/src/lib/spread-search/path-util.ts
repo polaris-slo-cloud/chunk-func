@@ -1,5 +1,5 @@
 import { findResourceProfileResults, getResourceProfileId } from '../model';
-import { WorkflowStepWeight } from '../workflow';
+import { WorkflowStepWeight, createSwappedWeightFn } from '../workflow';
 import { GetStepWeightWithProfileFn, FunctionNodeResourceConfigAttributes } from './model';
 
 /**
@@ -45,9 +45,4 @@ export const getAvgExecTimeAcrossAllInputs: GetStepWeightWithProfileFn = (stepNo
  * - `sloWeight` = average cost across input sizes for the resource profile
  * - `optimizationWeight` = average execution time across input sizes for the resource profile
  */
-export const getAvgCostAcrossAllInputs: GetStepWeightWithProfileFn = (stepNode: FunctionNodeResourceConfigAttributes) => {
-    const weight = getAvgExecTimeAcrossAllInputs(stepNode);
-    weight.sloWeight = weight.profilingResult.executionCost;
-    weight.optimizationWeight = weight.profilingResult.executionTimeMs;
-    return weight;
-}
+export const getAvgCostAcrossAllInputs: GetStepWeightWithProfileFn = createSwappedWeightFn(getAvgExecTimeAcrossAllInputs);

@@ -33,10 +33,12 @@ export interface WorkflowGraph {
      * Finds the critical path from the source step to the target step using the specified weight function.
      *
      * The critical path computation assumes that the source step has already executed, i.e., its weight is disregarded
-     * and not included in the executionTimeMs of the returned path.
+     * and not included in the weights of the returned path.
      * The steps of the path include the source node for completeness though.
+     *
+     * @param pathWeightKey The name of the weight property that should be used to compute the path weights. Default: 'sloWeight'.
      */
-    findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn): WorkflowPath;
+    findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn, pathWeightKey?: StepWeightKey): WorkflowPath;
 
     /**
      * Creates a subgraph starting from the `start` step.
@@ -63,18 +65,16 @@ export interface WorkflowNodeAttributes {
 export interface WorkflowStepWeight {
 
     /**
-     * The weight that should be used for computing the critical path or the shortest path.
-     *
-     * The sum of these weights on the path are constrained by the SLO.
+     * The sum of these weights along a path are constrained by the SLO.
      *
      * Example: the `sloWeight` could be the execution time and the `optimizationWeight` could be the cost.
      */
     sloWeight: number;
 
     /**
-     * The weight that should be optimized (typically minimized).
-     * This weight is not used for computing the critical or shortest path.
-     * It needs to be optimized, while the sum of the sloWeights meet the SLO constraint.
+     * The sum of these weights should be optimized (typically minimized).
+     *
+     * This weight needs to be optimized, while the sum of the sloWeights meet the SLO constraint.
      *
      * Example: the `sloWeight` could be the execution time and the `optimizationWeight` could be the cost.
      */
@@ -96,6 +96,9 @@ export interface WorkflowStepWeight {
  * Function to get the weight of a WorkflowFunctionStep for finding a critical path.
  */
 export type GetStepWeightFn = (step: WorkflowFunctionStep) => WorkflowStepWeight;
+
+/** The name of the property of `WorkflowStepWeight` that should be used for computing the shortest path or critical path. */
+export type StepWeightKey = keyof Pick<WorkflowStepWeight, 'sloWeight' | 'optimizationWeight'>;
 
 /**
  * Describes a path between two workflow steps.

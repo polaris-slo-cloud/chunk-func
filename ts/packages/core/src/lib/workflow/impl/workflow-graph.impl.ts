@@ -4,7 +4,7 @@ import { dijkstra } from 'graphology-shortest-path';
 import { bfsFromNode } from 'graphology-traversal';
 import { WorkflowDescription, WorkflowStepType } from '../../model';
 import { WorkflowFunctionStep, WorkflowStep, WorkflowStepsMap } from '../step';
-import { GetStepWeightFn, WorkflowGraph, WorkflowNodeAttributes, WorkflowPath } from '../workflow-graph';
+import { GetStepWeightFn, StepWeightKey, WorkflowGraph, WorkflowNodeAttributes, WorkflowPath } from '../workflow-graph';
 
 export class WorkflowGraphImpl implements WorkflowGraph {
 
@@ -30,7 +30,7 @@ export class WorkflowGraphImpl implements WorkflowGraph {
         this.end = end;
     }
 
-    findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn): WorkflowPath {
+    findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn, pathWeightKey: StepWeightKey = 'sloWeight'): WorkflowPath {
         const rawPath = dijkstra.bidirectional(
             this.graph,
             source.name,
@@ -39,7 +39,7 @@ export class WorkflowGraphImpl implements WorkflowGraph {
                 const targetNode = this.graph.getTargetAttributes(edge);
                 if (targetNode.step.type === WorkflowStepType.Function) {
                     const weight = weightFn(targetNode.step as WorkflowFunctionStep);
-                    return -weight.sloWeight;
+                    return -weight[pathWeightKey];
                 }
                 return 0;
             },

@@ -1,6 +1,6 @@
 import { dijkstra } from 'graphology-shortest-path';
 import { ResourceProfile, WorkflowStepType } from '../model';
-import { WorkflowFunctionStep, WorkflowGraph, WorkflowStep } from '../workflow';
+import { StepWeightKey, WorkflowFunctionStep, WorkflowGraph, WorkflowStep } from '../workflow';
 import {
     ConfiguredWorkflowPath,
     END_NODE,
@@ -61,9 +61,10 @@ export class WorkflowResourceConfigGraph {
      * Currently we only support finding the shortest path to the end of the workflow, because using any
      * other node as the end would require picking a resource profile for it, if it is a function node.
      *
+     * @param [pathWeightKey='sloWeight'] The name of the weight property that should be used to compute the path weights.
      * @returns The shortest path or `undefined` if no path exists between `srcStep` and the end node.
      */
-    findShortestPathToEnd(srcStep: WorkflowStep, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
+    findShortestPathToEnd(srcStep: WorkflowStep, weightFn: GetStepWeightWithProfileFn, pathWeightKey: StepWeightKey = 'sloWeight'): ConfiguredWorkflowPath | undefined {
         const srcNodeKey = this.getSourceNodeKey(srcStep);
         const targetStep = this.resConfigGraphEnd;
 
@@ -75,7 +76,7 @@ export class WorkflowResourceConfigGraph {
                 const targetNode = this.resConfigGraph.getTargetAttributes(edgeKey);
                 if (targetNode.resourceProfile) {
                     const stepWeight = weightFn(targetNode as FunctionNodeResourceConfigAttributes);
-                    return stepWeight.sloWeight;
+                    return stepWeight[pathWeightKey];
                 }
                 return 0;
             },
