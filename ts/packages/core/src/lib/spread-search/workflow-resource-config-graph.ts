@@ -99,7 +99,7 @@ export class WorkflowResourceConfigGraph {
     }
 
     private findSloCompliantPathToEndInGraph(graph: WorkflowResourceConfigDAG, srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
-        const path = this.findShortestPathToEnd(srcStep, weightFn);
+        const path = this.findShortestPathToEnd(srcStep, weightFn, 'optimizationWeight');
         if (!path) {
             return undefined;
         }
