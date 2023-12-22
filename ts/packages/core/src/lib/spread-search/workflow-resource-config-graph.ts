@@ -65,15 +65,36 @@ export class WorkflowResourceConfigGraph {
      * @returns The shortest path or `undefined` if no path exists between `srcStep` and the end node.
      */
     findShortestPathToEnd(srcStep: WorkflowStep, weightFn: GetStepWeightWithProfileFn, pathWeightKey: StepWeightKey = 'sloWeight'): ConfiguredWorkflowPath | undefined {
+        return this.findShortestPathToEndInGraph(this.resConfigGraph, srcStep, weightFn, pathWeightKey);
+    }
+
+    /**
+     * Finds and SLO-compliant path from the `srcStep` to the end of the graph using the specified `weightFn`.
+     *
+     * @returns The SLO-compliant path or `undefined` if no such path exists.
+     */
+    findSloCompliantPathToEnd(srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
+        return this.findSloCompliantPathToEndInGraph(this.resConfigGraph, srcStep, slo, weightFn);
+    }
+
+    /**
+     * Same as `findShortestPathToEnd()`, but operates on the specified graph.
+     */
+    private findShortestPathToEndInGraph(
+        graph: WorkflowResourceConfigDAG,
+        srcStep: WorkflowStep,
+        weightFn: GetStepWeightWithProfileFn,
+        pathWeightKey: StepWeightKey = 'sloWeight',
+    ): ConfiguredWorkflowPath | undefined {
         const srcNodeKey = this.getSourceNodeKey(srcStep);
         const targetStep = this.resConfigGraphEnd;
 
         const rawPath = dijkstra.bidirectional(
-            this.resConfigGraph,
+            graph,
             srcNodeKey,
             targetStep.name,
             (edgeKey: string) => {
-                const targetNode = this.resConfigGraph.getTargetAttributes(edgeKey);
+                const targetNode = graph.getTargetAttributes(edgeKey);
                 if (targetNode.resourceProfile) {
                     const stepWeight = weightFn(targetNode as FunctionNodeResourceConfigAttributes);
                     return stepWeight[pathWeightKey];
@@ -86,20 +107,11 @@ export class WorkflowResourceConfigGraph {
             return undefined;
         }
 
-        return this.convertToConfiguredWorkflowPath(rawPath, weightFn);
-    }
-
-    /**
-     * Finds and SLO-compliant path from the `srcStep` to the end of the graph using the specified `weightFn`.
-     *
-     * @returns The SLO-compliant path or `undefined` if no such path exists.
-     */
-    findSloCompliantPathToEnd(srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
-        return this.findSloCompliantPathToEndInGraph(this.resConfigGraph, srcStep, slo, weightFn);
+        return this.convertToConfiguredWorkflowPath(graph, rawPath, weightFn);
     }
 
     private findSloCompliantPathToEndInGraph(graph: WorkflowResourceConfigDAG, srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
-        const path = this.findShortestPathToEnd(srcStep, weightFn, 'optimizationWeight');
+        const path = this.findShortestPathToEndInGraph(graph, srcStep, weightFn, 'optimizationWeight');
         if (!path) {
             return undefined;
         }
@@ -132,7 +144,7 @@ export class WorkflowResourceConfigGraph {
      */
     private removeEdge(graph: WorkflowResourceConfigDAG, srcStep: WorkflowStepAndWeight, targetStep: WorkflowStepAndWeight): WorkflowResourceConfigDAG {
         if (graph === this.resConfigGraph) {
-            graph = this.resConfigGraph.copy() as WorkflowResourceConfigDAG;
+            graph = graph.copy() as WorkflowResourceConfigDAG;
         }
 
         const srcNodeKey = getWorkflowResourceConfigNodeKey(srcStep.step, srcStep.weight?.resourceProfileId);
@@ -151,14 +163,14 @@ export class WorkflowResourceConfigGraph {
         const funcStep = step as WorkflowFunctionStep;
         for (const result of funcStep.profilingResults.results) {
             if (result.results) {
-                return getWorkflowResourceConfigNodeKey(step, this.availableResourceProfiles[result.resourceProfileId]);
+                return getWorkflowResourceConfigNodeKey(step, result.resourceProfileId);
             }
         }
 
         throw new Error(`No successful profiling result found for function step ${step.name}`);
     }
 
-    private convertToConfiguredWorkflowPath(rawPath: dijkstra.BidirectionalDijstraResult, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath {
+    private convertToConfiguredWorkflowPath(graph: WorkflowResourceConfigDAG, rawPath: dijkstra.BidirectionalDijstraResult, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath {
         const workflowPath: ConfiguredWorkflowPath = {
             executionTimeMs: 0,
             cost: 0,
@@ -166,7 +178,7 @@ export class WorkflowResourceConfigGraph {
         };
 
         for (let i = 0; i < rawPath.length; ++i) {
-            const node = this.resConfigGraph.getNodeAttributes(rawPath[i]);
+            const node = graph.getNodeAttributes(rawPath[i]);
             const stepAndWeight: WorkflowStepAndWeight = {
                 step: node.step,
             };
