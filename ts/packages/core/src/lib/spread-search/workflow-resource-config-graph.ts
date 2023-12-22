@@ -65,7 +65,8 @@ export class WorkflowResourceConfigGraph {
      * @returns The shortest path or `undefined` if no path exists between `srcStep` and the end node.
      */
     findShortestPathToEnd(srcStep: WorkflowStep, weightFn: GetStepWeightWithProfileFn, pathWeightKey: StepWeightKey = 'sloWeight'): ConfiguredWorkflowPath | undefined {
-        return this.findShortestPathToEndInGraph(this.resConfigGraph, srcStep, weightFn, pathWeightKey);
+        const srcStepKey = this.getSourceNodeKey(srcStep);
+        return this.findShortestPathToEndInGraph(this.resConfigGraph, srcStepKey, weightFn, pathWeightKey);
     }
 
     /**
@@ -74,7 +75,8 @@ export class WorkflowResourceConfigGraph {
      * @returns The SLO-compliant path or `undefined` if no such path exists.
      */
     findSloCompliantPathToEnd(srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
-        return this.findSloCompliantPathToEndInGraph(this.resConfigGraph, srcStep, slo, weightFn);
+        const srcStepKey = this.getSourceNodeKey(srcStep);
+        return this.findSloCompliantPathToEndInGraph(this.resConfigGraph, srcStepKey, slo, weightFn);
     }
 
     /**
@@ -82,16 +84,15 @@ export class WorkflowResourceConfigGraph {
      */
     private findShortestPathToEndInGraph(
         graph: WorkflowResourceConfigDAG,
-        srcStep: WorkflowStep,
+        srcStepKey: string,
         weightFn: GetStepWeightWithProfileFn,
         pathWeightKey: StepWeightKey = 'sloWeight',
     ): ConfiguredWorkflowPath | undefined {
-        const srcNodeKey = this.getSourceNodeKey(srcStep);
         const targetStep = this.resConfigGraphEnd;
 
         const rawPath = dijkstra.bidirectional(
             graph,
-            srcNodeKey,
+            srcStepKey,
             targetStep.name,
             (edgeKey: string) => {
                 const targetNode = graph.getTargetAttributes(edgeKey);
@@ -110,8 +111,8 @@ export class WorkflowResourceConfigGraph {
         return this.convertToConfiguredWorkflowPath(graph, rawPath, weightFn);
     }
 
-    private findSloCompliantPathToEndInGraph(graph: WorkflowResourceConfigDAG, srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
-        const path = this.findShortestPathToEndInGraph(graph, srcStep, weightFn, 'optimizationWeight');
+    private findSloCompliantPathToEndInGraph(graph: WorkflowResourceConfigDAG, srcStepKey: string, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
+        const path = this.findShortestPathToEndInGraph(graph, srcStepKey, weightFn, 'optimizationWeight');
         if (!path) {
             return undefined;
         }
@@ -130,7 +131,7 @@ export class WorkflowResourceConfigGraph {
             sloWeight += currStep.weight.sloWeight;
             if (sloWeight > slo) {
                 graph = this.removeEdge(graph, prevStep, currStep);
-                return this.findSloCompliantPathToEndInGraph(graph, srcStep, slo, weightFn);
+                return this.findSloCompliantPathToEndInGraph(graph, srcStepKey, slo, weightFn);
             }
         }
 
