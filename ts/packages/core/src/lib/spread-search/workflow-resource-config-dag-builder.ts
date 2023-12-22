@@ -2,7 +2,7 @@ import { DirectedGraph } from 'graphology';
 import { ResourceProfile, WorkflowStepType } from '../model';
 import { WorkflowFunctionStep, WorkflowGraph, WorkflowStep } from '../workflow';
 import { GenericWorkflowStepImpl } from '../workflow/impl/step.impl';
-import { END_NODE, START_NODE, WorkflowNodeResourceConfigAttributes, WorkflowResourceConfigDAG, getWorkflowResourceConfigNodeKey } from './model';
+import { END_NODE, START_NODE, WorkflowNodeResourceConfigAttributes, WorkflowResourceConfigDAG, getEdgeKey, getWorkflowResourceConfigNodeKey } from './model';
 
 /**
  * Builds a `WorkflowResourceConfigGraph` from a `WorkflowGraph`.
@@ -76,7 +76,7 @@ export class WorkflowResourceConfigDAGBuilder {
     ): void {
         if (successorStep.type !== WorkflowStepType.Function) {
             const targetNodeKey = getWorkflowResourceConfigNodeKey(successorStep);
-            const edgeKey = this.getEdgeName(srcNodeKey, targetNodeKey);
+            const edgeKey = getEdgeKey(srcNodeKey, targetNodeKey);
             configGraph.addDirectedEdgeWithKey(edgeKey, srcNodeKey, targetNodeKey);
             return;
         }
@@ -84,7 +84,7 @@ export class WorkflowResourceConfigDAGBuilder {
         const successorFuncStep = successorStep as WorkflowFunctionStep;
         this.forEachResourceProfile(successorFuncStep, resourceProfile => {
             const targetNodeKey = getWorkflowResourceConfigNodeKey(successorFuncStep, resourceProfile);
-            const edgeKey = this.getEdgeName(srcNodeKey, targetNodeKey);
+            const edgeKey = getEdgeKey(srcNodeKey, targetNodeKey);
             configGraph.addDirectedEdgeWithKey(edgeKey, srcNodeKey, targetNodeKey);
         });
     }
@@ -111,10 +111,6 @@ export class WorkflowResourceConfigDAGBuilder {
                 callback(this.availableResourceProfiles[result.resourceProfileId]);
             }
         }
-    }
-
-    private getEdgeName(srcNode: string, targetNode: string) {
-        return `${srcNode}->${targetNode}`;
     }
 
 }

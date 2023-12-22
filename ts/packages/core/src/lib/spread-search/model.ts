@@ -21,11 +21,16 @@ export interface FunctionNodeResourceConfigAttributes extends Required<WorkflowN
 export const START_NODE = 'WorkflowResourceConfigGraph.start';
 export const END_NODE = 'WorkflowResourceConfigGraph.end';
 
-export function getWorkflowResourceConfigNodeKey(step: WorkflowStep, resourceProfile?: ResourceProfile): string {
+export function getWorkflowResourceConfigNodeKey(step: WorkflowStep, resourceProfile?: ResourceProfile | string): string {
     if (resourceProfile) {
-        return `${step.name}-${getResourceProfileId(resourceProfile)}`;
+        const resourceProfileId = typeof resourceProfile === 'object' ? getResourceProfileId(resourceProfile) : resourceProfile;
+        return `${step.name}-${resourceProfileId}`;
     }
     return step.name;
+}
+
+export function getEdgeKey(srcNode: string, targetNode: string) {
+    return `${srcNode}->${targetNode}`;
 }
 
 export type GetStepWeightWithProfileFn = (stepNode: FunctionNodeResourceConfigAttributes) => WorkflowStepWeight;

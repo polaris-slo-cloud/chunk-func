@@ -39,8 +39,13 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
             }
         };
 
+        const remainingSlo = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
         const prevStep = this.getSearchStartStep(step);
-        const shortestPath = this.resConfigGraph.findShortestPathToEnd(prevStep, getStepNodeExecTime);
+        const shortestPath = this.resConfigGraph.findSloCompliantPathToEnd(prevStep, remainingSlo, getStepNodeExecTime);
+
+        if (!shortestPath) {
+            throw new Error(`There is no path from ${prevStep.name} to the end of the workflow.`);
+        }
 
         // Since the path starts at the previous step, this step has index 1.
         const resProfileId = shortestPath.steps[1].weight!.resourceProfileId;

@@ -10,6 +10,7 @@ import {
     WorkflowResourceConfigDAG,
     WorkflowStepAndWeight,
     getWorkflowResourceConfigNodeKey,
+    getEdgeKey,
 } from './model';
 import { WorkflowResourceConfigDAGBuilder } from './workflow-resource-config-dag-builder';
 
@@ -59,8 +60,10 @@ export class WorkflowResourceConfigGraph {
      *
      * Currently we only support finding the shortest path to the end of the workflow, because using any
      * other node as the end would require picking a resource profile for it, if it is a function node.
+     *
+     * @returns The shortest path or `undefined` if no path exists between `srcStep` and the end node.
      */
-    findShortestPathToEnd(srcStep: WorkflowStep, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath {
+    findShortestPathToEnd(srcStep: WorkflowStep, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
         const srcNodeKey = this.getSourceNodeKey(srcStep);
         const targetStep = this.resConfigGraphEnd;
 
@@ -79,10 +82,64 @@ export class WorkflowResourceConfigGraph {
         );
 
         if (!rawPath) {
-            throw new Error(`There is no path between ${srcStep.name} and ${targetStep.name}`);
+            return undefined;
         }
 
         return this.convertToConfiguredWorkflowPath(rawPath, weightFn);
+    }
+
+    /**
+     * Finds and SLO-compliant path from the `srcStep` to the end of the graph using the specified `weightFn`.
+     *
+     * @returns The SLO-compliant path or `undefined` if no such path exists.
+     */
+    findSloCompliantPathToEnd(srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
+        return this.findSloCompliantPathToEndInGraph(this.resConfigGraph, srcStep, slo, weightFn);
+    }
+
+    private findSloCompliantPathToEndInGraph(graph: WorkflowResourceConfigDAG, srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
+        const path = this.findShortestPathToEnd(srcStep, weightFn);
+        if (!path) {
+            return undefined;
+        }
+        if (path.steps.length === 1) {
+            return path;
+        }
+
+        let sloWeight = 0;
+        let currStep: WorkflowStepAndWeight;
+        let prevStep = path.steps[0]; // The first step has weight 0, so we don't check it.
+        for (let i = 1; i < path.steps.length; ++i, prevStep = currStep) {
+            currStep = path.steps[i];
+            if (!currStep.weight) {
+                continue;
+            }
+            sloWeight += currStep.weight.sloWeight;
+            if (sloWeight > slo) {
+                graph = this.removeEdge(graph, prevStep, currStep);
+                return this.findSloCompliantPathToEndInGraph(graph, srcStep, slo, weightFn);
+            }
+        }
+
+        return path;
+    }
+
+    /**
+     * Removes the edge between the two steps from the graph and returns the modified graph.
+     *
+     * If `graph === this.resConfigGraph`, a copy is created first.
+     */
+    private removeEdge(graph: WorkflowResourceConfigDAG, srcStep: WorkflowStepAndWeight, targetStep: WorkflowStepAndWeight): WorkflowResourceConfigDAG {
+        if (graph === this.resConfigGraph) {
+            graph = this.resConfigGraph.copy() as WorkflowResourceConfigDAG;
+        }
+
+        const srcNodeKey = getWorkflowResourceConfigNodeKey(srcStep.step, srcStep.weight?.resourceProfileId);
+        const targetNodeKey = getWorkflowResourceConfigNodeKey(targetStep.step, targetStep.weight?.resourceProfileId);
+        const edgeKey = getEdgeKey(srcNodeKey, targetNodeKey);
+        graph.dropEdge(edgeKey);
+
+        return graph;
     }
 
     private getSourceNodeKey(step: WorkflowStep): string {
