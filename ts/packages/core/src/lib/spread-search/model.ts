@@ -67,4 +67,20 @@ export interface ConfiguredWorkflowPath {
      */
     cost: number;
 
+    /**
+     * The sum of these weights along a path are constrained by the SLO.
+     *
+     * Example: the `sloWeight` could be the execution time and the `optimizationWeight` could be the cost.
+     */
+    sloWeight: number;
+
+    /**
+     * The sum of these weights should be optimized (typically minimized).
+     *
+     * This weight needs to be optimized, while the sum of the sloWeights meet the SLO constraint.
+     *
+     * Example: the `sloWeight` could be the execution time and the `optimizationWeight` could be the cost.
+     */
+    optimizationWeight: number;
+
 }

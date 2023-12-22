@@ -175,6 +175,8 @@ export class WorkflowResourceConfigGraph {
         const workflowPath: ConfiguredWorkflowPath = {
             executionTimeMs: 0,
             cost: 0,
+            sloWeight: 0,
+            optimizationWeight: 0,
             steps: new Array(rawPath.length),
         };
 
@@ -184,10 +186,20 @@ export class WorkflowResourceConfigGraph {
                 step: node.step,
             };
 
-            if (i > 0 && node.resourceProfile) {
+            if (node.resourceProfile) {
                 stepAndWeight.weight = weightFn(node as FunctionNodeResourceConfigAttributes);
-                workflowPath.executionTimeMs += stepAndWeight.weight.profilingResult.executionTimeMs;
-                workflowPath.cost += stepAndWeight.weight.profilingResult.executionCost;
+
+                // The first step counts as already executed and, thus, does not contribute any weight to the path.
+                // We only count the weight for the subsequent steps.
+                if (i > 0) {
+                    workflowPath.executionTimeMs += stepAndWeight.weight.profilingResult.executionTimeMs;
+                    workflowPath.cost += stepAndWeight.weight.profilingResult.executionCost;
+                    workflowPath.sloWeight += stepAndWeight.weight.sloWeight;
+                    workflowPath.optimizationWeight += stepAndWeight.weight.optimizationWeight;
+                } else {
+                    stepAndWeight.weight.sloWeight = 0;
+                    stepAndWeight.weight.optimizationWeight = 0;
+                }
             }
 
             workflowPath.steps[i] = stepAndWeight;
