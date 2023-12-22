@@ -26,7 +26,7 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
         }
 
         const getStepNodeExecTime: GetStepWeightWithProfileFn = (stepNode) => {
-            if (stepNode.step.name != step.name) {
+            if (stepNode.step.name !== step.name) {
                 return getAvgExecTimeAcrossAllInputs(stepNode);
             } else {
                 const profilingResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, stepNode.resourceProfile);
@@ -41,14 +41,14 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
 
         const remainingSlo = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
         const prevStep = this.getSearchStartStep(step);
-        const shortestPath = this.resConfigGraph.findSloCompliantPathToEnd(prevStep, remainingSlo, getStepNodeExecTime);
+        const path = this.resConfigGraph.findSloCompliantPathToEnd(prevStep, remainingSlo, getStepNodeExecTime);
 
-        if (!shortestPath) {
+        if (!path) {
             throw new Error(`There is no path from ${prevStep.name} to the end of the workflow.`);
         }
 
         // Since the path starts at the previous step, this step has index 1.
-        const resProfileId = shortestPath.steps[1].weight!.resourceProfileId;
+        const resProfileId = path.steps[1].weight!.resourceProfileId;
         return this.availableResourceProfiles[resProfileId];
     }
 

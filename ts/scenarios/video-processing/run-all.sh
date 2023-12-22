@@ -31,6 +31,16 @@ node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-11.5s.
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-14s.yaml ProportionalCriticalPathSloConfigStrategy > ./simulation-logs/scenario-03-14s-proportional-critical-path-slo.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-16s.yaml ProportionalCriticalPathSloConfigStrategy > ./simulation-logs/scenario-03-16s-proportional-critical-path-slo.json
 
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-56s.yaml SpreadSearchConfigStrategy > ./simulation-logs/scenario-01-56s-spread-search.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-67.5s.yaml SpreadSearchConfigStrategy > ./simulation-logs/scenario-01-67.5s-spread-search.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-78.5s.yaml SpreadSearchConfigStrategy > ./simulation-logs/scenario-01-78.5s-spread-search.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-37s.yaml SpreadSearchConfigStrategy > ./simulation-logs/scenario-02-37s-spread-search.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-44s.yaml SpreadSearchConfigStrategy > ./simulation-logs/scenario-02-44s-spread-search.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-51.5s.yaml SpreadSearchConfigStrategy > ./simulation-logs/scenario-02-51.5s-spread-search.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-11.5s.yaml SpreadSearchConfigStrategy > ./simulation-logs/scenario-03-11.5s-spread-search.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-14s.yaml SpreadSearchConfigStrategy > ./simulation-logs/scenario-03-14s-spread-search.json
+node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-03-16s.yaml SpreadSearchConfigStrategy > ./simulation-logs/scenario-03-16s-spread-search.json
+
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-56s.yaml InputHeuristicProportionalCPSloConfigStrategy > ./simulation-logs/scenario-01-56s-input-heuristic-proportional-cp-slo.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-67.5s.yaml InputHeuristicProportionalCPSloConfigStrategy > ./simulation-logs/scenario-01-67.5s-input-heuristic-proportional-cp-slo.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-78.5s.yaml InputHeuristicProportionalCPSloConfigStrategy > ./simulation-logs/scenario-01-78.5s-input-heuristic-proportional-cp-slo.json

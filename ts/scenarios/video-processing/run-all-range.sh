@@ -22,6 +22,7 @@ declare -A SCENARIOS=(
 declare -A CONFIG_STRATEGIES=(
     ["proportional-critical-path-slo"]="ProportionalCriticalPathSloConfigStrategy"
     ["step-conf"]="StepConfConfigStrategy"
+    ["spread-search"]="SpreadSearchConfigStrategy"
 )
 
 declare -A CONFIG_STRATEGIES_WITH_TRAINING=(
