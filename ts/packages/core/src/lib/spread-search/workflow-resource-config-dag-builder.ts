@@ -21,6 +21,22 @@ export class WorkflowResourceConfigDAGBuilder {
         return configGraph;
     }
 
+    /**
+     * Creates a copy of the `graph`, adds a temporary node with the specified name to it, and creates
+     * edges from the temp node to all nodes representing the `targetStep`.
+     *
+     * @return A copy of `graph` with the temp node added.
+     */
+    addTempStartNodeToCopy(graph: WorkflowResourceConfigDAG, tempNodeName: string, targetStep: WorkflowStep): WorkflowResourceConfigDAG {
+        graph = graph.copy() as WorkflowResourceConfigDAG;
+
+        const tempWorkflowStep = this.createPseudoStep(tempNodeName, [ targetStep.name ]);
+        graph.addNode(tempNodeName, { step: tempWorkflowStep });
+
+        this.addEdgesToSuccessorStepNodes(graph, tempNodeName, targetStep);
+        return graph;
+    }
+
     private createPseudoStep(name: string, successors?: string[]): WorkflowStep {
         return new GenericWorkflowStepImpl({
             name,

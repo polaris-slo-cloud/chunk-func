@@ -1,6 +1,6 @@
 import { ResourceProfile, getProfilingResultForProfile, getResourceProfileId } from '../model';
 import { GetStepWeightWithProfileFn, WorkflowResourceConfigGraph, getAvgExecTimeAcrossAllInputs } from '../spread-search';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, Workflow, WorkflowStep } from '../workflow';
+import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, Workflow } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 export const createSpreadSearchConfigStrategy: ChooseConfigurationStrategyFactory =
@@ -40,23 +40,14 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
         };
 
         const remainingSlo = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
-        const prevStep = this.getSearchStartStep(step);
-        const path = this.resConfigGraph.findSloCompliantPathToEnd(prevStep, remainingSlo, getStepNodeExecTime);
+        const path = this.resConfigGraph.findSloCompliantPathToEnd(step, remainingSlo, getStepNodeExecTime);
 
         if (!path) {
-            throw new Error(`There is no path from ${prevStep.name} to the end of the workflow.`);
+            throw new Error(`There is no path from ${step.name} to the end of the workflow.`);
         }
 
-        // Since the path starts at the previous step, this step has index 1.
-        const resProfileId = path.steps[1].weight!.resourceProfileId;
+        const resProfileId = path.steps[0].weight!.resourceProfileId;
         return this.availableResourceProfiles[resProfileId];
-    }
-
-    private getSearchStartStep(currStep: WorkflowFunctionStep): WorkflowStep {
-        if (currStep.requiredInputs && currStep.requiredInputs.length > 0) {
-            return this.workflowGraph.steps[currStep.requiredInputs[0]];
-        }
-        return this.resConfigGraph!.resConfigGraphStart;
     }
 
 }

@@ -1,6 +1,6 @@
 import { dijkstra } from 'graphology-shortest-path';
-import { ResourceProfile, WorkflowStepType } from '../model';
-import { StepWeightKey, WorkflowFunctionStep, WorkflowGraph, WorkflowStep } from '../workflow';
+import { ResourceProfile } from '../model';
+import { StepWeightKey, WorkflowGraph, WorkflowStep } from '../workflow';
 import {
     ConfiguredWorkflowPath,
     END_NODE,
@@ -13,6 +13,8 @@ import {
     getEdgeKey,
 } from './model';
 import { WorkflowResourceConfigDAGBuilder } from './workflow-resource-config-dag-builder';
+
+const TEMP_START_NODE_KEY = 'temp-start';
 
 /**
  * A DAG that models a workflow using one node for each (`WorkflowFunctionStep`, `ResourceProfile`) pair.
@@ -39,12 +41,14 @@ export class WorkflowResourceConfigGraph {
 
     workflowGraph: WorkflowGraph;
 
+    private dagBuilder: WorkflowResourceConfigDAGBuilder;
+
     constructor(workflowGraph: WorkflowGraph, availableResourceProfiles: Record<string, ResourceProfile>) {
         this.workflowGraph = workflowGraph;
         this.availableResourceProfiles = availableResourceProfiles;
 
-        const dagBuilder = new WorkflowResourceConfigDAGBuilder(availableResourceProfiles);
-        this.resConfigGraph = dagBuilder.buildGraph(workflowGraph);
+        this.dagBuilder = new WorkflowResourceConfigDAGBuilder(availableResourceProfiles);
+        this.resConfigGraph = this.dagBuilder.buildGraph(workflowGraph);
         this.resConfigGraphStart = this.resConfigGraph.getNodeAttribute(START_NODE, 'step');
         this.resConfigGraphEnd = this.resConfigGraph.getNodeAttribute(END_NODE, 'step');
     }
@@ -52,35 +56,52 @@ export class WorkflowResourceConfigGraph {
     /**
      * Finds the shortest path between the `srcStep` and the end of the workflow using the `weightFn` to determine
      * the weights of the edges.
-     * The weight calculation assumes that the `srcStep` has already been executed.
-     * This means that the `srcStep` is included in the returned path, but with a weight of zero.
      *
-     * Since we assume that the source step has already executed, it is irrelevant which of the
-     * source step's resource profile nodes we pick.
+     * This method assumes that the `srcStep` has NOT BEEN EXECUTED yet and still needs to be executed.
+     * Thus, it has a weight in the returned path.
      *
      * Currently we only support finding the shortest path to the end of the workflow, because using any
-     * other node as the end would require picking a resource profile for it, if it is a function node.
+     * other node as the end would require picking a resource profile for it, as if it were a function node.
      *
      * @param [pathWeightKey='sloWeight'] The name of the weight property that should be used to compute the path weights.
      * @returns The shortest path or `undefined` if no path exists between `srcStep` and the end node.
      */
     findShortestPathToEnd(srcStep: WorkflowStep, weightFn: GetStepWeightWithProfileFn, pathWeightKey: StepWeightKey = 'sloWeight'): ConfiguredWorkflowPath | undefined {
-        const srcStepKey = this.getSourceNodeKey(srcStep);
-        return this.findShortestPathToEndInGraph(this.resConfigGraph, srcStepKey, weightFn, pathWeightKey);
+        const graphCopy = this.dagBuilder.addTempStartNodeToCopy(this.resConfigGraph, TEMP_START_NODE_KEY, srcStep);
+        const path = this.findShortestPathToEndInGraph(graphCopy, TEMP_START_NODE_KEY, weightFn, pathWeightKey);
+
+        if (!path || path.steps.length === 1) {
+            return undefined;
+        }
+        this.trimFirstStepFromWorkflowPath(path);
+        return path;
     }
 
     /**
      * Finds and SLO-compliant path from the `srcStep` to the end of the graph using the specified `weightFn`.
      *
+     * This method assumes that the `srcStep` has NOT BEEN EXECUTED yet and still needs to be executed.
+     * Thus, it has a weight in the returned path.
+     *
      * @returns The SLO-compliant path or `undefined` if no such path exists.
      */
     findSloCompliantPathToEnd(srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
-        const srcStepKey = this.getSourceNodeKey(srcStep);
-        return this.findSloCompliantPathToEndInGraph(this.resConfigGraph, srcStepKey, slo, weightFn);
+        const graphCopy = this.dagBuilder.addTempStartNodeToCopy(this.resConfigGraph, TEMP_START_NODE_KEY, srcStep);
+        const path = this.findSloCompliantPathToEndInGraph(graphCopy, TEMP_START_NODE_KEY, slo, weightFn);
+
+        if (!path || path.steps.length === 1) {
+            return undefined;
+        }
+        this.trimFirstStepFromWorkflowPath(path);
+        return path;
     }
 
     /**
-     * Same as `findShortestPathToEnd()`, but operates on the specified graph.
+     * Finds the shortest path between the srcStep and the end of the workflow in the specified `graph`,
+     * using the `weightFn` to determine the weights of the edges.
+     *
+     * IMPORTANT: This method assumes that the step with `srcStepKey` is a NOP step or that it has already been executed.
+     * Thus, the srcStep is included in the returned path with weight 0.
      */
     private findShortestPathToEndInGraph(
         graph: WorkflowResourceConfigDAG,
@@ -111,6 +132,14 @@ export class WorkflowResourceConfigGraph {
         return this.convertToConfiguredWorkflowPath(graph, rawPath, weightFn);
     }
 
+    /**
+     * Finds and SLO-compliant path from the srcStep to the end of the specified `graph` using the specified `weightFn`.
+     *
+     * IMPORTANT: This method assumes that the step with `srcStepKey` is a NOP step or that it has already been executed.
+     * Thus, the srcStep is included in the returned path with weight 0.
+     *
+     * @returns The SLO-compliant path or `undefined` if no such path exists.
+     */
     private findSloCompliantPathToEndInGraph(graph: WorkflowResourceConfigDAG, srcStepKey: string, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
         const path = this.findShortestPathToEndInGraph(graph, srcStepKey, weightFn, 'optimizationWeight');
         if (!path) {
@@ -156,21 +185,6 @@ export class WorkflowResourceConfigGraph {
         return graph;
     }
 
-    private getSourceNodeKey(step: WorkflowStep): string {
-        if (step.type !== WorkflowStepType.Function) {
-            return getWorkflowResourceConfigNodeKey(step);
-        }
-
-        const funcStep = step as WorkflowFunctionStep;
-        for (const result of funcStep.profilingResults.results) {
-            if (result.results) {
-                return getWorkflowResourceConfigNodeKey(step, result.resourceProfileId);
-            }
-        }
-
-        throw new Error(`No successful profiling result found for function step ${step.name}`);
-    }
-
     private convertToConfiguredWorkflowPath(graph: WorkflowResourceConfigDAG, rawPath: dijkstra.BidirectionalDijstraResult, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath {
         const workflowPath: ConfiguredWorkflowPath = {
             executionTimeMs: 0,
@@ -206,6 +220,17 @@ export class WorkflowResourceConfigGraph {
         }
 
         return workflowPath;
+    }
+
+    private trimFirstStepFromWorkflowPath(path: ConfiguredWorkflowPath): void {
+        const firstStep = path.steps[0];
+        path.steps = path.steps.slice(1);
+        if (firstStep.weight) {
+            path.executionTimeMs -= firstStep.weight.profilingResult.executionTimeMs;
+            path.cost -= firstStep.weight.profilingResult.executionCost;
+            path.sloWeight -= firstStep.weight.sloWeight;
+            path.optimizationWeight -= firstStep.weight.optimizationWeight;
+        }
     }
 
 }
