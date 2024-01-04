@@ -1,4 +1,4 @@
-import { findResourceProfileResults, getResourceProfileId } from '../model';
+import { ProfilingResult, findResourceProfileResults, getResourceProfileId } from '../model';
 import { WorkflowStepWeight, createSwappedWeightFn } from '../workflow';
 import { GetStepWeightWithProfileFn, FunctionNodeResourceConfigAttributes } from './model';
 
@@ -46,3 +46,36 @@ export const getAvgExecTimeAcrossAllInputs: GetStepWeightWithProfileFn = (stepNo
  * - `optimizationWeight` = average execution time across input sizes for the resource profile
  */
 export const getAvgCostAcrossAllInputs: GetStepWeightWithProfileFn = createSwappedWeightFn(getAvgExecTimeAcrossAllInputs);
+
+/**
+ * Gets the execution time for the largest input size for the resource profile of the node and returns it as the SLO weight.
+ *
+ * - `sloWeight` = execution time for the largest input size for the resource profile
+ * - `optimizationWeight` = cost for the largest input size for the resource profile
+ */
+export const getExecTimeForMaxInput: GetStepWeightWithProfileFn = (stepNode: FunctionNodeResourceConfigAttributes) => {
+    const resultsForProfile = findResourceProfileResults(stepNode.resourceProfile, stepNode.step.profilingResults);
+    if (!resultsForProfile || !resultsForProfile.results) {
+        throw new Error(`Step ${stepNode.step.name} does not have results for resource profile ${getResourceProfileId(stepNode.resourceProfile)}`);
+    }
+
+    const resultForLargestInput = resultsForProfile.results[resultsForProfile.results.length - 1];
+
+    const weight: WorkflowStepWeight = {
+        resourceProfileId: resultsForProfile.resourceProfileId,
+        sloWeight: resultForLargestInput!.executionTimeMs,
+        optimizationWeight: resultForLargestInput!.executionCost,
+        profilingResult: {
+            ...resultForLargestInput!,
+        },
+    };
+    return weight;
+};
+
+/**
+ * Gets the cost for the largest input size for the resource profile of the node and returns it as the SLO weight.
+ *
+ * - `sloWeight` = cost for the largest input size for the resource profile
+ * - `optimizationWeight` = execution time for the largest input size for the resource profile
+ */
+export const getCostForMaxInput: GetStepWeightWithProfileFn = createSwappedWeightFn(getExecTimeForMaxInput);

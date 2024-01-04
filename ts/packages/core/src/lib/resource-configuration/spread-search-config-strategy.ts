@@ -1,5 +1,5 @@
 import { ResourceProfile, getProfilingResultForProfile, getResourceProfileId } from '../model';
-import { GetStepWeightWithProfileFn, WorkflowResourceConfigGraph, getAvgExecTimeAcrossAllInputs } from '../spread-search';
+import { GetStepWeightWithProfileFn, WorkflowResourceConfigGraph, getAvgExecTimeAcrossAllInputs, getExecTimeForMaxInput } from '../spread-search';
 import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, Workflow } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
@@ -27,6 +27,7 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
 
         const getStepNodeExecTime: GetStepWeightWithProfileFn = (stepNode) => {
             if (stepNode.step.name !== step.name) {
+                // return getExecTimeForMaxInput(stepNode);
                 return getAvgExecTimeAcrossAllInputs(stepNode);
             } else {
                 const profilingResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, stepNode.resourceProfile);
