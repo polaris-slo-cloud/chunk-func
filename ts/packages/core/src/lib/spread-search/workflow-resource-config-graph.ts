@@ -4,14 +4,15 @@ import { StepWeightKey, WorkflowGraph, WorkflowStep } from '../workflow';
 import {
     ConfiguredWorkflowPath,
     END_NODE,
+    FunctionNodeResourceConfigAttributes,
     GetStepWeightWithProfileFn,
     START_NODE,
-    FunctionNodeResourceConfigAttributes,
     WorkflowResourceConfigDAG,
     WorkflowStepAndWeight,
-    getWorkflowResourceConfigNodeKey,
     getEdgeKey,
+    getWorkflowResourceConfigNodeKey,
 } from './model';
+import { sloCompliantDijkstra } from './slo-compliant-dijkstra';
 import { WorkflowResourceConfigDAGBuilder } from './workflow-resource-config-dag-builder';
 
 const TEMP_START_NODE_KEY = 'temp-start';
@@ -70,10 +71,11 @@ export class WorkflowResourceConfigGraph {
         const graphCopy = this.dagBuilder.addTempStartNodeToCopy(this.resConfigGraph, TEMP_START_NODE_KEY, srcStep);
         const path = this.findShortestPathToEndInGraph(graphCopy, TEMP_START_NODE_KEY, weightFn, pathWeightKey);
 
-        if (!path || path.steps.length === 1) {
+        // The path must contain at least 3 nodes, because the first and the last one are not part of the workflow.
+        if (!path || path.steps.length <= 2) {
             return undefined;
         }
-        this.trimFirstStepFromWorkflowPath(path);
+        this.trimAuxiliaryStepsFromWorkflowPath(path);
         return path;
     }
 
@@ -87,12 +89,14 @@ export class WorkflowResourceConfigGraph {
      */
     findSloCompliantPathToEnd(srcStep: WorkflowStep, slo: number, weightFn: GetStepWeightWithProfileFn): ConfiguredWorkflowPath | undefined {
         const graphCopy = this.dagBuilder.addTempStartNodeToCopy(this.resConfigGraph, TEMP_START_NODE_KEY, srcStep);
-        const path = this.findSloCompliantPathToEndInGraph(graphCopy, TEMP_START_NODE_KEY, slo, weightFn);
+        // const path = this.findSloCompliantPathToEndInGraph(graphCopy, TEMP_START_NODE_KEY, slo, weightFn);
+        const path = this.sloCompliantDijkstraInGraph(graphCopy, TEMP_START_NODE_KEY, slo, weightFn);
 
-        if (!path || path.steps.length === 1) {
+        // The path must contain at least 3 nodes, because the first and the last one are not part of the workflow.
+        if (!path || path.steps.length <= 2) {
             return undefined;
         }
-        this.trimFirstStepFromWorkflowPath(path);
+        this.trimAuxiliaryStepsFromWorkflowPath(path);
         return path;
     }
 
@@ -133,7 +137,33 @@ export class WorkflowResourceConfigGraph {
     }
 
     /**
-     * Finds and SLO-compliant path from the srcStep to the end of the specified `graph` using the specified `weightFn`.
+     * Finds an SLO-compliant path from the srcStep to the end of the specified `graph` using the specified `weightFn`.
+     *
+     * This method relies on an SLO-aware variant of Dijkstra's shortest path algorithm, which due to using a heuristic when
+     * updating a node's distance might not return the shortest SLO-compliant path. This is done to increase the chances of
+     * greedily finding an SLO-compliant path.
+     *
+     * IMPORTANT: This method assumes that the step with `srcStepKey` is a NOP step or that it has already been executed.
+     * Thus, the srcStep is included in the returned path with weight 0.
+     *
+     * @returns The shortest SLO-compliant path or `undefined` if no such path exists.
+     */
+    private sloCompliantDijkstraInGraph(
+        graph: WorkflowResourceConfigDAG,
+        srcStepKey: string,
+        slo: number,
+        weightFn: GetStepWeightWithProfileFn,
+    ): ConfiguredWorkflowPath | undefined {
+        const rawPath = sloCompliantDijkstra(graph, srcStepKey, this.resConfigGraphEnd.name, slo, weightFn);
+        if (!rawPath) {
+            return undefined;
+        }
+
+        return this.convertToConfiguredWorkflowPath(graph, rawPath, weightFn);
+    }
+
+    /**
+     * Finds an SLO-compliant path from the srcStep to the end of the specified `graph` using the specified `weightFn`.
      *
      * IMPORTANT: This method assumes that the step with `srcStepKey` is a NOP step or that it has already been executed.
      * Thus, the srcStep is included in the returned path with weight 0.
@@ -222,14 +252,23 @@ export class WorkflowResourceConfigGraph {
         return workflowPath;
     }
 
-    private trimFirstStepFromWorkflowPath(path: ConfiguredWorkflowPath): void {
+    private trimAuxiliaryStepsFromWorkflowPath(path: ConfiguredWorkflowPath): void {
         const firstStep = path.steps[0];
-        path.steps = path.steps.slice(1);
+        const lastStep = path.steps[path.steps.length - 1];
+        path.steps = path.steps.slice(1, -1);
+
         if (firstStep.weight) {
             path.executionTimeMs -= firstStep.weight.profilingResult.executionTimeMs;
             path.cost -= firstStep.weight.profilingResult.executionCost;
             path.sloWeight -= firstStep.weight.sloWeight;
             path.optimizationWeight -= firstStep.weight.optimizationWeight;
+        }
+
+        if (lastStep.weight) {
+            path.executionTimeMs -= lastStep.weight.profilingResult.executionTimeMs;
+            path.cost -= lastStep.weight.profilingResult.executionCost;
+            path.sloWeight -= lastStep.weight.sloWeight;
+            path.optimizationWeight -= lastStep.weight.optimizationWeight;
         }
     }
 

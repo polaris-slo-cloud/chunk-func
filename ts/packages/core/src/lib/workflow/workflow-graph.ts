@@ -98,6 +98,8 @@ export interface WorkflowStepWeight {
 export type GetStepWeightFn = (step: WorkflowFunctionStep) => WorkflowStepWeight;
 
 /** The name of the property of `WorkflowStepWeight` that should be used for computing the shortest path or critical path. */
+// ToDo: Refactor GetStepWeightFns to avoid having to use a StepWeightKey.
+// Idea: Declare which property an algorithm uses and then create a timeSloWeightFn() and a costSloWegihtFn().
 export type StepWeightKey = keyof Pick<WorkflowStepWeight, 'sloWeight' | 'optimizationWeight'>;
 
 /**
