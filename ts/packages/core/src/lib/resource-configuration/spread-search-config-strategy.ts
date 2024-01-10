@@ -1,6 +1,15 @@
 import { ResourceProfile, getProfilingResultForProfile, getResourceProfileId } from '../model';
 import { GetStepWeightWithProfileFn, WorkflowResourceConfigGraph, getAvgExecTimeAcrossAllInputs, getExecTimeForMaxInput } from '../spread-search';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, Workflow } from '../workflow';
+import {
+    AccumulatedStepInput,
+    ChooseConfigurationStrategyFactory,
+    ResourceConfigurationStrategy,
+    Workflow,
+    WorkflowFunctionStep,
+    WorkflowGraph,
+    WorkflowState,
+} from '../workflow';
+import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 export const createSpreadSearchConfigStrategy: ChooseConfigurationStrategyFactory =
@@ -14,10 +23,12 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
 
     static readonly strategyName = 'SpreadSearchConfigStrategy';
 
+    private fallbackStrategy: ResourceConfigurationStrategy;
     private resConfigGraph?: WorkflowResourceConfigGraph;
 
     constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
         super(SpreadSearchConfigStrategy.strategyName, graph, availableResProfiles);
+        this.fallbackStrategy = new FastestConfigStrategy(graph, availableResProfiles);
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
@@ -43,12 +54,12 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
         const remainingSlo = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
         const path = this.resConfigGraph.findSloCompliantPathToEnd(step, remainingSlo, getStepNodeExecTime);
 
-        if (!path) {
-            throw new Error(`There is no path from ${step.name} to the end of the workflow.`);
+        if (path) {
+            const resProfileId = path.steps[0].weight!.resourceProfileId;
+            return this.availableResourceProfiles[resProfileId];
         }
-
-        const resProfileId = path.steps[0].weight!.resourceProfileId;
-        return this.availableResourceProfiles[resProfileId];
+        // throw new Error(`There is no path from ${step.name} to the end of the workflow.`);
+        return this.fallbackStrategy.chooseConfiguration(workflowState, step, input);
     }
 
 }
