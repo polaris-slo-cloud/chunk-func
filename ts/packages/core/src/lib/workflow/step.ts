@@ -172,4 +172,9 @@ export interface WorkflowStepExecutionLog {
      * The cost of executing this step.
      */
     executionCost: number;
+
+    /**
+     * The number of milliseconds that the resource configuration strategy took to execute.
+     */
+    resourceConfigStrategyExecutionTimeMs: number;
 }

@@ -58,6 +58,11 @@ export interface StepState {
     selectedConfig?: ResourceProfile;
 
     /**
+     * The number of milliseconds that the resource configuration strategy took to execute.
+     */
+    resourceConfigStrategyExecutionTimeMs: number;
+
+    /**
      * The time the execution of this step took.
      */
     executionTimeMs: number;

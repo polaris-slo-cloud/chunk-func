@@ -46,6 +46,7 @@ function processResultFile(filePath: string): ProcessedSimulationResult {
         sloMs: simResult.sloMs,
         executionTimeMs: simResult.workflowOutput.executionTimeMs,
         cost: simResult.workflowOutput.totalCost,
+        avgResConfigStratExecTimeMs: simResult.workflowOutput.avgResourceConfigStrategyExecutionTimeMs,
     };
 }
 

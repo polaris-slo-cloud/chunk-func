@@ -11,4 +11,6 @@ export interface ProcessedSimulationResult {
 
     cost: number;
 
+    avgResConfigStratExecTimeMs: number;
+
 }

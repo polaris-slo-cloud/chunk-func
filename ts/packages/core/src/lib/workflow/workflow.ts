@@ -80,6 +80,11 @@ export interface WorkflowOutput<T> {
     totalCost: number;
 
     /**
+     * The average number of milliseconds that the resource configuration strategy took to execute.
+     */
+    avgResourceConfigStrategyExecutionTimeMs: number;
+
+    /**
      * The output data computed by the workflow.
      */
     data: InputOutputData<T>;
