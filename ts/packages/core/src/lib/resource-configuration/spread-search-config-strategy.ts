@@ -19,6 +19,12 @@ import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 /**
+ * SLO weight and optimization weight estimates will be multiplied by this value for steps, for which we don't
+ * know the exact input size.
+ */
+const ESTIMATE_MULTIPLIER = 1.1;
+
+/**
  * Defines the minimum spare length that should exist between the current path length and the remaining SLO.
  * The value is a percentage of the remaining SLO.
  *
@@ -54,7 +60,10 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
         const getStepNodeExecTime: GetStepWeightWithProfileFn = (stepNode) => {
             if (stepNode.step.name !== step.name) {
                 // return getExecTimeForMaxInput(stepNode);
-                return getAvgExecTimeAcrossAllInputs(stepNode);
+                const stepWeight = getAvgExecTimeAcrossAllInputs(stepNode);
+                stepWeight.sloWeight *= ESTIMATE_MULTIPLIER;
+                stepWeight.optimizationWeight *= ESTIMATE_MULTIPLIER;
+                return stepWeight;
             } else {
                 const profilingResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, stepNode.resourceProfile);
                 return {
