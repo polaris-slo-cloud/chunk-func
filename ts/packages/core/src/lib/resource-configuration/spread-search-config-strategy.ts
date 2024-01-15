@@ -23,30 +23,40 @@ import {
 import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
-/**
- * SLO weight and optimization weight estimates will be multiplied by this value for steps, for which we don't
- * know the exact input size.
- */
-const ESTIMATE_MULTIPLIER = 1.6;
 
-/**
- * Defines the minimum spare length that should exist between the current path length and the remaining SLO.
- * The value is a percentage of the remaining SLO.
- *
- * If the difference between the remaining SLO and the projected path length is less than this value,
- * the next higher profile will be picked for the current step, unless it is the last step. *
- */
-const SAFETY_MARGIN = 0.01;
+const DEFAULT_ESTIMATE_MULTIPLIER = 1.6;
+const DEFAULT_SAFETY_MARGIN = 0.01;
+const DEFAULT_PROFILE_INCREMENTS = 2;
 
-/**
- * The number of profile increments that should be made, if the safety margin is not maintained.
- *
- * E.g., 1 increment means to switch to the next faster profile.
- */
-const PROFILE_INCREMENTS = 2;
+/** Configuration options for the `SpreadSearchConfigStrategy`. */
+export interface SpreadSearchOptions {
+
+    /**
+     * SLO weight and optimization weight estimates will be multiplied by this value for steps, for which we don't
+     * know the exact input size.
+     */
+    estimateMultiplier: number;
+
+    /**
+     * Defines the minimum spare length that should exist between the current path length and the remaining SLO.
+     * The value is a percentage of the remaining SLO.
+     *
+     * If the difference between the remaining SLO and the projected path length is less than this value,
+     * the next higher profile will be picked for the current step, unless it is the last step. *
+     */
+    safetyMargin: number;
+
+    /**
+     * The number of profile increments that should be made, if the safety margin is not maintained.
+     *
+     * E.g., 1 increment means to switch to the next faster profile.
+     */
+    profileIncrements: number;
+
+}
 
 export const createSpreadSearchConfigStrategy: ChooseConfigurationStrategyFactory =
-    (workflow: Workflow) => new SpreadSearchConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
+    (workflow: Workflow, options?: Record<string, number>) => new SpreadSearchConfigStrategy(workflow.graph, workflow.availableResourceProfiles, options || {});
 
 /**
  * ResourceConfigurationStrategy that relies on a DAG with one node per function and resource configuration combination
@@ -57,11 +67,18 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
     static readonly strategyName = 'SpreadSearchConfigStrategy';
 
     private fallbackStrategy: ResourceConfigurationStrategy;
+    private options: SpreadSearchOptions;
     private resConfigGraph?: WorkflowResourceConfigGraph;
 
-    constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
+    constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>, options: Partial<SpreadSearchOptions>) {
         super(SpreadSearchConfigStrategy.strategyName, graph, availableResProfiles);
         this.fallbackStrategy = new FastestConfigStrategy(graph, availableResProfiles);
+
+        this.options = {
+            estimateMultiplier: options.estimateMultiplier || DEFAULT_ESTIMATE_MULTIPLIER,
+            profileIncrements: options.profileIncrements !== undefined ? options.profileIncrements : DEFAULT_PROFILE_INCREMENTS,
+            safetyMargin: options.safetyMargin !== undefined ? options.safetyMargin : DEFAULT_SAFETY_MARGIN,
+        };
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
@@ -73,8 +90,8 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
             if (stepNode.step.name !== step.name) {
                 // return getExecTimeForMaxInput(stepNode);
                 const stepWeight = getAvgExecTimeAcrossAllInputs(stepNode);
-                stepWeight.sloWeight *= ESTIMATE_MULTIPLIER;
-                stepWeight.optimizationWeight *= ESTIMATE_MULTIPLIER;
+                stepWeight.sloWeight *= this.options.estimateMultiplier;
+                stepWeight.optimizationWeight *= this.options.estimateMultiplier;
                 return stepWeight;
             } else {
                 const profilingResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, stepNode.resourceProfile);
@@ -88,7 +105,7 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
         };
 
         const remainingSlo = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
-        const path = this.resConfigGraph.findSloCompliantPathToEnd(step, remainingSlo, getStepNodeExecTime);
+        const path = this.resConfigGraph.findSloCompliantPathToEnd(step, remainingSlo, stepNode => getStepNodeExecTime(stepNode));
 
         if (path) {
             return this.pickSafeResourceProfile(step, path, input, remainingSlo);
@@ -106,7 +123,7 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
 
         // If we have sufficient safety margin at the end or if this is the last step,
         // we return the resource profile from the path.
-        if (slack / remainingSlo >= SAFETY_MARGIN || path.steps.length === 1) {
+        if (slack / remainingSlo >= this.options.safetyMargin || path.steps.length === 1) {
             return this.availableResourceProfiles[resProfileIdFromPath];
         }
 
@@ -117,7 +134,7 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
         if (profileFromPathIndex === -1) {
             throw new Error(`Cannot find profile ${resProfileIdFromPath} in ${step.name}'s profilingResults.`);
         }
-        const profileIndex = Math.min(profileFromPathIndex + PROFILE_INCREMENTS, sortedProfilingResults.length - 1);
+        const profileIndex = Math.min(profileFromPathIndex + this.options.profileIncrements, sortedProfilingResults.length - 1);
         const nextFasterProfile = sortedProfilingResults[profileIndex];
         return this.availableResourceProfiles[nextFasterProfile.resourceProfileId];
     }

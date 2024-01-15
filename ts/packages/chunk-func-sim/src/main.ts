@@ -35,6 +35,7 @@ import {
     SpreadSearchConfigStrategy,
     createSpreadSearchConfigStrategy,
 } from '@chunk-func/core';
+import { convertArgsToOptions } from './util';
 
 const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactory> = {
     [FastestConfigStrategy.strategyName]: createFastestConfigStrategy,
@@ -66,9 +67,14 @@ function loadYamlFile<T>(path: string): T {
 
 const workflowDesc = loadYamlFile<WorkflowDescription>(process.argv[2]);
 const execDesc =  loadYamlFile<WorkflowExecutionDescription>(process.argv[3]);
+
+let optionsStartIndex = 5;
 let trainingScenarioDesc: WorkflowExecutionDescription | undefined;
 if (process.argv[5]) {
-    trainingScenarioDesc = loadYamlFile<WorkflowExecutionDescription>(process.argv[5]);
+    if (!process.argv[5].startsWith('--')) {
+        trainingScenarioDesc = loadYamlFile<WorkflowExecutionDescription>(process.argv[5]);
+        ++optionsStartIndex;
+    }
 }
 
 const resourceConfigStratName = process.argv[4];
@@ -78,6 +84,7 @@ if (!resConfigStratFactory) {
     console.error('Available ResourceConfigurationStrategies:', Object.keys(resourceConfigStrategies));
     process.exit(1);
 }
+const resConfigOptions = convertArgsToOptions(process.argv.slice(optionsStartIndex));
 
 const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
@@ -88,7 +95,7 @@ let output: WorkflowOutput<unknown>;
 let error: Error;
 
 try {
-    const resConfigStrat = resConfigStratFactory(workflow);
+    const resConfigStrat = resConfigStratFactory(workflow, resConfigOptions);
 
     if (resConfigStrat.train) {
         if (!trainingScenarioDesc) {

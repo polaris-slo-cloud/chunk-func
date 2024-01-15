@@ -39,8 +39,13 @@ export interface ResourceConfigurationStrategy {
 
 }
 
-/** Factory for creating ResourceConfigurationStrategies */
-export type ChooseConfigurationStrategyFactory = (workflow: Workflow) => ResourceConfigurationStrategy;
+/**
+ * Factory for creating ResourceConfigurationStrategies
+ *
+ * @param workflow The `Workflow` that will be configured.
+ * @param options (optional) Configuration parameters for the strategy.
+ */
+export type ChooseConfigurationStrategyFactory = (workflow: Workflow, options?: Record<string, number>) => ResourceConfigurationStrategy;
 
 /**
  * Describes the input for a Workflow.
