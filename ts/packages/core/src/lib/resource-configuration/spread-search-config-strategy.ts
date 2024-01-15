@@ -22,7 +22,7 @@ import { ResourceConfigurationStrategyBase } from './resource-configuration-stra
  * SLO weight and optimization weight estimates will be multiplied by this value for steps, for which we don't
  * know the exact input size.
  */
-const ESTIMATE_MULTIPLIER = 1.1;
+const ESTIMATE_MULTIPLIER = 1.6;
 
 /**
  * Defines the minimum spare length that should exist between the current path length and the remaining SLO.
