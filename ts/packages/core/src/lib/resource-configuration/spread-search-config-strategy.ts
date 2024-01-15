@@ -1,10 +1,15 @@
-import { ResourceProfile, getProfilingResultForProfile, getResourceProfileId, getResultsForInput } from '../model';
+import {
+    ProfilingResultsDescExecTimeComparator,
+    ResourceProfile,
+    getProfilingResultForProfile,
+    getResourceProfileId,
+    getResultsForInputSizeSorted,
+} from '../model';
 import {
     ConfiguredWorkflowPath,
     GetStepWeightWithProfileFn,
     WorkflowResourceConfigGraph,
     getAvgExecTimeAcrossAllInputs,
-    getExecTimeForMaxInput,
 } from '../spread-search';
 import {
     AccumulatedStepInput,
@@ -32,6 +37,13 @@ const ESTIMATE_MULTIPLIER = 1.6;
  * the next higher profile will be picked for the current step, unless it is the last step. *
  */
 const SAFETY_MARGIN = 0.01;
+
+/**
+ * The number of profile increments that should be made, if the safety margin is not maintained.
+ *
+ * E.g., 1 increment means to switch to the next faster profile.
+ */
+const PROFILE_INCREMENTS = 2;
 
 export const createSpreadSearchConfigStrategy: ChooseConfigurationStrategyFactory =
     (workflow: Workflow) => new SpreadSearchConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
@@ -98,18 +110,16 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
             return this.availableResourceProfiles[resProfileIdFromPath];
         }
 
-        // If there is not sufficient safety margin at the end, we return the next higher profile.
-        let profileFromPathFound = false;
-        for (const resProfile of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            if (profileFromPathFound) {
-                // If the previous profile was the one from the path, we return this one (the next higher one).
-                return this.availableResourceProfiles[resProfile.resourceProfileId];
-            }
-            profileFromPathFound = resProfile.resourceProfileId === resProfileIdFromPath;
+        // If there is not sufficient safety margin at the end, we return the next faster profile.
+        // To this end, we need to sort the profiling results, because more memory does not always mean a faster exec time.
+        const sortedProfilingResults = getResultsForInputSizeSorted(step.profilingResults, input.totalDataSizeBytes, ProfilingResultsDescExecTimeComparator);
+        const profileFromPathIndex = sortedProfilingResults.findIndex(result => result.resourceProfileId === resProfileIdFromPath);
+        if (profileFromPathIndex === -1) {
+            throw new Error(`Cannot find profile ${resProfileIdFromPath} in ${step.name}'s profilingResults.`);
         }
-
-        // If we get here, the profile from the path is the highest profile, so we return it.
-        return this.availableResourceProfiles[resProfileIdFromPath];
+        const profileIndex = Math.min(profileFromPathIndex + PROFILE_INCREMENTS, sortedProfilingResults.length - 1);
+        const nextFasterProfile = sortedProfilingResults[profileIndex];
+        return this.availableResourceProfiles[nextFasterProfile.resourceProfileId];
     }
 
 }

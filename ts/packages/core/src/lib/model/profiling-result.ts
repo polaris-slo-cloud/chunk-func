@@ -120,6 +120,17 @@ export interface ProfilingResultWithProfileId {
 }
 
 /**
+ * @returns A negative number if `a < b`, a positive number if `a > b`, or zero if they are equal.
+ */
+export type ProfilingResultsComparator = (a: ProfilingResultWithProfileId, b: ProfilingResultWithProfileId) => number;
+
+/**
+ * Sorts according to `executionTimeMs` in descending order (from slowest to fastest).
+ */
+export const ProfilingResultsDescExecTimeComparator: ProfilingResultsComparator =
+    (a: ProfilingResultWithProfileId, b: ProfilingResultWithProfileId) => b.result.executionTimeMs - a.result.executionTimeMs;
+
+/**
  * Finds the profiling results for the specified resource profile.
  */
 export function findResourceProfileResults(profile: ResourceProfile, profilingSessionResults: ProfilingSessionResults): ResourceProfileResults | undefined {
@@ -197,4 +208,15 @@ export function getProfilingResultForProfile(profilingSessionResults: ProfilingS
         }
     }
     throw new Error(`Could not find a successful ProfilingResult for ${profileId}.`);
+}
+
+/**
+ * Gets the profiling results for a specific input size, sorted according to the specified criteria.
+ */
+export function getResultsForInputSizeSorted(profilingSessionResults: ProfilingSessionResults, inputSize: number, sortBy: ProfilingResultsComparator): ProfilingResultWithProfileId[] {
+    const results: ProfilingResultWithProfileId[] = [];
+    for (const profilingResult of getResultsForInput(profilingSessionResults, inputSize)) {
+        results.push(profilingResult);
+    }
+    return results.sort(sortBy);
 }
