@@ -17,7 +17,8 @@
           "price100Ms": 0.00000952
         },
         "executionTimeMs": 78,
-        "executionCost": 0.00001
+        "executionCost": 0.00001,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "extract-basic-stats": {
         "resourceProfile": {
@@ -26,7 +27,8 @@
           "price100Ms": 0.0001904
         },
         "executionTimeMs": 84,
-        "executionCost": 0.00019
+        "executionCost": 0.00019,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "extract-successes": {
         "resourceProfile": {
@@ -35,7 +37,8 @@
           "price100Ms": 0.00000406
         },
         "executionTimeMs": 163,
-        "executionCost": 0.000008
+        "executionCost": 0.000008,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "extract-success-stats": {
         "resourceProfile": {
@@ -44,9 +47,11 @@
           "price100Ms": 0.00000952
         },
         "executionTimeMs": 74,
-        "executionCost": 0.00001
+        "executionCost": 0.00001,
+        "resourceConfigStrategyExecutionTimeMs": 0
       }
-    }
+    },
+    "avgResourceConfigStrategyExecutionTimeMs": 0
   },
   "sloFulfilled": false
 }

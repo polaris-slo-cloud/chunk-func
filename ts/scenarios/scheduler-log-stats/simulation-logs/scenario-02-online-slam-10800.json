@@ -1,0 +1,57 @@
+{
+  "scenarioName": "scenario-02-input-54-Mib",
+  "resourceConfigStrategy": "OnlineSlamConfigStrategy",
+  "inputDataSizeMib": 54.2734375,
+  "sloMs": 10800,
+  "workflowOutput": {
+    "executionTimeMs": 9489,
+    "totalCost": 0.000172,
+    "data": {
+      "sizeBytes": 21569326
+    },
+    "stepLogs": {
+      "validate-log": {
+        "resourceProfile": {
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
+        },
+        "executionTimeMs": 2975,
+        "executionCost": 0.000039,
+        "resourceConfigStrategyExecutionTimeMs": 5
+      },
+      "extract-basic-stats": {
+        "resourceProfile": {
+          "memoryMiB": 1024,
+          "milliCpu": 583,
+          "price100Ms": 0.00000231
+        },
+        "executionTimeMs": 2318,
+        "executionCost": 0.000055,
+        "resourceConfigStrategyExecutionTimeMs": 1
+      },
+      "extract-successes": {
+        "resourceProfile": {
+          "memoryMiB": 1024,
+          "milliCpu": 583,
+          "price100Ms": 0.00000231
+        },
+        "executionTimeMs": 2114,
+        "executionCost": 0.000051,
+        "resourceConfigStrategyExecutionTimeMs": 1
+      },
+      "extract-success-stats": {
+        "resourceProfile": {
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
+        },
+        "executionTimeMs": 2082,
+        "executionCost": 0.000027,
+        "resourceConfigStrategyExecutionTimeMs": 1
+      }
+    },
+    "avgResourceConfigStrategyExecutionTimeMs": 2
+  },
+  "sloFulfilled": true
+}

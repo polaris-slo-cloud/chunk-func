@@ -18,7 +18,8 @@
             "price100Ms": 6.48e-7
           },
           "executionTimeMs": 636,
-          "executionCost": 0.000005
+          "executionCost": 0.000005,
+          "resourceConfigStrategyExecutionTimeMs": 0
         },
         "cut-video-segment-a": {
           "resourceProfile": {
@@ -27,7 +28,8 @@
             "price100Ms": 0.0001904
           },
           "executionTimeMs": 27616,
-          "executionCost": 0.052741
+          "executionCost": 0.052741,
+          "resourceConfigStrategyExecutionTimeMs": 0
         },
         "cut-video-segment-b": {
           "resourceProfile": {
@@ -36,7 +38,8 @@
             "price100Ms": 0.0001904
           },
           "executionTimeMs": 27616,
-          "executionCost": 0.052741
+          "executionCost": 0.052741,
+          "resourceConfigStrategyExecutionTimeMs": 0
         },
         "merge-videos": {
           "resourceProfile": {
@@ -45,9 +48,11 @@
             "price100Ms": 6.48e-7
           },
           "executionTimeMs": 30221,
-          "executionCost": 0.000196
+          "executionCost": 0.000196,
+          "resourceConfigStrategyExecutionTimeMs": 0
         }
-      }
+      },
+      "avgResourceConfigStrategyExecutionTimeMs": 0
     },
     "stepConfigs": {
       "validate-video": {
@@ -86,7 +91,8 @@
           "price100Ms": 6.48e-7
         },
         "executionTimeMs": 501,
-        "executionCost": 0.000004
+        "executionCost": 0.000004,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "cut-video-segment-a": {
         "resourceProfile": {
@@ -95,7 +101,8 @@
           "price100Ms": 0.0001904
         },
         "executionTimeMs": 8026,
-        "executionCost": 0.015422
+        "executionCost": 0.015422,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "cut-video-segment-b": {
         "resourceProfile": {
@@ -104,7 +111,8 @@
           "price100Ms": 0.0001904
         },
         "executionTimeMs": 8026,
-        "executionCost": 0.015422
+        "executionCost": 0.015422,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "merge-videos": {
         "resourceProfile": {
@@ -113,9 +121,11 @@
           "price100Ms": 6.48e-7
         },
         "executionTimeMs": 11960,
-        "executionCost": 0.000078
+        "executionCost": 0.000078,
+        "resourceConfigStrategyExecutionTimeMs": 0
       }
-    }
+    },
+    "avgResourceConfigStrategyExecutionTimeMs": 0
   },
   "sloFulfilled": true
 }

@@ -17,7 +17,8 @@
           "price100Ms": 0.00000406
         },
         "executionTimeMs": 119,
-        "executionCost": 0.000008
+        "executionCost": 0.000008,
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "cut-video-segment-a": {
         "resourceProfile": {
@@ -26,7 +27,8 @@
           "price100Ms": 0.00000812
         },
         "executionTimeMs": 107389,
-        "executionCost": 0.008721
+        "executionCost": 0.008721,
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "cut-video-segment-b": {
         "resourceProfile": {
@@ -35,7 +37,8 @@
           "price100Ms": 0.00000812
         },
         "executionTimeMs": 107389,
-        "executionCost": 0.008721
+        "executionCost": 0.008721,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "merge-videos": {
         "resourceProfile": {
@@ -44,9 +47,11 @@
           "price100Ms": 0.00000812
         },
         "executionTimeMs": 1592,
-        "executionCost": 0.00013
+        "executionCost": 0.00013,
+        "resourceConfigStrategyExecutionTimeMs": 0
       }
-    }
+    },
+    "avgResourceConfigStrategyExecutionTimeMs": 0.5
   },
   "sloFulfilled": false
 }
