@@ -24,9 +24,9 @@ import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 
-const DEFAULT_ESTIMATE_MULTIPLIER = 1.6;
+const DEFAULT_ESTIMATE_MULTIPLIER = 1.0;
 const DEFAULT_SAFETY_MARGIN = 0.01;
-const DEFAULT_PROFILE_INCREMENTS = 2;
+const DEFAULT_PROFILE_INCREMENTS = 1;
 
 /** Configuration options for the `SpreadSearchConfigStrategy`. */
 export interface SpreadSearchOptions {
