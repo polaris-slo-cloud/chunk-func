@@ -30,6 +30,10 @@ declare -A CONFIG_STRATEGIES_WITH_TRAINING=(
     ["online-slam"]="OnlineSlamConfigStrategy"
 )
 
+declare -A CMD_LINE_ARGUMENTS=(
+    ["spread-search"]="--estimateMultiplier 1.3 --safetyMargin 0.11 --profileIncrements 2"
+)
+
 # Executes simulations for the SLO-independent strategies, i.e., fastest and cheapest.
 function runSloIndependentStrategies() {
     local scenarioName=$1
@@ -55,14 +59,16 @@ function runSloStrategies() {
 
     for configStratKey in "${!CONFIG_STRATEGIES[@]}"; do
         local configStrat=${CONFIG_STRATEGIES[$configStratKey]}
-        echo "Running $configStrat with SLO: $sloMs"
-        node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloMs}.json"
+        local cmdLineArgs=${CMD_LINE_ARGUMENTS[$configStratKey]}
+        echo "Running $configStrat $cmdLineArgs with SLO: $sloMs"
+        node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" $cmdLineArgs > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloMs}.json"
     done
 
     for configStratKey in "${!CONFIG_STRATEGIES_WITH_TRAINING[@]}"; do
         local configStrat=${CONFIG_STRATEGIES_WITH_TRAINING[$configStratKey]}
-        echo "Running $configStrat with SLO: $sloMs"
-        node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" "$TRAINING_SCENARIO_PATH" > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloMs}.json"
+        local cmdLineArgs=${CMD_LINE_ARGUMENTS[$configStratKey]}
+        echo "Running $configStrat $cmdLineArgs with SLO: $sloMs"
+        node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" "$TRAINING_SCENARIO_PATH" $cmdLineArgs > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloMs}.json"
     done
 
     rm "$scenarioFinalYamlFile"
