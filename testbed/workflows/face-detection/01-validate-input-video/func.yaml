@@ -1,0 +1,16 @@
+specVersion: 0.35.0
+name: validate-video
+runtime: typescript
+registry: polarissloc
+image: polarissloc/chunk-func-validate-video:latest
+imageDigest: sha256:8ebd4d178eff6fe09ca5702cc8afb38239a8017dde31c4a190707a3c49c3c058
+created: 2023-10-18T12:03:34.789666879+02:00
+build:
+  builder: pack
+  buildEnvs:
+  - name: BP_NODE_RUN_SCRIPTS
+    value: build
+  - name: BP_NODE_VERSION
+    value: 18.16.1
+deploy:
+  namespace: func-test
