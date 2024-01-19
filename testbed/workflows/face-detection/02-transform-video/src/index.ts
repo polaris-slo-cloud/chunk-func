@@ -9,8 +9,8 @@ import { createErrorResponse, reportInvalidVideoRequest } from './util';
 import { FFmpegLog, VideoCutRequest, VideoProcessingResponse, isValidVideoCutRequest } from './video';
 
 const OUTPUT_BUCKET = 'output';
-const FFMPEG_VIDEO_PRESET = '-vf scale=640:-1 -c:v libx264 -preset veryfast';
-const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 128k';
+const FFMPEG_VIDEO_PRESET = '-vf scale=1280:-1 -c:v libx264 -preset veryfast';
+const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 96k';
 
 const liveness: HealthCheck = () => {
     return {
