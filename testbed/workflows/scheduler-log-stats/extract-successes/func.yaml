@@ -11,7 +11,7 @@ build:
   - name: BP_NODE_RUN_SCRIPTS
     value: build
   - name: BP_NODE_VERSION
-    value: 18.16.0
+    value: 18.*
   pvcSize: 256Mi
 deploy:
   namespace: func-test
