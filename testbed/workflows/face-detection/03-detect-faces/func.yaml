@@ -1,4 +1,13 @@
 specVersion: 0.35.0
 name: detect-faces
 runtime: python
+registry: polarissloc
+image: polarissloc/chunk-func-detect-faces:latest
 created: 2024-01-19T17:05:13.540623154+01:00
+build:
+  builder: pack
+  buildEnvs:
+  - name: BP_CPYTHON_VERSION
+    value: 3.11.*
+deploy:
+  namespace: func-test
