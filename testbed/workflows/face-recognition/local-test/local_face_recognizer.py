@@ -1,5 +1,4 @@
 import cv2
-import face_recognition
 import stopwatch
 
 def find_faces(inputVideo: cv2.VideoCapture, output: cv2.VideoWriter) -> None:
@@ -10,6 +9,10 @@ def find_faces(inputVideo: cv2.VideoCapture, output: cv2.VideoWriter) -> None:
     drawing = stopwatch.Stopwatch()
     encoding = stopwatch.Stopwatch()
 
+    face_cascade = cv2.CascadeClassifier()
+    if not face_cascade.load('.venv/lib64/python3.12/site-packages/cv2/data/haarcascade_frontalface_alt.xml'):
+        raise Exception('Could not load classifier model')
+
     while True:
         # Grab a single frame of the video
         reading.start()
@@ -18,14 +21,15 @@ def find_faces(inputVideo: cv2.VideoCapture, output: cv2.VideoWriter) -> None:
         if not ok:
             break
 
-        # Convert the image from BGR color (used by OpenCV) to RGB color (used by face_recognition)
+        # Convert the image to grayscale
         transformation.start()
-        rgb_frame = frame[:, :, ::-1]
+        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame_gray = cv2.equalizeHist(frame_gray)
         transformation.stop()
 
         # Find all faces in the current frame
         face_recog.start()
-        face_locations = face_recognition.face_locations(rgb_frame)
+        face_locations = face_cascade.detectMultiScale(frame_gray)
         face_recog.stop()
 
         logging.start()
@@ -33,9 +37,9 @@ def find_faces(inputVideo: cv2.VideoCapture, output: cv2.VideoWriter) -> None:
         logging.stop()
 
         drawing.start()
-        for top, right, bottom, left in face_locations:
+        for (x, y, w, h) in face_locations:
             # Draw a box around the face
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
         drawing.stop()
 
         # Write the frame to the output queue
