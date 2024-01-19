@@ -1,3 +1,21 @@
+## TypeScript gitignore
+# compiled output
+dist/
+tmp/
+out-tsc/
+build/
+
+# dependencies
+node_modules/
+
+# misc
+coverage/
+npm-debug.log
+yarn-error.log
+
+
+
+## Python gitignore
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
