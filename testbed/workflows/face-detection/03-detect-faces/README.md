@@ -1,8 +1,21 @@
 # Python HTTP Function
 
-Welcome to your new Python function project! The boilerplate function
-code can be found in [`func.py`](./func.py). This function will respond
-to incoming HTTP GET and POST requests.
+## Building and Deployment
+
+Due to a problem with installing the `libgl1` package (which is required by `opencv-python`) with `apt` through a buildpack (see GitHub issue), we created a Dockerfile manually.
+
+To build and deploy this function, run the following:
+
+```sh
+# Build and push image
+docker build . -t polarissloc/chunk-func-detect-faces:latest
+docker push polarissloc/chunk-func-detect-faces:latest
+
+# Deploy the function
+kn service create detect-faces -n func-test --image polarissloc/chunk-func-detect-faces:latest
+```
+
+
 
 ## Endpoints
 
