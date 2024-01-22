@@ -1,0 +1,25 @@
+specVersion: 0.35.0
+name: mark-faces
+runtime: python
+registry: polarissloc
+image: polarissloc/chunk-func-mark-faces:latest
+created: 2024-01-19T17:05:13.540623154+01:00
+build:
+  builder: pack
+  buildpacks:
+    ## We need to install the libgl1 package with apt, that's why we need an additional build pack,
+    ## but I was not able to make this work (see https://github.com/knative/func/issues/2128 ).
+    ## Thus, we use a Dockerfile for building this function.
+    # - gcr.io/paketo-buildpacks/ca-certificates:3.6.3
+    - ghcr.io/dmikusa/buildpacks/dmikusa_apt:0.0.2
+    # - gcr.io/paketo-buildpacks/watchexec:2.8.3
+    # - gcr.io/paketo-buildpacks/cpython:1.9.0
+    # - gcr.io/paketo-buildpacks/pip:0.18.0
+    # - gcr.io/paketo-buildpacks/pip-install:0.6.0
+    # - gcr.io/paketo-buildpacks/python-start:0.14.14
+    # - gcr.io/paketo-buildpacks/procfile:5.6.4
+  buildEnvs:
+  - name: BP_CPYTHON_VERSION
+    value: 3.11.*
+deploy:
+  namespace: func-test
