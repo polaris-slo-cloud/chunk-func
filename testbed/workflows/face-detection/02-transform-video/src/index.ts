@@ -6,10 +6,10 @@ import * as fs from 'node:fs';
 import { ObjectStoreReference } from './object-store';
 import { createS3ObjectStoreClient } from './object-store/impl/factories';
 import { createErrorResponse, reportInvalidVideoRequest } from './util';
-import { FFmpegLog, VideoCutRequest, VideoProcessingResponse, isValidVideoCutRequest } from './video';
+import { FFmpegLog, DetectFacesRequest, VideoProcessingResponse, isValidDetectFacesRequest } from './video';
 
 const OUTPUT_BUCKET = 'output';
-const FFMPEG_VIDEO_PRESET = '-vf scale=1280:-1 -c:v libx264 -preset veryfast';
+const FFMPEG_VIDEO_PRESET = '-vf scale=-1:720 -c:v libx264 -preset veryfast -crf 16';
 const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 96k';
 
 const liveness: HealthCheck = () => {
@@ -28,8 +28,8 @@ const readiness: HealthCheck = () => {
 
 const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Promise<StructuredReturn> => {
     const start = new Date();
-    if (!isValidVideoCutRequest(body)) {
-        return reportInvalidVideoRequest('VideoCutRequest');
+    if (!isValidDetectFacesRequest(body)) {
+        return reportInvalidVideoRequest('DetectFacesRequest');
     }
 
     let result: VideoProcessingResponse;
@@ -56,13 +56,13 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
     };
 };
 
-async function processVideoFile(req: VideoCutRequest): Promise<VideoProcessingResponse> {
+async function processVideoFile(req: DetectFacesRequest): Promise<VideoProcessingResponse> {
     const s3Client = createS3ObjectStoreClient(req.input);
     const srcUrl = await s3Client.createPresignedReadUrl(req.input);
     const tempFilePath = getTempFilePath('mp4');
 
     try {
-        const ffmpegLog = await cutVideo(req, srcUrl, tempFilePath);
+        const ffmpegLog = await transformVideo(req, srcUrl, tempFilePath);
         let targetObjRef = createTargetObjRef(req.input);
         targetObjRef = await s3Client.uploadFile(tempFilePath, targetObjRef);
 
@@ -75,8 +75,8 @@ async function processVideoFile(req: VideoCutRequest): Promise<VideoProcessingRe
     }
 }
 
-function cutVideo(req: VideoCutRequest, srcUrl: string, targetFile: string): Promise<FFmpegLog> {
-    const ffmpegArgs = `-i "${srcUrl}" -ss ${req.segment.start} -to ${req.segment.end} ${FFMPEG_VIDEO_PRESET} -crf ${req.quality} ${FFMPEG_AUDIO_PRESET} -f mp4 "${targetFile}"`;
+function transformVideo(req: DetectFacesRequest, srcUrl: string, targetFile: string): Promise<FFmpegLog> {
+    const ffmpegArgs = `-i "${srcUrl}" ${FFMPEG_VIDEO_PRESET} ${FFMPEG_AUDIO_PRESET} -f mp4 "${targetFile}"`;
     return new Promise((resolve, reject) => {
         exec(`"${ffmpegPath}" ${ffmpegArgs}`, (error, stdout, stderr) => {
             if (error) {
