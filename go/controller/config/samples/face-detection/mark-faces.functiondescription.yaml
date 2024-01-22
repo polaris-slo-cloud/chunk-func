@@ -14,7 +14,7 @@ spec:
   functionDescription:
     functionName: mark-faces
     functionContainer: user-container
-    maxResponseTimeMs: 200000
+    maxResponseTimeMs: 120000
     typicalInputs:
       - sizeBytes: 345600 # 20s * 720p * 24fps
         message:
