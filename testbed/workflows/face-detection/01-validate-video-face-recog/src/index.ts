@@ -3,7 +3,7 @@ import ffmpegPath from 'ffmpeg-static';
 import { exec } from 'node:child_process';
 import { createS3ObjectStoreClient } from './object-store/impl/factories';
 import { createErrorResponse, reportInvalidVideoRequest } from './util';
-import { FFmpegLog, VideoEditRequest, isValidVideoEditRequest } from './video';
+import { FFmpegLog, DetectFacesRequest, isValidDetectFacesRequest } from './video';
 
 const liveness: HealthCheck = () => {
     return {
@@ -21,8 +21,8 @@ const readiness: HealthCheck = () => {
 
 const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Promise<StructuredReturn> => {
     const start = new Date();
-    if (!isValidVideoEditRequest(body)) {
-        return reportInvalidVideoRequest('VideoEditRequest');
+    if (!isValidDetectFacesRequest(body)) {
+        return reportInvalidVideoRequest('DetectFacesRequest');
     }
 
     let log: FFmpegLog;
@@ -49,13 +49,13 @@ const handle: HTTPFunction = async (context: Context, body?: IncomingBody): Prom
     };
 };
 
-async function processVideoFile(req: VideoEditRequest): Promise<FFmpegLog> {
+async function processVideoFile(req: DetectFacesRequest): Promise<FFmpegLog> {
     const s3Client = createS3ObjectStoreClient(req.input);
     const readUrl = await s3Client.createPresignedReadUrl(req.input);
     return extractVideoStats(req, readUrl);
 }
 
-function extractVideoStats(req: VideoEditRequest, readUrl: string): Promise<FFmpegLog> {
+function extractVideoStats(req: DetectFacesRequest, readUrl: string): Promise<FFmpegLog> {
     return new Promise((resolve, reject) => {
         const proc = exec(`"${ffmpegPath}" -i "${readUrl}" /dev/null`, (error, stdout, stderr) => {
             // we only want to get file information here. ffmpeg will always exit with an error in this setup.
