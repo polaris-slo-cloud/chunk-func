@@ -9,8 +9,9 @@ import { createErrorResponse, reportInvalidVideoRequest } from './util';
 import { FFmpegLog, DetectFacesRequest, VideoProcessingResponse, isValidDetectFacesRequest } from './video';
 
 const OUTPUT_BUCKET = 'output';
-const FFMPEG_VIDEO_PRESET = '-vf scale=-1:720 -c:v libx264 -preset veryfast -crf 16';
-const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 96k';
+// We deliberately choose parameters that will make encoding slower, because we don't want the face detection function to make up 95% of the workflow.
+const FFMPEG_VIDEO_PRESET = '-vf scale=-1:720:flags=lanczos -c:v libx264 -preset veryslow -crf 10';
+const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 192k';
 
 const liveness: HealthCheck = () => {
     return {
