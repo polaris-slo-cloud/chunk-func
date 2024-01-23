@@ -160,7 +160,7 @@ func (fdr *FunctionDescriptionReconciler) getProfilingConfig(profilingNamespace 
 	config := &profiler.ProfilingConfig{
 		CandidateProfiles:            profile.GetAvailableResourceProfiles(),
 		IterationsPerInputAndProfile: 5,
-		ConcurrentProfiles:           2,
+		ConcurrentProfiles:           3,
 		ProfilingNamespace:           profilingNamespace,
 		FunctionReadyTimeout:         timeout,
 	}
