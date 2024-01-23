@@ -42,6 +42,9 @@ func CreateKnativeServiceWithProfile(
 	}
 	SetResourceLimits(container, &resourceProfile.ResourceConfiguration)
 
+	timeoutSec := int64(fn.Description.MaxResponseTimeMs / 1000)
+	ret.Spec.ConfigurationSpec.Template.Spec.TimeoutSeconds = &timeoutSec
+
 	return ret, nil
 }
 

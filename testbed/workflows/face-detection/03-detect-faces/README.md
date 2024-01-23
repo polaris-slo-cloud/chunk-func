@@ -13,6 +13,9 @@ docker push polarissloc/chunk-func-detect-faces:latest
 
 # Deploy the function
 kn service create detect-faces -n func-test --image polarissloc/chunk-func-detect-faces:latest
+
+# Alternatively, deploy the function with resource limits for testing
+# kn service create detect-faces -n func-test --image polarissloc/chunk-func-detect-faces:latest --timeout 480 --limit 'cpu=2000m,memory=4096Mi'
 ```
 
 
