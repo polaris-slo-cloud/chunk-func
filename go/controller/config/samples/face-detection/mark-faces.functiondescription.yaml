@@ -32,7 +32,7 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: people-walking-20s-720p-transcoded-to-720p.mp4-faces.json
+            objectKey: people-walking-20s-720p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 72701
 
       - sizeBytes: 518400 # 20s * 1080p * 24fps
@@ -51,7 +51,7 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: people-walking-20s-1080p-transcoded-to-720p.mp4-faces.json
+            objectKey: people-walking-20s-1080p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 71413
 
       - sizeBytes: 864000 # 40s * 720p * 30fps
@@ -70,7 +70,7 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: workout-40s-720p-transcoded-to-720p.mp4-faces.json
+            objectKey: workout-40s-720p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 95911
 
       - sizeBytes: 1080000 # 60s * 720p * 25fps
@@ -89,7 +89,7 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: society-1m-720p-transcoded-to-720p.mp4-faces.json
+            objectKey: society-1m-720p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 117518
 
       - sizeBytes: 1296000 # 40s * 1080p * 30fps
@@ -108,7 +108,7 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: workout-40s-1080p-transcoded-to-720p.mp4-faces.json
+            objectKey: workout-40s-1080p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 95714
 
       - sizeBytes: 1620000 #  60s * 1080p * 25fps
@@ -127,5 +127,5 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: society-1m-1080p-transcoded-to-720p.mp4.json
+            objectKey: society-1m-1080p-transcoded-to-360p.mp4.json
             objectSizeBytes: 119860

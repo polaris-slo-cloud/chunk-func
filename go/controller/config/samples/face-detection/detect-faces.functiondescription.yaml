@@ -16,7 +16,7 @@ spec:
     functionContainer: user-container
     maxResponseTimeMs: 420000
     typicalInputs:
-      - sizeBytes: 9451069
+      - sizeBytes: 2168077
         message:
           input:
             url: http://10.152.183.192
@@ -24,10 +24,10 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: people-walking-20s-720p-transcoded-to-720p.mp4
-            objectSizeBytes: 9451069
+            objectKey: people-walking-20s-1080p-transcoded-to-360p.mp4
+            objectSizeBytes: 2168077
 
-      - sizeBytes: 17039168
+      - sizeBytes: 2200720
         message:
           input:
             url: http://10.152.183.192
@@ -35,10 +35,10 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: people-walking-20s-1080p-transcoded-to-720p.mp4
-            objectSizeBytes: 17039168
+            objectKey: people-walking-20s-720p-transcoded-to-360p.mp4
+            objectSizeBytes: 2200720
 
-      - sizeBytes: 42830122
+      - sizeBytes: 6462780
         message:
           input:
             url: http://10.152.183.192
@@ -46,10 +46,10 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: workout-40s-720p-transcoded-to-720p.mp4
-            objectSizeBytes: 42830122
+            objectKey: workout-40s-1080p-transcoded-to-360p.mp4
+            objectSizeBytes: 6462780
 
-      - sizeBytes: 48834766
+      - sizeBytes: 6478567
         message:
           input:
             url: http://10.152.183.192
@@ -57,10 +57,10 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: society-1m-720p-transcoded-to-720p.mp4
-            objectSizeBytes: 48834766
+            objectKey: workout-40s-720p-transcoded-to-360p.mp4
+            objectSizeBytes: 6478567
 
-      - sizeBytes: 63415104
+      - sizeBytes: 14938139
         message:
           input:
             url: http://10.152.183.192
@@ -68,10 +68,10 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: workout-40s-1080p-transcoded-to-720p.mp4
-            objectSizeBytes: 63415104
+            objectKey: society-1m-1080p-transcoded-to-360p.mp4
+            objectSizeBytes: 14938139
 
-      - sizeBytes: 71834162
+      - sizeBytes: 15033099
         message:
           input:
             url: http://10.152.183.192
@@ -79,5 +79,5 @@ spec:
             user: HYlOGOqiOSpSnBjP
             password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
             bucket: face-detection
-            objectKey: society-1m-1080p-transcoded-to-720p.mp4
-            objectSizeBytes: 71834162
+            objectKey: society-1m-720p-transcoded-to-360p.mp4
+            objectSizeBytes: 15033099
