@@ -3,7 +3,7 @@ name: transform-video
 runtime: typescript
 registry: polarissloc
 image: polarissloc/chunk-func-transform-video:latest
-imageDigest: sha256:5ba4af5274fe61256771c1e7c8161936d9256574100004e514bca1bc2f92474b
+imageDigest: sha256:695e7ee923853ac6960de84efbdb515e5d4736d40341ed1f24557400ff2fcf92
 created: 2023-10-18T12:03:34.789666879+02:00
 build:
   builder: pack
@@ -14,3 +14,9 @@ build:
     value: 18.*
 deploy:
   namespace: func-test
+  ## For testing with specific limits
+  # options:
+  #   resources:
+  #     limits:
+  #       cpu: 1000m
+  #       memory: 2048Mi

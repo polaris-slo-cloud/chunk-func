@@ -10,8 +10,8 @@ import { FFmpegLog, DetectFacesRequest, VideoProcessingResponse, isValidDetectFa
 
 const OUTPUT_BUCKET = 'output';
 // We deliberately choose parameters that will make encoding slower, because we don't want the face detection function to make up 95% of the workflow.
-const FFMPEG_VIDEO_PRESET = '-vf scale=-1:720:flags=lanczos -c:v libx264 -preset veryslow -crf 10';
-const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 192k';
+const FFMPEG_VIDEO_PRESET = '-vf scale=-1:360:flags=lanczos -c:v libx264 -preset medium -crf 16';
+const FFMPEG_AUDIO_PRESET = '-c:a aac -b:a 96k';
 
 const liveness: HealthCheck = () => {
     return {
