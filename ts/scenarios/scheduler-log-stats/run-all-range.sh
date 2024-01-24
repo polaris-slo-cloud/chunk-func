@@ -23,6 +23,7 @@ declare -A CONFIG_STRATEGIES=(
     ["proportional-critical-path-slo"]="ProportionalCriticalPathSloConfigStrategy"
     ["step-conf"]="StepConfConfigStrategy"
     ["spread-search"]="SpreadSearchConfigStrategy"
+    ["hybrid-search"]="HybridSearchConfigStrategy"
 )
 
 declare -A CONFIG_STRATEGIES_WITH_TRAINING=(
@@ -32,6 +33,7 @@ declare -A CONFIG_STRATEGIES_WITH_TRAINING=(
 
 declare -A CMD_LINE_ARGUMENTS=(
     ["spread-search"]="--estimateMultiplier 1.3 --safetyMargin 0.11 --profileIncrements 2"
+    ["hybrid-search"]="--estimateMultiplier 1.3 --safetyMargin 0.11 --profileIncrements 2"
 )
 
 # Executes simulations for the SLO-independent strategies, i.e., fastest and cheapest.

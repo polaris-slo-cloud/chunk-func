@@ -34,6 +34,8 @@ import {
     createOnlineSlamConfigStrategy,
     SpreadSearchConfigStrategy,
     createSpreadSearchConfigStrategy,
+    HybridSearchConfigStrategy,
+    createHybridSearchConfigStrategy,
 } from '@chunk-func/core';
 import { convertArgsToOptions } from './util';
 
@@ -51,6 +53,7 @@ const resourceConfigStrategies: Record<string, ChooseConfigurationStrategyFactor
     [SlamConfigStrategy.strategyName]: createSlamConfigStrategy,
     [OnlineSlamConfigStrategy.strategyName]: createOnlineSlamConfigStrategy,
     [SpreadSearchConfigStrategy.strategyName]: createSpreadSearchConfigStrategy,
+    [HybridSearchConfigStrategy.strategyName]: createHybridSearchConfigStrategy,
 };
 
 if (process.argv.length < 5) {
