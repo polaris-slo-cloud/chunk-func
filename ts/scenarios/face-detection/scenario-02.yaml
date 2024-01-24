@@ -1,0 +1,16 @@
+# This is a WorkflowExecutionDescription
+scenarioName: scenario-02-input-40s-720p
+inputSizeBytes: 864000 # 40s * 720p * 30fps
+
+# Cheapest possible execution time is: 699258 ms
+# Fastest possible execution time is: 127995 ms
+maxResponseTimeMs: 150000
+stepExecutions:
+  validate-video-face-recog:
+    outputSizeBytes: 864000
+  transform-video:
+    outputSizeBytes: 6478567
+  detect-faces:
+    outputSizeBytes: 864000
+  mark-faces:
+    outputSizeBytes: 864000

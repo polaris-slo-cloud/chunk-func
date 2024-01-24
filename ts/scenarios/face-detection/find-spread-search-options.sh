@@ -1,9 +1,16 @@
 #!/bin/bash
 # set -x
 
-BASE_SLO_MS=12000
-SLO_RANGE_PERCENT=15
+BASE_SLO_MS=435375
+SLO_RANGE_PERCENT=40
 SLO_STEP_PERCENT=1
+
+# This script will execute multiple executions in parallel.
+# The output of each execution is written to a temporary file, so that
+# it can be collected for the final CSV.
+PARALLEL_EXECUTIONS=8
+EXECUTION_OUTPUT_FILES=()
+EXECUTION_PARAMS=()
 
 WORKFLOW_PATH="workflow.yaml"
 RESULTS_CSV="./spread-search-options.csv"
@@ -13,7 +20,7 @@ CHUNK_FUNC_SIM_JS="../../dist/packages/chunk-func-sim/main.js"
 declare -A SCENARIOS=(
     ["scenario-01"]="scenario-01-template.yaml"
     # ["scenario-02"]="scenario-02-template.yaml"
-    # ["scenario-03"]="scenario-03-template.yaml" # For the third scenario the costs are writting in scientific notation, which `bc` apparetly can't handle in its default configuration.
+    # ["scenario-03"]="scenario-03-template.yaml"
 )
 
 ESTIMATE_MULTIPLIERS=("1.0" "1.1" "1.2" "1.3" "1.4" "1.5" "1.6" "1.7" "1.8" "1.9" "2.0")
@@ -45,15 +52,17 @@ function evaluateScenario() {
     fi
 }
 
-# Simulates the SLO range (BASE_SLO_MS, BASE_SLO_MS +/- SLO_RANGE_PERCENT] and returns the average cost for an execution.
-# Sets `$ret` to the average cost achieved over the SLO range, if all SLOs were fulfilled.
-# Sets `$ret` to `-1`, if not all SLOs were fulfilled.
+# Simulates the SLO range (BASE_SLO_MS, BASE_SLO_MS +/- SLO_RANGE_PERCENT] and writes the average cost for an execution to the output file.
+# After executing this funtion the output file will contain a single number, i.e.,
+#     - the average cost achieved over the SLO range, if all SLOs were fulfilled, or
+#     - `-1`, if not all SLOs were fulfilled.
 function computeAvgCostForSloRange() {
     local scenarioName=$1
     local scenarioTemplateFile=${SCENARIOS[$scenarioName]}
     local estimateMultiplier=$2
     local safetyMargin=$3
     local profileIncrements=$4
+    local outputFile=$5
 
     echo "Evaluating estimateMultiplier=$estimateMultiplier, safetyMargin=$safetyMargin, profileIncrements=$profileIncrements"
 
@@ -75,21 +84,62 @@ function computeAvgCostForSloRange() {
 
     # Calculate the average cost.
     ret=$(echo "$totalCost/$iterationsCount" | bc -l)
-    echo "Calulating avgCost: $totalCost / $iterationsCount = $ret"
+    # echo "Calulating avgCost: $totalCost / $iterationsCount = $ret"
+    echo "$ret" > "$outputFile"
+}
+
+# Genertes the names of the temporary output file names for the subprocesses.
+function generateExecutionOutputFilenames() {
+    for ((i=0; i<=$PARALLEL_EXECUTIONS; i++)); do
+        EXECUTION_OUTPUT_FILES+=("$(mktemp)")
+    done
+}
+
+# Reads the output from the specified number of subprocesses and writes them to the CSV.
+function waitAndLogOutput() {
+    local subprocCount=$1
+    local result=""
+
+    wait
+    for ((i=0; i<$subprocCount; i++)); do
+        result=$(cat "${EXECUTION_OUTPUT_FILES[$i]}")
+        echo "${EXECUTION_PARAMS[$i]},$result" >> "$RESULTS_CSV"
+    done
+}
+
+# Deletes the temporary output files
+function doCleanup() {
+    for tempFile in "${EXECUTION_OUTPUT_FILES[@]}"; do
+        rm "$tempFile"
+    done
 }
 
 # Simulates a scenario with all SpreadSearch options.
 function simulateScenario() {
     local scenarioName=$1
+    generateExecutionOutputFilenames
 
+    local execId=0
     for estimateMult in "${ESTIMATE_MULTIPLIERS[@]}"; do
         for safetyM in "${SAFETY_MARGINS[@]}"; do
             for profileInc in "${PROFILE_INCREMENTS[@]}"; do
-                computeAvgCostForSloRange "$scenarioName" "$estimateMult" "$safetyM" "$profileInc"
-                echo "$scenarioName,$estimateMult,$safetyM,$profileInc,$ret" >> "$RESULTS_CSV"
+                if [ $execId -eq $PARALLEL_EXECUTIONS ]; then
+                    waitAndLogOutput $execId
+                    execId=0
+                fi
+                computeAvgCostForSloRange "$scenarioName" "$estimateMult" "$safetyM" "$profileInc" "${EXECUTION_OUTPUT_FILES[$execId]}" &
+                EXECUTION_PARAMS[$execId]="$scenarioName,$estimateMult,$safetyM,$profileInc"
+                ((execId++))
             done
         done
     done
+
+    if [ $execId -gt 0 ]; then
+        # One or more executions are still running.
+        waitAndLogOutput $execId
+    fi
+
+    doCleanup
 }
 
 

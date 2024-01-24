@@ -93,8 +93,6 @@ function simulateScenario() {
 }
 
 
-mkdir -p "$OUTPUT_DIR"
-
 # Write the CSV header
 echo "scenario,estimateMultiplier,safetyMargin,profileIncrements,avgCost" > "$RESULTS_CSV"
 
