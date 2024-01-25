@@ -76,6 +76,7 @@ function computeAvgCostForSloRange() {
 
         if [ "$ret" == "-1" ]; then
             echo "SLO not fulfilled: $sloMs Changing to next configuration."
+            echo "$ret" > "$outputFile"
             return 0
         fi
         totalCost=$(echo "$totalCost+$ret" | bc -l)
