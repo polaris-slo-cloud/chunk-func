@@ -2,7 +2,7 @@
   "scenarioName": "scenario-03",
   "resourceConfigStrategy": "CheapestConfigStrategy",
   "inputDataSizeMib": 0.494384765625,
-  "sloMs": 1000,
+  "sloMs": 100,
   "workflowOutput": {
     "executionTimeMs": 1937386,
     "totalCost": 0.15741300000000005,
@@ -18,7 +18,7 @@
         },
         "executionTimeMs": 77,
         "executionCost": 0.000004,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "step-1": {
         "resourceProfile": {
@@ -28,7 +28,7 @@
         },
         "executionTimeMs": 10855,
         "executionCost": 0.000885,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-2": {
         "resourceProfile": {
@@ -178,7 +178,7 @@
         },
         "executionTimeMs": 14330,
         "executionCost": 0.001169,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "step-17": {
         "resourceProfile": {
@@ -431,7 +431,7 @@
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0.023809523809523808
+    "avgResourceConfigStrategyExecutionTimeMs": 0.047619047619047616
   },
   "sloFulfilled": false
 }
