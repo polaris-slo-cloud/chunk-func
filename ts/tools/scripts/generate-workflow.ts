@@ -11,6 +11,7 @@ import {
     generateScenarios,
     generateSlamTrainingScenario,
     generateWorkflow,
+    getCyclicWorkflowPlan,
     getHalfHalfWorkflowPlan,
     getHomogeneousWorkflowPlan,
     getLargeInputsOnly,
@@ -26,6 +27,9 @@ const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHomogeneousWorkflowP
 
 // Short-long workflow.
 // const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHalfHalfWorkflowPlan(20, functionsAndInputs[SHORT_STEP_INDEX], functionsAndInputs[MEDIUM_STEP_INDEX]);
+
+// Cyclic workflow.
+// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getCyclicWorkflowPlan(14, functionsAndInputs);
 
 const SCENARIO_INPUT_RANGES: InputRangeSlicerFn[] = [
     getLargeInputsOnly,
