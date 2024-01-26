@@ -1,6 +1,9 @@
 #!/bin/bash
 set -x
 
+echo "Removing all JSON files from output directory"
+rm "$OUTPUT_DIR/"*.json
+
 # Fastest ignores the SLO, so one scenario per input size is enough.
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-01-11s.yaml FastestConfigStrategy > ./simulation-logs/scenario-01-fastest.json
 node ../../dist/packages/chunk-func-sim/main.js workflow.yaml scenario-02-7.0s.yaml FastestConfigStrategy > ./simulation-logs/scenario-02-fastest.json

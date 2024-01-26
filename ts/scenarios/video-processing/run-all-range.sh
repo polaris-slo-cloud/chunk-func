@@ -105,6 +105,9 @@ function simulateScenario() {
 
 mkdir -p "$OUTPUT_DIR"
 
+echo "Removing all JSON files from output directory"
+rm "$OUTPUT_DIR/"*.json
+
 echo "Simulating scenarios ..."
 for scenarioKey in "${!SCENARIOS[@]}"; do
     simulateScenario "$scenarioKey"
