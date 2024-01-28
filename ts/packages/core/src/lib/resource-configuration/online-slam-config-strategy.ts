@@ -75,22 +75,22 @@ export class OnlineSlamConfigStrategy extends ResourceConfigurationStrategyBase 
         // const slamConfigFinder = new SlamConfigFinder(subWorkflow, { funcInfoComparator: slamFuncInfoCostsMinHeapComparator });
 
         // max-heap with mean exec time across all input sizes
-        // const slamConfigFinder = new SlamConfigFinder(subWorkflow, {
-        //     funcInfoComparator: slamFuncInfoExecTimeMaxHeapComparator,
-        //     profileComputationStrategy: createMeanProfilingResultAllInputsStrategy(step),
-        // });
+        const slamConfigFinder = new SlamConfigFinder(subWorkflow, {
+            funcInfoComparator: slamFuncInfoExecTimeMaxHeapComparator,
+            profileComputationStrategy: createMeanProfilingResultAllInputsStrategy(step),
+        });
 
-        const stepInputSizes = computeWorkflowStepsInputSizes(subWorkflow.graph, slamInput);
-        const slamConfigFinder = new SlamConfigFinder(
-            subWorkflow,
-            {
-                // max-heap with potential exec time improvement
-                funcInfoComparator: createExecTimeImprovementMaxHeapComparator(this.resourceProfilesSortedByMem, stepInputSizes),
+        // const stepInputSizes = computeWorkflowStepsInputSizes(subWorkflow.graph, slamInput);
+        // const slamConfigFinder = new SlamConfigFinder(
+        //     subWorkflow,
+        //     {
+        //         // max-heap with potential exec time improvement
+        //         funcInfoComparator: createExecTimeImprovementMaxHeapComparator(this.resourceProfilesSortedByMem, stepInputSizes),
 
-                // min-heap with potential cost increase
-                // funcInfoComparator: createCostIncreaseMinHeapComparator(this.resourceProfilesSortedByMem, stepInputSizes),
-            },
-        );
+        //         // min-heap with potential cost increase
+        //         // funcInfoComparator: createCostIncreaseMinHeapComparator(this.resourceProfilesSortedByMem, stepInputSizes),
+        //     },
+        // );
 
         const slamOutput = slamConfigFinder.optimizeForSloAndCost(remainingTime, slamInput);
         if (slamOutput) {
