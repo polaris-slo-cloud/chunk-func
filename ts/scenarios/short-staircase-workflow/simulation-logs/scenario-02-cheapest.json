@@ -1,0 +1,107 @@
+{
+  "scenarioName": "scenario-02",
+  "resourceConfigStrategy": "CheapestConfigStrategy",
+  "inputDataSizeMib": 0.823974609375,
+  "sloMs": 100,
+  "workflowOutput": {
+    "executionTimeMs": 1825407,
+    "totalCost": 0.051153000000000004,
+    "data": {
+      "sizeBytes": 1
+    },
+    "stepLogs": {
+      "step-0": {
+        "resourceProfile": {
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
+        },
+        "executionTimeMs": 258,
+        "executionCost": 0.000004,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "step-1": {
+        "resourceProfile": {
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
+        },
+        "executionTimeMs": 258,
+        "executionCost": 0.000004,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "step-2": {
+        "resourceProfile": {
+          "memoryMiB": 512,
+          "milliCpu": 333,
+          "price100Ms": 0.000001295
+        },
+        "executionTimeMs": 258,
+        "executionCost": 0.000004,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "step-3": {
+        "resourceProfile": {
+          "memoryMiB": 256,
+          "milliCpu": 167,
+          "price100Ms": 6.48e-7
+        },
+        "executionTimeMs": 224137,
+        "executionCost": 0.001453,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "step-4": {
+        "resourceProfile": {
+          "memoryMiB": 256,
+          "milliCpu": 167,
+          "price100Ms": 6.48e-7
+        },
+        "executionTimeMs": 224137,
+        "executionCost": 0.001453,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "step-5": {
+        "resourceProfile": {
+          "memoryMiB": 256,
+          "milliCpu": 167,
+          "price100Ms": 6.48e-7
+        },
+        "executionTimeMs": 224137,
+        "executionCost": 0.001453,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "step-6": {
+        "resourceProfile": {
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "price100Ms": 0.00000406
+        },
+        "executionTimeMs": 384074,
+        "executionCost": 0.015594,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "step-7": {
+        "resourceProfile": {
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "price100Ms": 0.00000406
+        },
+        "executionTimeMs": 384074,
+        "executionCost": 0.015594,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "step-8": {
+        "resourceProfile": {
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "price100Ms": 0.00000406
+        },
+        "executionTimeMs": 384074,
+        "executionCost": 0.015594,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      }
+    },
+    "avgResourceConfigStrategyExecutionTimeMs": 0
+  },
+  "sloFulfilled": false
+}
