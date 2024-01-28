@@ -72,3 +72,10 @@ export function getCyclicWorkflowPlan(cyclesCount: number, cycleDef: FunctionAnd
     }
     return ret;
 }
+
+export function getStaircaseWorkflowPlan(stepsPerLevel: number, levels: FunctionAndInput[]): WorkflowGenerationPlan {
+    return levels.map(level => ({
+        functionsAndInputs: [ level ],
+        stepsCount: stepsPerLevel,
+    }));
+}

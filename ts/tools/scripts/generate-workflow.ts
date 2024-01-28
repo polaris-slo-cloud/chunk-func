@@ -17,6 +17,7 @@ import {
     getLargeInputsOnly,
     getMediumInputsOnly,
     getSmallInputsOnly,
+    getStaircaseWorkflowPlan,
 } from './lib';
 
 // Homogeneous workflow.
@@ -30,6 +31,9 @@ const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHomogeneousWorkflowP
 
 // Cyclic workflow.
 // const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getCyclicWorkflowPlan(14, functionsAndInputs);
+
+// Staircase workflow.
+// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getStaircaseWorkflowPlan(14, functionsAndInputs);
 
 const SCENARIO_INPUT_RANGES: InputRangeSlicerFn[] = [
     getLargeInputsOnly,
