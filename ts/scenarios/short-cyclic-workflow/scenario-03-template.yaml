@@ -1,0 +1,22 @@
+scenarioName: scenario-03
+inputSizeBytes: 518400
+maxResponseTimeMs: {{ .sloMs }}
+stepExecutions:
+  step-0:
+    outputSizeBytes: 518400
+  step-1:
+    outputSizeBytes: 2168077
+  step-2:
+    outputSizeBytes: 345600
+  step-3:
+    outputSizeBytes: 518400
+  step-4:
+    outputSizeBytes: 2200720
+  step-5:
+    outputSizeBytes: 518400
+  step-6:
+    outputSizeBytes: 518400
+  step-7:
+    outputSizeBytes: 2200720
+  step-8:
+    outputSizeBytes: 1
