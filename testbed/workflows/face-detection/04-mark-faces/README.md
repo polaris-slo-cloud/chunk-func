@@ -2,9 +2,10 @@
 
 ## Building and Deployment
 
-Due to a problem with installing the `libgl1` package (which is required by `opencv-python`) with `apt` through a buildpack (see GitHub issue), we created a Dockerfile manually.
+Due to a problem with installing the `libgl1`, `libgl1-mesa-glx`, and `libglib2.0-0` packages (which are required by `opencv-python`) with `apt` through a buildpack (see GitHub [issue](https://github.com/knative/func/issues/2128)), we initially created a Dockerfile manually.
+Thanks to assistance on GitHub, we were able to make the buildpack work (so `kn func build` works), but the Dockerfile produces a smaller container image.
 
-To build and deploy this function, run the following:
+To build and deploy this function, use `kn func deploy` or run the following:
 
 ```sh
 # Build and push image
