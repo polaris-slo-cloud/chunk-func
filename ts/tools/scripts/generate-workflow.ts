@@ -35,6 +35,9 @@ const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHomogeneousWorkflowP
 // Staircase workflow.
 // const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getStaircaseWorkflowPlan(14, functionsAndInputs);
 
+// Random workflow.
+// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = [ { functionsAndInputs: functionsAndInputs, stepsCount: 40 } ];
+
 const SCENARIO_INPUT_RANGES: InputRangeSlicerFn[] = [
     getLargeInputsOnly,
     getMediumInputsOnly,
