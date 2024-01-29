@@ -3,6 +3,7 @@ import * as fs from 'node:fs';
 import { exit } from 'node:process';
 import {
     InputRangeSlicerFn,
+    LONG_STEP_INDEX,
     MEDIUM_STEP_INDEX,
     SHORT_STEP_INDEX,
     WorkflowGenerationPlan,
@@ -26,8 +27,14 @@ const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHomogeneousWorkflowP
 // Long-short workflow.
 // const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHalfHalfWorkflowPlan(20, functionsAndInputs[MEDIUM_STEP_INDEX], functionsAndInputs[SHORT_STEP_INDEX]);
 
+// High resources - low resources workflow.
+// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHalfHalfWorkflowPlan(20, functionsAndInputs[LONG_STEP_INDEX], functionsAndInputs[SHORT_STEP_INDEX]);
+
 // Short-long workflow.
 // const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHalfHalfWorkflowPlan(20, functionsAndInputs[SHORT_STEP_INDEX], functionsAndInputs[MEDIUM_STEP_INDEX]);
+
+// Low resources - high resources workflow.
+// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHalfHalfWorkflowPlan(20, functionsAndInputs[SHORT_STEP_INDEX], functionsAndInputs[LONG_STEP_INDEX]);
 
 // Cyclic workflow.
 // const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getCyclicWorkflowPlan(14, functionsAndInputs);
