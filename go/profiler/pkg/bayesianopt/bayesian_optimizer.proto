@@ -1,0 +1,75 @@
+syntax = "proto3";
+package bayesianopt;
+
+option go_package = "polaris-slo-cloud.github.io/chunk-func/profiler/pkg/bayesianopt";
+
+// Describes an inclusive integer interval.
+message IntInterval {
+    uint64 lowerBound = 1;
+    uint64 upperBound = 2;
+}
+
+// Collects data needed to initialize a new BO model.
+// Either possibleXValues or interval is needed, the other two values are optional.
+message BoModelInitData {
+    // The discrete set of possible values of X.
+    repeated uint64 possibleXValues = 1;
+
+    // An inclusive integer interval for the possible values of X.
+    optional IntInterval interval = 2;
+
+    optional double kappa = 3;
+    optional double xi = 4;
+}
+
+message BoModelId {
+    string modelId = 1;
+}
+
+message BoSuggestion {
+    // The suggested value of X for the next profiling run.
+    uint64 x = 1;
+
+    // Expected improvement for the next profiling run.
+    double ei = 2;
+}
+
+// The observation made during a profiling run.
+message BoObservation {
+    // The value of X, for which the profiling was executed.
+    uint64 x = 1;
+
+    // The result of the profiling.
+    double observation = 2;
+}
+
+// Requests a new suggestion for the next X value and
+// optionally submits an observation from the previous profiling run.
+message GetBoSuggestionRequest {
+    // The ID of the model to be used.
+    string modelId = 1;
+
+    // (optional) The observation from the last profiling run.
+    optional BoObservation observation = 2;
+}
+
+// Delivers a suggestion from a BO model.
+message GetBoSuggestionResponse {
+    // The ID of the model that was used.
+    string modelId = 1;
+
+    // The suggested value of X and the expected improvement.
+    BoSuggestion suggestion = 2;
+}
+
+// A service for utilizing a BO model.
+service BayesianOptimizerService {
+    // Creates a new BO model and returns its ID.
+    rpc CreateBoModel(BoModelInitData) returns (BoModelId) {}
+
+    // Requests a suggestion for the next X value to explore, optionally supplying an observation from the previous profiling run.
+    rpc GetBoSuggestion(GetBoSuggestionRequest) returns (GetBoSuggestionResponse) {}
+
+    // Delete the specified model.
+    rpc DeleteBoModel(BoModelId) returns (BoModelId) {}
+}
