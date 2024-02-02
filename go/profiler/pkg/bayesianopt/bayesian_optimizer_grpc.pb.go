@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	BayesianOptimizerService_CreateBoModel_FullMethodName   = "/bayesianopt.BayesianOptimizerService/CreateBoModel"
 	BayesianOptimizerService_GetBoSuggestion_FullMethodName = "/bayesianopt.BayesianOptimizerService/GetBoSuggestion"
+	BayesianOptimizerService_InferY_FullMethodName          = "/bayesianopt.BayesianOptimizerService/InferY"
 	BayesianOptimizerService_DeleteBoModel_FullMethodName   = "/bayesianopt.BayesianOptimizerService/DeleteBoModel"
 )
 
@@ -32,6 +33,8 @@ type BayesianOptimizerServiceClient interface {
 	CreateBoModel(ctx context.Context, in *BoModelInitData, opts ...grpc.CallOption) (*BoModelId, error)
 	// Requests a suggestion for the next X value to explore, optionally supplying an observation from the previous profiling run.
 	GetBoSuggestion(ctx context.Context, in *GetBoSuggestionRequest, opts ...grpc.CallOption) (*GetBoSuggestionResponse, error)
+	// Requests an inference of Y for a specific X.
+	InferY(ctx context.Context, in *InferYRequest, opts ...grpc.CallOption) (*InferYResponse, error)
 	// Delete the specified model.
 	DeleteBoModel(ctx context.Context, in *BoModelId, opts ...grpc.CallOption) (*BoModelId, error)
 }
@@ -62,6 +65,15 @@ func (c *bayesianOptimizerServiceClient) GetBoSuggestion(ctx context.Context, in
 	return out, nil
 }
 
+func (c *bayesianOptimizerServiceClient) InferY(ctx context.Context, in *InferYRequest, opts ...grpc.CallOption) (*InferYResponse, error) {
+	out := new(InferYResponse)
+	err := c.cc.Invoke(ctx, BayesianOptimizerService_InferY_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *bayesianOptimizerServiceClient) DeleteBoModel(ctx context.Context, in *BoModelId, opts ...grpc.CallOption) (*BoModelId, error) {
 	out := new(BoModelId)
 	err := c.cc.Invoke(ctx, BayesianOptimizerService_DeleteBoModel_FullMethodName, in, out, opts...)
@@ -79,6 +91,8 @@ type BayesianOptimizerServiceServer interface {
 	CreateBoModel(context.Context, *BoModelInitData) (*BoModelId, error)
 	// Requests a suggestion for the next X value to explore, optionally supplying an observation from the previous profiling run.
 	GetBoSuggestion(context.Context, *GetBoSuggestionRequest) (*GetBoSuggestionResponse, error)
+	// Requests an inference of Y for a specific X.
+	InferY(context.Context, *InferYRequest) (*InferYResponse, error)
 	// Delete the specified model.
 	DeleteBoModel(context.Context, *BoModelId) (*BoModelId, error)
 	mustEmbedUnimplementedBayesianOptimizerServiceServer()
@@ -93,6 +107,9 @@ func (UnimplementedBayesianOptimizerServiceServer) CreateBoModel(context.Context
 }
 func (UnimplementedBayesianOptimizerServiceServer) GetBoSuggestion(context.Context, *GetBoSuggestionRequest) (*GetBoSuggestionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBoSuggestion not implemented")
+}
+func (UnimplementedBayesianOptimizerServiceServer) InferY(context.Context, *InferYRequest) (*InferYResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InferY not implemented")
 }
 func (UnimplementedBayesianOptimizerServiceServer) DeleteBoModel(context.Context, *BoModelId) (*BoModelId, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteBoModel not implemented")
@@ -147,6 +164,24 @@ func _BayesianOptimizerService_GetBoSuggestion_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BayesianOptimizerService_InferY_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InferYRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BayesianOptimizerServiceServer).InferY(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BayesianOptimizerService_InferY_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BayesianOptimizerServiceServer).InferY(ctx, req.(*InferYRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BayesianOptimizerService_DeleteBoModel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BoModelId)
 	if err := dec(in); err != nil {
@@ -179,6 +214,10 @@ var BayesianOptimizerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBoSuggestion",
 			Handler:    _BayesianOptimizerService_GetBoSuggestion_Handler,
+		},
+		{
+			MethodName: "InferY",
+			Handler:    _BayesianOptimizerService_InferY_Handler,
 		},
 		{
 			MethodName: "DeleteBoModel",

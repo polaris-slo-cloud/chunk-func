@@ -62,3 +62,21 @@ class GetBoSuggestionResponse(_message.Message):
     modelId: str
     suggestion: BoSuggestion
     def __init__(self, modelId: _Optional[str] = ..., suggestion: _Optional[_Union[BoSuggestion, _Mapping]] = ...) -> None: ...
+
+class InferYRequest(_message.Message):
+    __slots__ = ("modelId", "x")
+    MODELID_FIELD_NUMBER: _ClassVar[int]
+    X_FIELD_NUMBER: _ClassVar[int]
+    modelId: str
+    x: int
+    def __init__(self, modelId: _Optional[str] = ..., x: _Optional[int] = ...) -> None: ...
+
+class InferYResponse(_message.Message):
+    __slots__ = ("modelId", "x", "y")
+    MODELID_FIELD_NUMBER: _ClassVar[int]
+    X_FIELD_NUMBER: _ClassVar[int]
+    Y_FIELD_NUMBER: _ClassVar[int]
+    modelId: str
+    x: int
+    y: float
+    def __init__(self, modelId: _Optional[str] = ..., x: _Optional[int] = ..., y: _Optional[float] = ...) -> None: ...

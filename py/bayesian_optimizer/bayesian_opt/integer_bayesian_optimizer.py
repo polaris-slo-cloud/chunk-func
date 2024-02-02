@@ -70,7 +70,8 @@ class IntegerBayesianOptimizer:
         """
         Makes a new suggestion for X and also returns its expected improvement.
         """
-        self.__ensure_input_domain_not_exhausted()
+        if self.__is_input_domain_exhausted():
+            return BoSuggestion(x=-1, poi=0.0)
 
         x_suggestion = self.__compute_new_suggestion()
         poi = 1.0
@@ -93,6 +94,15 @@ class IntegerBayesianOptimizer:
         params = { 'x': self.__param_domain_to_suggestion_space(x) }
         self.__optimizer.register(params=params, target=observation)
         self.__observed_values[x] = observation
+
+
+    def infer_y(self, x: int) -> float:
+        """
+        Infers Y at the coordinate X.
+        """
+        x_float = self.__param_domain_to_suggestion_space(x)
+        y = cast(numpy.ndarray, self.__optimizer.gp.predict(numpy.array([ [x_float] ], numpy.float64)))
+        return y[0]
 
 
     def __determineInputBounds(self, possible_x_values: list[int] | IntegerInterval) -> tuple[float, float]:
@@ -121,7 +131,7 @@ class IntegerBayesianOptimizer:
         return x_int
 
 
-    def __ensure_input_domain_not_exhausted(self) -> None:
+    def __is_input_domain_exhausted(self) -> bool:
         input_domain_size: int
 
         if self.__xInterval is not None:
@@ -130,8 +140,7 @@ class IntegerBayesianOptimizer:
             possible_x_values = cast(list[int], self.__possible_x_values)
             input_domain_size = len(possible_x_values)
 
-        if len(self.__observed_values) == input_domain_size:
-            raise ValueError('Cannot make another suggestion, because values for every possible input X have already been observed.')
+        return len(self.__observed_values) == input_domain_size
 
 
     def __suggestion_space_to_param_domain(self, suggestion: float) -> int:

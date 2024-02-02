@@ -18,12 +18,17 @@ package controller
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"strings"
 	"time"
 
+	"github.com/go-logr/logr"
 	core "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/uuid"
+	"k8s.io/client-go/rest"
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -130,13 +135,35 @@ func (fdr *FunctionDescriptionReconciler) Reconcile(ctx context.Context, req ctr
 func (fdr *FunctionDescriptionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	k8sConfig := mgr.GetConfig()
 	profilerLog := mgr.GetLogger().WithName("profiler")
-	fdr.fnProfiler = profiler.NewExhaustiveFunctionProfiler(k8sConfig, &profilerLog)
+	profiler, err := fdr.createProfiler(k8sConfig, &profilerLog)
+	if err != nil {
+		return err
+	}
+	fdr.fnProfiler = profiler
 	fdr.fnOptimizer = optimizer.NewResponseTimeSloAndCostOptimizer()
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&chunkFunc.FunctionDescription{}).
 		Named("chunk-func-controller").
 		Complete(fdr)
+}
+
+func (fdr *FunctionDescriptionReconciler) createProfiler(k8sConfig *rest.Config, logger *logr.Logger) (profiler.FunctionProfiler, error) {
+	profilerType := strings.ToLower(os.Getenv("PROFILER"))
+
+	switch profilerType {
+	case "bayesianopt":
+		address := os.Getenv("BAYESIAN_OPT_SERVER")
+		if address == "" {
+			return nil, fmt.Errorf("the BAYESIAN_OPT_SERVER environment variable must be set to the address of the Bayesian Optimizer server, e.g., \"localhost:9000\"")
+		}
+		return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, logger), nil
+
+	case "exhaustive":
+		fallthrough
+	default:
+		return profiler.NewExhaustiveFunctionProfiler(k8sConfig, logger), nil
+	}
 }
 
 func (fdr *FunctionDescriptionReconciler) fetchKnativeService(ctx context.Context, fnDesc *chunkFunc.FunctionDescription) (*knServing.Service, error) {

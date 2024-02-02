@@ -62,6 +62,27 @@ message GetBoSuggestionResponse {
     BoSuggestion suggestion = 2;
 }
 
+// Requests an inference for a specific X.
+message InferYRequest {
+    // The ID of the model that was used.
+    string modelId = 1;
+
+    // The value of X, for which we want to infer Y.
+    uint64 x = 2;
+}
+
+// Delivers an inference for a specific X.
+message InferYResponse {
+    // The ID of the model that was used.
+    string modelId = 1;
+
+    // The value of X, for which we requested Y.
+    uint64 x = 2;
+
+    // The inferred Y value at position X.
+    double y = 3;
+}
+
 // A service for utilizing a BO model.
 service BayesianOptimizerService {
     // Creates a new BO model and returns its ID.
@@ -69,6 +90,9 @@ service BayesianOptimizerService {
 
     // Requests a suggestion for the next X value to explore, optionally supplying an observation from the previous profiling run.
     rpc GetBoSuggestion(GetBoSuggestionRequest) returns (GetBoSuggestionResponse) {}
+
+    // Requests an inference of Y for a specific X.
+    rpc InferY(InferYRequest) returns (InferYResponse) {}
 
     // Delete the specified model.
     rpc DeleteBoModel(BoModelId) returns (BoModelId) {}

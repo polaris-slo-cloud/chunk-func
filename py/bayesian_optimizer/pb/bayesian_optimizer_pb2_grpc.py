@@ -25,6 +25,11 @@ class BayesianOptimizerServiceStub(object):
                 request_serializer=bayesian__optimizer__pb2.GetBoSuggestionRequest.SerializeToString,
                 response_deserializer=bayesian__optimizer__pb2.GetBoSuggestionResponse.FromString,
                 )
+        self.InferY = channel.unary_unary(
+                '/bayesianopt.BayesianOptimizerService/InferY',
+                request_serializer=bayesian__optimizer__pb2.InferYRequest.SerializeToString,
+                response_deserializer=bayesian__optimizer__pb2.InferYResponse.FromString,
+                )
         self.DeleteBoModel = channel.unary_unary(
                 '/bayesianopt.BayesianOptimizerService/DeleteBoModel',
                 request_serializer=bayesian__optimizer__pb2.BoModelId.SerializeToString,
@@ -50,6 +55,13 @@ class BayesianOptimizerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def InferY(self, request, context):
+        """Requests an inference of Y for a specific X.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def DeleteBoModel(self, request, context):
         """Delete the specified model.
         """
@@ -69,6 +81,11 @@ def add_BayesianOptimizerServiceServicer_to_server(servicer, server):
                     servicer.GetBoSuggestion,
                     request_deserializer=bayesian__optimizer__pb2.GetBoSuggestionRequest.FromString,
                     response_serializer=bayesian__optimizer__pb2.GetBoSuggestionResponse.SerializeToString,
+            ),
+            'InferY': grpc.unary_unary_rpc_method_handler(
+                    servicer.InferY,
+                    request_deserializer=bayesian__optimizer__pb2.InferYRequest.FromString,
+                    response_serializer=bayesian__optimizer__pb2.InferYResponse.SerializeToString,
             ),
             'DeleteBoModel': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteBoModel,
@@ -117,6 +134,23 @@ class BayesianOptimizerService(object):
         return grpc.experimental.unary_unary(request, target, '/bayesianopt.BayesianOptimizerService/GetBoSuggestion',
             bayesian__optimizer__pb2.GetBoSuggestionRequest.SerializeToString,
             bayesian__optimizer__pb2.GetBoSuggestionResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def InferY(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/bayesianopt.BayesianOptimizerService/InferY',
+            bayesian__optimizer__pb2.InferYRequest.SerializeToString,
+            bayesian__optimizer__pb2.InferYResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -7,7 +7,7 @@ from uuid import uuid1
 
 from google.protobuf.message import Message as ProtobufMessage
 
-from pb.bayesian_optimizer_pb2 import BoModelId, BoModelInitData, BoObservation, BoSuggestion as PbufBoSuggestion, GetBoSuggestionRequest, GetBoSuggestionResponse
+from pb.bayesian_optimizer_pb2 import BoModelId, BoModelInitData, BoSuggestion as PbufBoSuggestion, GetBoSuggestionRequest, GetBoSuggestionResponse, InferYRequest, InferYResponse
 from pb.bayesian_optimizer_pb2_grpc import BayesianOptimizerServiceServicer
 from bayesian_opt import IntegerBayesianOptimizer, IntegerInterval
 
@@ -63,6 +63,16 @@ class BayesianOptimizerServer(BayesianOptimizerServiceServicer):
             logging.info('Obtained suggestion for %s: x=%d, poi=%f', modelId, suggestion.x, suggestion.poi)
             boSuggestion = PbufBoSuggestion(x=suggestion.x, poi=suggestion.poi)
             return GetBoSuggestionResponse(modelId=modelId, suggestion=boSuggestion)
+
+
+    def InferY(self, request: InferYRequest, context) -> InferYResponse:
+        modelId = self.__extractModelId(request)
+        logging.info('InferY for %s', modelId)
+
+        with self.__getLockedOptimizer(modelId) as optimizer:
+            y = optimizer.infer_y(request.x)
+            logging.info("Obtained inference, x=%d, y=%f", request.x, y)
+            return InferYResponse(modelId=modelId, x=request.x, y=y)
 
 
     def DeleteBoModel(self, request: BoModelId, context) -> BoModelId:

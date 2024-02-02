@@ -96,6 +96,12 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
+        env:
+          - name: PROFILER
+            # value: exhaustive
+            value: bayesianopt
+          - name: BAYESIAN_OPT_SERVER
+            value: bayesian-optimizer:9000
 
       - name: bayesian-optimizer
         image: bayesian-optimizer:latest
