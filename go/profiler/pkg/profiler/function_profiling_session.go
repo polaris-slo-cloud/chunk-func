@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/go-logr/logr"
@@ -17,14 +16,20 @@ import (
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/trigger"
 )
 
-// Encapsulates the state of a profiling run.
-type exhaustiveFunctionProfilerSession struct {
+// Encapsulates the state and generic logic of a profiling session.
+// The deployment of function instances with specific resource profiles and their profiling is
+// handled by this type. The selection of the resource profiles to be evaluated and the final
+// aggregation or interpolation of the results is handled by the ProfilingStrategy.
+type FunctionProfilingSession struct {
 	// The original Knative Service of the serverless function being profiled.
 	// For profiling copies of this service are created with different resource profiles.
 	fn *function.FunctionWithDescription
 
 	// The configuration for this profiling run.
 	profilingConfig *ProfilingConfig
+
+	// The strategy used for determining the candidate profiles and for aggregation of the final results.
+	profilingStrategy ProfilingStrategy
 
 	// Used to access Knative Services in the cluster.
 	servingClient knServingClient.ServingV1Interface
@@ -40,13 +45,14 @@ type exhaustiveFunctionProfilerSession struct {
 	logger *logr.Logger
 }
 
-func newExhaustiveFunctionProfilerSession(
+func NewFunctionProfilingSession(
 	fn *function.FunctionWithDescription,
 	profilingConfig *ProfilingConfig,
+	profilingStrategy ProfilingStrategy,
 	servingClient knServingClient.ServingV1Interface,
 	logger *logr.Logger,
-) *exhaustiveFunctionProfilerSession {
-	pr := &exhaustiveFunctionProfilerSession{
+) *FunctionProfilingSession {
+	fps := &FunctionProfilingSession{
 		fn:              fn,
 		profilingConfig: profilingConfig,
 		servingClient:   servingClient,
@@ -55,20 +61,26 @@ func newExhaustiveFunctionProfilerSession(
 		deploymentMgr:   NewFunctionDeploymentManager(servingClient),
 		logger:          logger,
 	}
-	return pr
+	return fps
 }
 
 // Executes the complete profiling session for all resource profiles and typical inputs.
 // This operation commonly takes several minutes.
-func (pr *exhaustiveFunctionProfilerSession) ExecuteProfilingSession(ctx context.Context) (*function.ProfilingSessionResults, error) {
+// At the end of the session, the ProfilingStrategy.Cleanup() method is called.
+func (fps *FunctionProfilingSession) ExecuteProfilingSession(ctx context.Context) (*function.ProfilingSessionResults, error) {
 	stopwatch := timing.NewStopwatch()
 	stopwatch.Start()
 
 	cancellableCtx, cancelFn := context.WithCancelCause(ctx)
 	defer cancelFn(nil)
+	defer fps.profilingStrategy.Cleanup()
 
-	candidateProfiles := setUpCandidateProfilesChan(pr.profilingConfig.CandidateProfiles)
-	workersCount := pr.profilingConfig.ConcurrentProfiles
+	profilingQueue, err := fps.profilingStrategy.SetUpProfilingQueue(cancellableCtx, fps.fn, fps.profilingConfig.CandidateProfiles, cancelFn)
+	if err != nil {
+		return nil, err
+	}
+
+	workersCount := fps.profilingConfig.ConcurrentProfiles
 	wg := sync.WaitGroup{}
 	wg.Add(workersCount)
 
@@ -80,7 +92,7 @@ func (pr *exhaustiveFunctionProfilerSession) ExecuteProfilingSession(ctx context
 
 	for i := 0; i < workersCount; i++ {
 		go func(id int) {
-			pr.runProfilingWorker(cancellableCtx, id, candidateProfiles, abortFn)
+			fps.runProfilingWorker(cancellableCtx, id, profilingQueue, abortFn)
 			wg.Done()
 		}(i)
 	}
@@ -92,7 +104,11 @@ func (pr *exhaustiveFunctionProfilerSession) ExecuteProfilingSession(ctx context
 		return nil, cause
 	}
 
-	sessionResults := pr.aggregateAllResults()
+	// No locking needed anymore, because this is the only goroutine accessing the results.
+	sessionResults, err := fps.profilingStrategy.AggregateAllResults(cancellableCtx, fps.results)
+	if err != nil {
+		return nil, err
+	}
 
 	stopwatch.Stop()
 	startTime := meta.NewTime(stopwatch.StartTime())
@@ -103,41 +119,56 @@ func (pr *exhaustiveFunctionProfilerSession) ExecuteProfilingSession(ctx context
 
 // Receives ResourceProfiles to be evaluated from the profiles channel and profiles them.
 // Results are added to the pr.results map.
-func (pr *exhaustiveFunctionProfilerSession) runProfilingWorker(
+func (fps *FunctionProfilingSession) runProfilingWorker(
 	ctx context.Context,
 	workerId int,
-	profiles chan *function.ResourceProfile,
+	queue chan ProfilingJob,
 	abortOnErrorFn func(*function.ResourceProfile, error),
 ) {
-	for resProfile := range profiles {
-		results, err := pr.evaluateResourceProfile(ctx, resProfile)
+	for job := range queue {
+		resProfile := job.ResourceProfile()
+		results, err := fps.evaluateResourceProfileWithInputs(ctx, resProfile, job.Inputs())
 		if err != nil {
 			abortOnErrorFn(resProfile, err)
+			job.ProfilingError(err)
 			return
 		}
 
-		profileId := resProfile.ID()
-		pr.resultsMutex.Lock()
-		pr.results[profileId] = results
-		pr.resultsMutex.Unlock()
+		fps.storeResults(resProfile, results)
+		job.ProfilingDone(ctx, results)
 	}
 }
 
-// Executes the profiling for a single ResourceProfile.
+func (fps *FunctionProfilingSession) storeResults(resProfile *function.ResourceProfile, results *function.ResourceProfileResults) {
+	profileId := resProfile.ID()
+	fps.resultsMutex.Lock()
+	defer fps.resultsMutex.Unlock()
+
+	if existingResults, ok := fps.results[profileId]; ok {
+		results = mergeResults(existingResults, results)
+	}
+	fps.results[profileId] = results
+}
+
+// Executes the profiling for a single ResourceProfile with the specified inputs.
 // This consists of the following steps:
 //  1. Deploy a function with the corresponding resource configuration.
 //  2. Call it once to warm it up, i.e., ensure that the profiled invocations do not suffer from cold starts.
-//  3. Iterate through all typical inputs and for each input perform N profiled function invocations.
+//  3. Iterate through all specified inputs and for each input perform N profiled function invocations.
 //  4. Clean up the deployed function (also done in case of an error).
-func (pr *exhaustiveFunctionProfilerSession) evaluateResourceProfile(ctx context.Context, resourceProfile *function.ResourceProfile) (*function.ResourceProfileResults, error) {
+func (fps *FunctionProfilingSession) evaluateResourceProfileWithInputs(
+	ctx context.Context,
+	resourceProfile *function.ResourceProfile,
+	inputs []*function.FunctionInput,
+) (*function.ResourceProfileResults, error) {
 	results := &function.ResourceProfileResults{
 		ResourceProfileId: resourceProfile.ID(),
 	}
 
-	targetFn, err := CreateAndWaitForService(ctx, pr.fn, pr.profilingConfig.ProfilingNamespace, resourceProfile, pr.deploymentMgr, pr.profilingConfig.FunctionReadyTimeout)
+	targetFn, err := CreateAndWaitForService(ctx, fps.fn, fps.profilingConfig.ProfilingNamespace, resourceProfile, fps.deploymentMgr, fps.profilingConfig.FunctionReadyTimeout)
 	if targetFn != nil {
 		// We use a background context for deleting the function to ensure that it happens, even if the main context is cancelled.
-		defer pr.deploymentMgr.DeleteFunction(context.Background(), targetFn)
+		defer fps.deploymentMgr.DeleteFunction(context.Background(), targetFn)
 	}
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
@@ -148,32 +179,32 @@ func (pr *exhaustiveFunctionProfilerSession) evaluateResourceProfile(ctx context
 		}
 	}
 	targetFnName := targetFn.Namespace + "." + targetFn.Name
-	pr.logger.Info("Created new Knative Service", "service", targetFnName)
+	fps.logger.Info("Created new Knative Service", "service", targetFnName)
 
 	var fnTrigger trigger.TimedFunctionTrigger[any] = trigger.NewRestTrigger()
 	results.DeploymentStatus = function.DeploymentSuccess
-	results.UnfilteredResults = make([]*function.ProfilingResult, len(pr.fn.Description.TypicalInputs))
+	results.UnfilteredResults = make([]*function.ProfilingResult, len(fps.fn.Description.TypicalInputs))
 
 	// Warm the function up.
-	_, err = pr.profileFunctionCall(ctx, fnTrigger, targetFn, pr.fn.Description.TypicalInputs[0])
+	_, err = fps.profileFunctionCall(ctx, fnTrigger, targetFn, fps.fn.Description.TypicalInputs[0])
 	if err != nil {
 		return nil, err
 	}
-	pr.logger.Info("Successfully warmed Knative Service", "service", targetFnName)
+	fps.logger.Info("Successfully warmed Knative Service", "service", targetFnName)
 
-	for i, input := range pr.fn.Description.TypicalInputs {
-		pr.logger.Info("Executing iterations for input", "service", targetFnName, "inputSize", input.SizeBytes, "iterations", pr.profilingConfig.IterationsPerInputAndProfile)
+	for i, input := range fps.fn.Description.TypicalInputs {
+		fps.logger.Info("Executing iterations for input", "service", targetFnName, "inputSize", input.SizeBytes, "iterations", fps.profilingConfig.IterationsPerInputAndProfile)
 
-		resultForInput, err := pr.profileWithInput(ctx, fnTrigger, targetFn, input)
+		resultForInput, err := fps.profileWithInput(ctx, fnTrigger, targetFn, input)
 		if err != nil {
 			return nil, err
 		}
 		results.UnfilteredResults[i] = resultForInput
 
-		pr.logger.Info("Successfully profiled input size", "service", targetFnName, "inputSize", input.SizeBytes)
+		fps.logger.Info("Successfully profiled input size", "service", targetFnName, "inputSize", input.SizeBytes)
 	}
 
-	pr.computeExecutionCosts(results, resourceProfile)
+	computeExecutionCosts(results, resourceProfile)
 	sortProfilingResultsByInputSize(results.UnfilteredResults)
 	results.Results = copyAndPruneResults(results.UnfilteredResults)
 
@@ -181,17 +212,17 @@ func (pr *exhaustiveFunctionProfilerSession) evaluateResourceProfile(ctx context
 }
 
 // Loops through all typical inputs and performs N profiled function invocations using each input.
-func (pr *exhaustiveFunctionProfilerSession) profileWithInput(
+func (fps *FunctionProfilingSession) profileWithInput(
 	ctx context.Context,
 	fnTrigger trigger.TimedFunctionTrigger[any],
 	targetFn *knServing.Service,
 	input *function.FunctionInput,
 ) (*function.ProfilingResult, error) {
-	iterations := pr.profilingConfig.IterationsPerInputAndProfile
+	iterations := fps.profilingConfig.IterationsPerInputAndProfile
 	results := make([]*function.ProfilingResult, iterations)
 
 	for i := 0; i < iterations; i++ {
-		result, err := pr.profileFunctionCall(ctx, fnTrigger, targetFn, input)
+		result, err := fps.profileFunctionCall(ctx, fnTrigger, targetFn, input)
 		if err != nil {
 			return nil, err
 		}
@@ -202,7 +233,7 @@ func (pr *exhaustiveFunctionProfilerSession) profileWithInput(
 }
 
 // Executes a single profiled function invocation.
-func (pr *exhaustiveFunctionProfilerSession) profileFunctionCall(
+func (fps *FunctionProfilingSession) profileFunctionCall(
 	ctx context.Context,
 	fnTrigger trigger.TimedFunctionTrigger[any],
 	targetFn *knServing.Service,
@@ -219,27 +250,4 @@ func (pr *exhaustiveFunctionProfilerSession) profileFunctionCall(
 		ExecutionTimeMs: execResult.ResponseTime.Milliseconds(),
 	}
 	return profResult, nil
-}
-
-func (pr *exhaustiveFunctionProfilerSession) aggregateAllResults() *function.ProfilingSessionResults {
-	ret := &function.ProfilingSessionResults{
-		Results: make([]*function.ResourceProfileResults, len(pr.profilingConfig.CandidateProfiles)),
-	}
-
-	for i, resProfile := range pr.profilingConfig.CandidateProfiles {
-		// No locking needed anymore, because this is the only goroutine accessing the results.
-		resProfileResults := pr.results[resProfile.ID()]
-		ret.Results[i] = resProfileResults
-	}
-
-	return ret
-}
-
-func (pr *exhaustiveFunctionProfilerSession) computeExecutionCosts(results *function.ResourceProfileResults, profile *function.ResourceProfile) {
-	for _, result := range results.UnfilteredResults {
-		cost := profile.CalculateCost(result.ExecutionTimeMs)
-		costStr := fmt.Sprintf("%10f", cost)
-		costStr = strings.Trim(costStr, " ")
-		result.ExecutionCost = &costStr
-	}
 }

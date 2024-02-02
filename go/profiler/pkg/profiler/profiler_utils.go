@@ -3,6 +3,7 @@ package profiler
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
 )
@@ -38,16 +39,6 @@ func AggregateProfilingResults(results []*function.ProfilingResult) (*function.P
 	return ret, nil
 }
 
-// Creates a buffered channel filled with the candidate profiles for distributing them to worker goroutines.
-func setUpCandidateProfilesChan(candidateProfiles []*function.ResourceProfile) chan *function.ResourceProfile {
-	profiles := make(chan *function.ResourceProfile, len(candidateProfiles))
-	for _, resProfile := range candidateProfiles {
-		profiles <- resProfile
-	}
-	close(profiles)
-	return profiles
-}
-
 // Sorts the specified results by increasing input size.
 func sortProfilingResultsByInputSize(results []*function.ProfilingResult) {
 	slices.SortFunc(results, func(a, b *function.ProfilingResult) int { return int(a.InputSizeBytes - b.InputSizeBytes) })
@@ -63,4 +54,37 @@ func copyAndPruneResults(results []*function.ProfilingResult) []*function.Profil
 		}
 	}
 	return dest
+}
+
+// Computes the execution costs for all unfiltered results.
+func computeExecutionCosts(results *function.ResourceProfileResults, profile *function.ResourceProfile) {
+	for _, result := range results.UnfilteredResults {
+		cost := profile.CalculateCost(result.ExecutionTimeMs)
+		costStr := fmt.Sprintf("%10f", cost)
+		costStr = strings.Trim(costStr, " ")
+		result.ExecutionCost = &costStr
+	}
+}
+
+// Merges the two results into a new ResourceProfileResults object.
+func mergeResults(a *function.ResourceProfileResults, b *function.ResourceProfileResults) *function.ResourceProfileResults {
+	var deploymentStatus function.FunctionDeploymentStatus
+	if a.DeploymentStatus == function.DeploymentSuccess || b.DeploymentStatus == function.DeploymentSuccess {
+		deploymentStatus = function.DeploymentSuccess
+	} else {
+		deploymentStatus = b.DeploymentStatus
+	}
+
+	ret := &function.ResourceProfileResults{
+		ResourceProfileId: a.ResourceProfileId,
+		DeploymentStatus:  deploymentStatus,
+		UnfilteredResults: make([]*function.ProfilingResult, 0, len(a.UnfilteredResults)+len(b.UnfilteredResults)),
+	}
+
+	ret.UnfilteredResults = append(ret.UnfilteredResults, a.UnfilteredResults...)
+	ret.UnfilteredResults = append(ret.UnfilteredResults, b.UnfilteredResults...)
+	sortProfilingResultsByInputSize(ret.UnfilteredResults)
+	ret.Results = copyAndPruneResults(ret.UnfilteredResults)
+
+	return ret
 }
