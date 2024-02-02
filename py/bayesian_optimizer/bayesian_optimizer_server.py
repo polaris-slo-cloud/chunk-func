@@ -60,8 +60,8 @@ class BayesianOptimizerServer(BayesianOptimizerServiceServicer):
                 optimizer.register_observation(request.observation.x, request.observation.observation)
 
             suggestion = optimizer.suggest()
-            logging.info('Obtained suggestion for %s: x=%d, ei=%f', modelId, suggestion.x, suggestion.ei)
-            boSuggestion = PbufBoSuggestion(x=suggestion.x, ei=suggestion.ei)
+            logging.info('Obtained suggestion for %s: x=%d, poi=%f', modelId, suggestion.x, suggestion.poi)
+            boSuggestion = PbufBoSuggestion(x=suggestion.x, poi=suggestion.poi)
             return GetBoSuggestionResponse(modelId=modelId, suggestion=boSuggestion)
 
 

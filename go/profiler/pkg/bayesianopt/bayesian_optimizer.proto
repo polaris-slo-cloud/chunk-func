@@ -30,8 +30,8 @@ message BoSuggestion {
     // The suggested value of X for the next profiling run.
     uint64 x = 1;
 
-    // Expected improvement for the next profiling run.
-    double ei = 2;
+    // Probability of improvement for the next profiling run.
+    double poi = 2;
 }
 
 // The observation made during a profiling run.

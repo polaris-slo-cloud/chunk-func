@@ -32,12 +32,12 @@ class BoModelId(_message.Message):
     def __init__(self, modelId: _Optional[str] = ...) -> None: ...
 
 class BoSuggestion(_message.Message):
-    __slots__ = ("x", "ei")
+    __slots__ = ("x", "poi")
     X_FIELD_NUMBER: _ClassVar[int]
-    EI_FIELD_NUMBER: _ClassVar[int]
+    POI_FIELD_NUMBER: _ClassVar[int]
     x: int
-    ei: float
-    def __init__(self, x: _Optional[int] = ..., ei: _Optional[float] = ...) -> None: ...
+    poi: float
+    def __init__(self, x: _Optional[int] = ..., poi: _Optional[float] = ...) -> None: ...
 
 class BoObservation(_message.Message):
     __slots__ = ("x", "observation")

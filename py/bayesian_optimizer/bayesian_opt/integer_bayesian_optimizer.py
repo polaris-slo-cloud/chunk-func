@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from bisect import bisect_left
 from typing import cast, TypedDict
-import math
 
 from bayes_opt import UtilityFunction
 import numpy
@@ -21,8 +20,8 @@ class BoSuggestion:
     x: int
     """The suggested value of the parameter."""
 
-    ei: float
-    """The expected improvement."""
+    poi: float
+    """The probability of improvement."""
 
 
 
@@ -54,7 +53,12 @@ class IntegerBayesianOptimizer:
             random_state=1,
         )
         self.__optimizer.set_gp_params(alpha=1e-3)
-        self.__utilityFn = UtilityFunction(kind='ei', kappa=kappa, xi=xi) # type: ignore (TypeHint for xi is wrong, it should be a float)
+
+        # We use expected improvement to determine the next suggestion by the BO.
+        self.__eiFn = UtilityFunction(kind='ei', kappa=kappa, xi=xi) # type: ignore (TypeHint for xi is wrong, it should be a float)
+
+        # The probability of improvement is only used for the BoSuggestion returned as a result.
+        self.__poiFn = UtilityFunction(kind='poi', kappa=kappa, xi=xi) # type: ignore (TypeHint for xi is wrong, it should be a float)
 
 
     def suggest(self) -> BoSuggestion:
@@ -62,19 +66,19 @@ class IntegerBayesianOptimizer:
         Makes a new suggestion for X and also returns its expected improvement.
         """
 
-        suggestion = self.__optimizer.suggest(self.__utilityFn)
+        suggestion = self.__optimizer.suggest(self.__eiFn)
         x_suggestion = suggestion['x']
-        ei: float = math.inf
+        poi = 1.0
 
         max_y = self.__optimizer.get_max_y()
         if max_y is not None:
             x = numpy.array([ [x_suggestion] ], numpy.float64)
-            utility = self.__utilityFn.utility(x, self.__optimizer.gp, self.__optimizer.get_max_y())
-            if utility is None:
+            utility_poi = self.__poiFn.utility(x, self.__optimizer.gp, self.__optimizer.get_max_y())
+            if utility_poi is None:
                 raise AssertionError('Could not compute EI')
-            ei = utility.max()
+            poi = utility_poi.max()
 
-        return BoSuggestion(x=self.__suggestion_space_to_param_domain(x_suggestion), ei=ei)
+        return BoSuggestion(x=self.__suggestion_space_to_param_domain(x_suggestion), poi=poi)
 
 
     def register_observation(self, x: int, observation: float) -> None:
