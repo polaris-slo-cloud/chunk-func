@@ -42,6 +42,9 @@ type FunctionProfilingSession struct {
 	// Used to deploy and undeploy functions for profiling.
 	deploymentMgr FunctionDeploymentManager
 
+	// Used to create the triggers for triggering a deployed function with and timing the call.
+	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any]
+
 	logger *logr.Logger
 }
 
@@ -49,17 +52,19 @@ func NewFunctionProfilingSession(
 	fn *function.FunctionWithDescription,
 	profilingConfig *ProfilingConfig,
 	profilingStrategy ProfilingStrategy,
+	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any],
 	servingClient knServingClient.ServingV1Interface,
 	logger *logr.Logger,
 ) *FunctionProfilingSession {
 	fps := &FunctionProfilingSession{
-		fn:              fn,
-		profilingConfig: profilingConfig,
-		servingClient:   servingClient,
-		results:         make(map[string]*function.ResourceProfileResults, len(profilingConfig.CandidateProfiles)),
-		resultsMutex:    sync.Mutex{},
-		deploymentMgr:   NewFunctionDeploymentManager(servingClient),
-		logger:          logger,
+		fn:                 fn,
+		profilingConfig:    profilingConfig,
+		servingClient:      servingClient,
+		results:            make(map[string]*function.ResourceProfileResults, len(profilingConfig.CandidateProfiles)),
+		resultsMutex:       sync.Mutex{},
+		deploymentMgr:      NewFunctionDeploymentManager(servingClient),
+		fnTriggerFactoryFn: fnTriggerFactoryFn,
+		logger:             logger,
 	}
 	return fps
 }
@@ -181,7 +186,7 @@ func (fps *FunctionProfilingSession) evaluateResourceProfileWithInputs(
 	targetFnName := targetFn.Namespace + "." + targetFn.Name
 	fps.logger.Info("Created new Knative Service", "service", targetFnName)
 
-	var fnTrigger trigger.TimedFunctionTrigger[any] = trigger.NewRestTrigger()
+	fnTrigger := fps.fnTriggerFactoryFn()
 	results.DeploymentStatus = function.DeploymentSuccess
 	results.UnfilteredResults = make([]*function.ProfilingResult, len(fps.fn.Description.TypicalInputs))
 

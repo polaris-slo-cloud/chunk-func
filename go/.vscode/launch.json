@@ -10,7 +10,12 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/controller/cmd/main.go",
-            "env": {},
+            "cwd": "${workspaceFolder}/controller",
+            "env": {
+              "FUNCTION_TRIGGER": "MockedResults",
+              "PROFILER": "BayesianOpt",
+              "BAYESIAN_OPT_SERVER": "localhost:9000"
+            },
             "args": []
         }
     ]

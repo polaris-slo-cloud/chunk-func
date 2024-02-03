@@ -1,0 +1,171 @@
+apiVersion: chunk-func.polaris-slo-cloud.github.io/v1
+kind: FunctionDescription
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"chunk-func.polaris-slo-cloud.github.io/v1","kind":"FunctionDescription","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"extract-success-stats","app.kubernetes.io/name":"functiondescription","app.kubernetes.io/part-of":"chunk-func-controller"},"name":"extract-success-stats","namespace":"func-test"},"spec":{"functionDescription":{"functionContainer":"user-container","functionName":"extract-success-stats","maxResponseTimeMs":4000,"typicalInputs":[{"message":{"bucket":"logs","objectKey":"scheduler-scalability-jobs-01-successes.log","objectSizeBytes":2070369,"password":"wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx","url":"http://10.152.183.192","user":"HYlOGOqiOSpSnBjP"},"sizeBytes":2070369},{"message":{"bucket":"logs","objectKey":"scheduler-scalability-jobs-13-successes.log","objectSizeBytes":21569326,"password":"wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx","url":"http://10.152.183.192","user":"HYlOGOqiOSpSnBjP"},"sizeBytes":21569326},{"message":{"bucket":"logs","objectKey":"scheduler-scalability-jobs-15-successes.log","objectSizeBytes":21511278,"password":"wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx","url":"http://10.152.183.192","user":"HYlOGOqiOSpSnBjP"},"sizeBytes":21511278}]}}}
+  creationTimestamp: "2023-08-18T09:15:09Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: extract-success-stats
+    app.kubernetes.io/name: functiondescription
+    app.kubernetes.io/part-of: chunk-func-controller
+  name: extract-success-stats
+  namespace: func-test
+  resourceVersion: "47176469"
+  uid: 71dd5f0c-d98b-4a9c-ab61-7df4b6cc2a8b
+spec:
+  functionDescription:
+    functionContainer: user-container
+    functionName: extract-success-stats
+    maxResponseTimeMs: 4000
+    typicalInputs:
+    - message:
+        bucket: logs
+        objectKey: scheduler-scalability-jobs-01-successes.log
+        objectSizeBytes: 2070369
+        password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+        url: http://10.152.183.192
+        user: HYlOGOqiOSpSnBjP
+      sizeBytes: 2070369
+    - message:
+        bucket: logs
+        objectKey: scheduler-scalability-jobs-13-successes.log
+        objectSizeBytes: 21569326
+        password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+        url: http://10.152.183.192
+        user: HYlOGOqiOSpSnBjP
+      sizeBytes: 21569326
+    - message:
+        bucket: logs
+        objectKey: scheduler-scalability-jobs-15-successes.log
+        objectSizeBytes: 21511278
+        password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+        url: http://10.152.183.192
+        user: HYlOGOqiOSpSnBjP
+      sizeBytes: 21511278
+status:
+  optimizedConfigs:
+  - config:
+      memoryMiB: 2048
+      milliCpu: 1000
+    inputSizeBytes: 2070369
+    optimizedFor: response-time-slo-and-min-cost
+  - config:
+      memoryMiB: 1024
+      milliCpu: 583
+    inputSizeBytes: 21569326
+    optimizedFor: response-time-slo-and-min-cost
+  - inputSizeBytes: 21511278
+    optimizedFor: response-time-slo-and-min-cost
+  profilingResults:
+    profilingDurationSeconds: 162
+    profilingStarted: "2023-08-18T09:15:09Z"
+    results:
+    - deploymentStatus: Timeout
+      resourceProfileId: 128mib-83m
+    - deploymentStatus: Success
+      resourceProfileId: 256mib-167m
+      results:
+      - executionCost: '  0.000005'
+        executionTimeMs: 740
+        inputSizeBytes: 2070369
+        statusCode: 200
+      - executionCost: '  0.000033'
+        executionTimeMs: 5076
+        inputSizeBytes: 21511278
+        statusCode: 200
+      - executionCost: '  0.000039'
+        executionTimeMs: 5979
+        inputSizeBytes: 21569326
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 512mib-333m
+      results:
+      - executionCost: '  0.000005'
+        executionTimeMs: 398
+        inputSizeBytes: 2070369
+        statusCode: 200
+      - executionCost: '  0.000027'
+        executionTimeMs: 2001
+        inputSizeBytes: 21511278
+        statusCode: 200
+      - executionCost: '  0.000027'
+        executionTimeMs: 2082
+        inputSizeBytes: 21569326
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 1024mib-583m
+      results:
+      - executionCost: '  0.000005'
+        executionTimeMs: 168
+        inputSizeBytes: 2070369
+        statusCode: 200
+      - executionCost: '  0.000021'
+        executionTimeMs: 860
+        inputSizeBytes: 21511278
+        statusCode: 200
+      - executionCost: '  0.000023'
+        executionTimeMs: 987
+        inputSizeBytes: 21569326
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 2048mib-1000m
+      results:
+      - executionCost: '  0.000004'
+        executionTimeMs: 95
+        inputSizeBytes: 2070369
+        statusCode: 200
+      - executionCost: '  0.000037'
+        executionTimeMs: 871
+        inputSizeBytes: 21511278
+        statusCode: 200
+      - executionCost: '  0.000037'
+        executionTimeMs: 846
+        inputSizeBytes: 21569326
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 4096mib-2000m
+      results:
+      - executionCost: '  0.000008'
+        executionTimeMs: 76
+        inputSizeBytes: 2070369
+        statusCode: 200
+      - executionCost: '  0.000065'
+        executionTimeMs: 788
+        inputSizeBytes: 21511278
+        statusCode: 200
+      - executionCost: '  0.000065'
+        executionTimeMs: 770
+        inputSizeBytes: 21569326
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 8192mib-2000m
+      results:
+      - executionCost: '  0.000010'
+        executionTimeMs: 74
+        inputSizeBytes: 2070369
+        statusCode: 200
+      - executionCost: '  0.000076'
+        executionTimeMs: 784
+        inputSizeBytes: 21511278
+        statusCode: 200
+      - executionCost: '  0.000076'
+        executionTimeMs: 760
+        inputSizeBytes: 21569326
+        statusCode: 200
+    - deploymentStatus: Success
+      resourceProfileId: 16384mib-4000m
+      results:
+      - executionCost: '  0.000190'
+        executionTimeMs: 82
+        inputSizeBytes: 2070369
+        statusCode: 200
+      - executionCost: '  0.001523'
+        executionTimeMs: 742
+        inputSizeBytes: 21511278
+        statusCode: 200
+      - executionCost: '  0.001714'
+        executionTimeMs: 831
+        inputSizeBytes: 21569326
+        statusCode: 200

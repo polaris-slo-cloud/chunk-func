@@ -97,9 +97,12 @@ spec:
             cpu: 10m
             memory: 64Mi
         env:
+          # FUNCTION_TRIGGER can be either "REST" or "MockedResults"
+          - name: FUNCTION_TRIGGER
+            value: REST
+          # PROFILER can be either "Exhaustive" or "BayesianOpt"
           - name: PROFILER
-            # value: exhaustive
-            value: bayesianopt
+            value: BayesianOpt
           - name: BAYESIAN_OPT_SERVER
             value: bayesian-optimizer:9000
 

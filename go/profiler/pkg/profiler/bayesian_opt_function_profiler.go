@@ -12,6 +12,7 @@ import (
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/bayesianopt"
+	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/trigger"
 )
 
 var (
@@ -21,9 +22,10 @@ var (
 // A FunctionProfiler that uses Bayesian Optimization to reduce the number resource profiles
 // that need to be evaluated.
 type BayesianOptFunctionProfiler struct {
-	servingClient   knServingClient.ServingV1Interface
-	boServerAddress string
-	logger          *logr.Logger
+	servingClient      knServingClient.ServingV1Interface
+	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any]
+	boServerAddress    string
+	logger             *logr.Logger
 }
 
 // Creates a new FunctionProfiler with the specified REST config and logger.
@@ -31,11 +33,17 @@ type BayesianOptFunctionProfiler struct {
 // This function takes a rest.Config instead of a rest.Interface, because each API group requires a distinct client instance
 // (see https://github.com/kubernetes/client-go/issues/1288#issuecomment-1667886214).
 // Thus, we let knServing handle the adaptation of the config.
-func NewBayesianOptFunctionProfiler(k8sConfig *rest.Config, boServerAddress string, logger *logr.Logger) *BayesianOptFunctionProfiler {
+func NewBayesianOptFunctionProfiler(
+	k8sConfig *rest.Config,
+	boServerAddress string,
+	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any],
+	logger *logr.Logger,
+) *BayesianOptFunctionProfiler {
 	modifiableConfig := rest.CopyConfig(k8sConfig)
 	efp := &BayesianOptFunctionProfiler{
-		servingClient: knServingClient.NewForConfigOrDie(modifiableConfig),
-		logger:        logger,
+		servingClient:      knServingClient.NewForConfigOrDie(modifiableConfig),
+		fnTriggerFactoryFn: fnTriggerFactoryFn,
+		logger:             logger,
 	}
 	return efp
 }
@@ -60,7 +68,7 @@ func (bfp *BayesianOptFunctionProfiler) ProfileFunction(ctx context.Context, fn 
 	boClient := bayesianopt.NewBayesianOptimizerServiceClient(conn)
 
 	profilingStrategy := NewBayesianOptProfilingStrategy(boClient, bfp.logger)
-	fps := NewFunctionProfilingSession(fn, profilingConfig, profilingStrategy, bfp.servingClient, bfp.logger)
+	fps := NewFunctionProfilingSession(fn, profilingConfig, profilingStrategy, bfp.fnTriggerFactoryFn, bfp.servingClient, bfp.logger)
 	return fps.ExecuteProfilingSession(ctx)
 }
 

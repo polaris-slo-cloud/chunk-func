@@ -5,6 +5,11 @@ import (
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/collections"
 )
 
+const (
+	// The pod label, where the ResourceProfile.ID is stored.
+	ResourceProfileLabel = "polaris-slo-cloud.github.io/chunk-func.resource-profile"
+)
+
 // GetLabel returns the label with the specified key.
 func GetLabel(obj metav1.Object, key string) (string, bool) {
 	if labels := obj.GetLabels(); labels != nil {

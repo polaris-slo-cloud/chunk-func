@@ -36,6 +36,11 @@ func CreateKnativeServiceWithProfile(
 	ret.ObjectMeta.Namespace = targetNamespace
 	ret.ObjectMeta.Name = fn.Function.Name + "-" + resourceProfile.StringifyForK8sObj()
 
+	if ret.ObjectMeta.Labels == nil {
+		ret.ObjectMeta.Labels = make(map[string]string)
+	}
+	ret.ObjectMeta.Labels[kubeutil.ResourceProfileLabel] = resourceProfile.ID()
+
 	container := kubeutil.FindContainer(ret.Spec.Template.Spec.Containers, fn.Description.FunctionContainer)
 	if container == nil {
 		return nil, fmt.Errorf("the Knative Service %s does not contain a container %s", fn.Function.Name, fn.Description.FunctionContainer)

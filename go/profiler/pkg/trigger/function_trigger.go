@@ -36,3 +36,6 @@ type TimedFunctionTrigger[R any] interface {
 	// or if the context is cancelled.
 	TriggerFunction(ctx context.Context, fn *knServing.Service, input *function.FunctionInput) (*FunctionExecutionResult[R], error)
 }
+
+// A factory function for creating a TimedFunctionTrigger.
+type TimedFunctionTriggerFactoryFn[R any] func() TimedFunctionTrigger[R]

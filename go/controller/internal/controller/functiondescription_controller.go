@@ -37,9 +37,11 @@ import (
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
 	chunkFunc "polaris-slo-cloud.github.io/chunk-func/controller/api/v1"
+	"polaris-slo-cloud.github.io/chunk-func/controller/internal/util"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/optimizer"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/profile"
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/profiler"
+	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/trigger"
 )
 
 var (
@@ -149,20 +151,44 @@ func (fdr *FunctionDescriptionReconciler) SetupWithManager(mgr ctrl.Manager) err
 }
 
 func (fdr *FunctionDescriptionReconciler) createProfiler(k8sConfig *rest.Config, logger *logr.Logger) (profiler.FunctionProfiler, error) {
-	profilerType := strings.ToLower(os.Getenv("PROFILER"))
+	fnTriggerFactory, err := fdr.createFunctionTriggerFactory(logger)
+	if err != nil {
+		return nil, err
+	}
 
+	profilerType := strings.ToLower(os.Getenv("PROFILER"))
 	switch profilerType {
 	case "bayesianopt":
 		address := os.Getenv("BAYESIAN_OPT_SERVER")
 		if address == "" {
 			return nil, fmt.Errorf("the BAYESIAN_OPT_SERVER environment variable must be set to the address of the Bayesian Optimizer server, e.g., \"localhost:9000\"")
 		}
-		return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, logger), nil
+		logger.Info("Creating BayesianOptFunctionProfiler")
+		return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, fnTriggerFactory, logger), nil
 
 	case "exhaustive":
 		fallthrough
 	default:
-		return profiler.NewExhaustiveFunctionProfiler(k8sConfig, logger), nil
+		logger.Info("Creating ExhaustiveFunctionProfiler")
+		return profiler.NewExhaustiveFunctionProfiler(k8sConfig, fnTriggerFactory, logger), nil
+	}
+}
+
+func (fdr *FunctionDescriptionReconciler) createFunctionTriggerFactory(logger *logr.Logger) (trigger.TimedFunctionTriggerFactoryFn[any], error) {
+	triggerType := strings.ToLower(os.Getenv("FUNCTION_TRIGGER"))
+	switch triggerType {
+	case "mockedresults":
+		mockedResults, err := util.LoadMockedProfilingResults("./config/mockedresults")
+		if err != nil {
+			return nil, fmt.Errorf("error loading mocked profiling results from ./config/mockedresults: %v", err)
+		}
+		logger.Info("Using MockedResultsTriggerFactory with", "mockedResults", len(mockedResults))
+		return trigger.NewMockedResultsTriggerFactory(mockedResults), nil
+	case "rest":
+		fallthrough
+	default:
+		logger.Info("Using RestTriggerFactory")
+		return trigger.RestTriggerFactory, nil
 	}
 }
 
