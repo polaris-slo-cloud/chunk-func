@@ -178,6 +178,11 @@ spec:
                                 description: The size of the used input in bytes.
                                 format: int64
                                 type: integer
+                              resultType:
+                                description: Describes whether the profiling result
+                                  is the result of a profiling run or of model inference.
+                                  If this is not set, the result comes from profiling.
+                                type: string
                               statusCode:
                                 description: The HTTP status code returned by the
                                   function execution. If the function is not triggered
@@ -216,6 +221,11 @@ spec:
                                 description: The size of the used input in bytes.
                                 format: int64
                                 type: integer
+                              resultType:
+                                description: Describes whether the profiling result
+                                  is the result of a profiling run or of model inference.
+                                  If this is not set, the result comes from profiling.
+                                type: string
                               statusCode:
                                 description: The HTTP status code returned by the
                                   function execution. If the function is not triggered

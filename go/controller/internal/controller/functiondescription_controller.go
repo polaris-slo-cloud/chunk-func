@@ -102,6 +102,7 @@ func (fdr *FunctionDescriptionReconciler) Reconcile(ctx context.Context, req ctr
 		Description: &fnDesc.Spec.FunctionDescription,
 	}
 
+	log.Info("Starting profiling of function", "name", fnDesc.Spec.FunctionDescription.FunctionName)
 	profilingNamespace, err := fdr.createProfilingNamespace(ctx)
 	if err != nil {
 		log.Error(err, "Unable to create profiling namespace", "namespace", profilingNamespace)

@@ -9,6 +9,9 @@ import (
 // Describes the deployment status of a function under a specific resource profile.
 type FunctionDeploymentStatus string
 
+// Describes whether a profiling result is the result of a profiling run or of model inference.
+type ProfilingResultType string
+
 const (
 	// Pseudo StatusCode to indicate that the function did not respond before the timeout.
 	TimeoutStatusCode = -1
@@ -16,6 +19,9 @@ const (
 	DeploymentSuccess  FunctionDeploymentStatus = "Success"
 	DeploymentFailed   FunctionDeploymentStatus = "Failed"
 	DeploymentTimedOut FunctionDeploymentStatus = "Timeout"
+
+	ProfilingResultProfiled ProfilingResultType = "Profiled"
+	ProfilingResultInferred ProfilingResultType = "Inferred"
 )
 
 // Collects the result of a single profiling session.
@@ -26,6 +32,13 @@ type ProfilingResult struct {
 	// If the function is not triggered via REST, this contains the
 	// exit code of the function converted into an HTTP status code.
 	StatusCode int32 `json:"statusCode" yaml:"statusCode"`
+
+	// Describes whether the profiling result is the result of
+	// a profiling run or of model inference.
+	// If this is not set, the result comes from profiling.
+	//
+	// +optional
+	ResultType *ProfilingResultType `json:"resultType" yaml:"resultType"`
 
 	// The execution time of the function in milliseconds.
 	ExecutionTimeMs int64 `json:"executionTimeMs" yaml:"executionTimeMs"`

@@ -21,6 +21,9 @@ const (
 
 var (
 	_ ProfilingStrategy = (*BayesianOptProfilingStrategy)(nil)
+
+	profiledResultType = function.ProfilingResultProfiled
+	inferredResultType = function.ProfilingResultInferred
 )
 
 // A ProfilingStrategy that uses Bayesian Optimization to reduce the number resource profiles
@@ -299,7 +302,9 @@ func (bops *BayesianOptProfilingStrategy) assembleResultsForProfile(
 
 	for i, fnInput := range bops.fnInputs {
 		if fnInput.SizeBytes == currProfiledInputSize {
-			ret.UnfilteredResults[i] = unfilteredProfilingResults[currProfiledIndex]
+			result := unfilteredProfilingResults[currProfiledIndex]
+			result.ResultType = &profiledResultType
+			ret.UnfilteredResults[i] = result
 			currProfiledIndex, currProfiledInputSize = getNextProfiledInputSize(unfilteredProfilingResults, currProfiledIndex)
 		} else {
 			inferredResult, err := bops.getInferredResult(ctx, fnInput, resProfile)
@@ -333,6 +338,7 @@ func (bops *BayesianOptProfilingStrategy) getInferredResult(ctx context.Context,
 
 	ret := &function.ProfilingResult{
 		StatusCode:      200,
+		ResultType:      &inferredResultType,
 		InputSizeBytes:  input.SizeBytes,
 		ExecutionTimeMs: int64(math.Round(result.Y)),
 	}
