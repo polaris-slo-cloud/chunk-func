@@ -6,6 +6,7 @@ import (
 	"time"
 
 	core "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/uuid"
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
@@ -34,7 +35,7 @@ func CreateKnativeServiceWithProfile(
 		Spec:       *fn.Function.Spec.DeepCopy(),
 	}
 	ret.ObjectMeta.Namespace = targetNamespace
-	ret.ObjectMeta.Name = fn.Function.Name + "-" + resourceProfile.StringifyForK8sObj()
+	ret.ObjectMeta.Name = fn.Function.Name + "-" + resourceProfile.StringifyForK8sObj() + "-" + string(uuid.NewUUID())
 
 	if ret.ObjectMeta.Labels == nil {
 		ret.ObjectMeta.Labels = make(map[string]string)
