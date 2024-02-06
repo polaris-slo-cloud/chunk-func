@@ -28,19 +28,19 @@ type FunctionDescriptionSpec struct {
 
 	// Collects information about a serverless function, such as
 	// its typical inputs for profiling or its response time SLO
-	FunctionDescription function.FunctionDescription `json:"functionDescription"`
+	FunctionDescription function.FunctionDescription `json:"functionDescription" yaml:"functionDescription"`
 }
 
 // FunctionDescriptionStatus defines the observed state of FunctionDescription
 type FunctionDescriptionStatus struct {
 	// The results of the profiling session.
 	// +optional
-	ProfilingResults *function.ProfilingSessionResults `json:"profilingResults,omitempty"`
+	ProfilingResults *function.ProfilingSessionResults `json:"profilingResults,omitempty" yaml:"profilingResults,omitempty"`
 
 	// The function configurations optimized using the profiling results.
 	// This array, if set, contains one entry for each function input size.
 	// +optional
-	OptimizedConfigs []*function.OptimizedFunctionConfig `json:"optimizedConfigs,omitempty"`
+	OptimizedConfigs []*function.OptimizedFunctionConfig `json:"optimizedConfigs,omitempty" yaml:"optimizedConfigs,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -48,20 +48,20 @@ type FunctionDescriptionStatus struct {
 
 // FunctionDescription is the Schema for the functiondescriptions API
 type FunctionDescription struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta   `json:",inline" yaml:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 
-	Spec   FunctionDescriptionSpec   `json:"spec,omitempty"`
-	Status FunctionDescriptionStatus `json:"status,omitempty"`
+	Spec   FunctionDescriptionSpec   `json:"spec,omitempty" yaml:"spec,omitempty"`
+	Status FunctionDescriptionStatus `json:"status,omitempty" yaml:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
 // FunctionDescriptionList contains a list of FunctionDescription
 type FunctionDescriptionList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []FunctionDescription `json:"items"`
+	metav1.TypeMeta `json:",inline" yaml:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty" yaml:"metadata,omitempty"`
+	Items           []FunctionDescription `json:"items" yaml:"items"`
 }
 
 func init() {
