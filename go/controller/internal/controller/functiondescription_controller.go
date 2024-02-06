@@ -164,7 +164,7 @@ func (fdr *FunctionDescriptionReconciler) createProfiler(k8sConfig *rest.Config,
 		if address == "" {
 			return nil, fmt.Errorf("the BAYESIAN_OPT_SERVER environment variable must be set to the address of the Bayesian Optimizer server, e.g., \"localhost:9000\"")
 		}
-		logger.Info("Creating BayesianOptFunctionProfiler")
+		logger.Info("Creating BayesianOptFunctionProfiler", "targetAddress", address)
 		return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, fnTriggerFactory, logger), nil
 
 	case "exhaustive":

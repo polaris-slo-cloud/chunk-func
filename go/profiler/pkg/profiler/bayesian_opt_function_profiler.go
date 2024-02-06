@@ -43,6 +43,7 @@ func NewBayesianOptFunctionProfiler(
 	efp := &BayesianOptFunctionProfiler{
 		servingClient:      knServingClient.NewForConfigOrDie(modifiableConfig),
 		fnTriggerFactoryFn: fnTriggerFactoryFn,
+		boServerAddress:    boServerAddress,
 		logger:             logger,
 	}
 	return efp

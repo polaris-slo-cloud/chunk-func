@@ -59,6 +59,7 @@ func NewFunctionProfilingSession(
 	fps := &FunctionProfilingSession{
 		fn:                 fn,
 		profilingConfig:    profilingConfig,
+		profilingStrategy:  profilingStrategy,
 		servingClient:      servingClient,
 		results:            make(map[string]*function.ResourceProfileResults, len(profilingConfig.CandidateProfiles)),
 		resultsMutex:       sync.Mutex{},
