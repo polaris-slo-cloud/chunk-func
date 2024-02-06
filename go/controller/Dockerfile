@@ -25,7 +25,7 @@ COPY common/pkg/ common/pkg/
 COPY profiler/pkg/ profiler/pkg/
 COPY controller/cmd/main.go controller/cmd/main.go
 COPY controller/api/ controller/api/
-COPY controller/internal/controller/ controller/internal/controller/
+COPY controller/internal/ controller/internal/
 
 # Build
 # the GOARCH has not a default value to allow the binary be built according to the host where the command
