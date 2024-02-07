@@ -19,6 +19,10 @@ var (
 
 // Allows deploying functions (Knative Services), waiting for them to become ready and deleting them.
 type FunctionDeploymentManager interface {
+	// Gets a name for this function that is guaranteed to be unique among all functions currently deployed with this FunctionDeploymentManager.
+	// This is needed, because parallel profiling may try to create multiple objects with the same name.
+	GetUniqueFunctionName(proposedName string) string
+
 	// Deploys the specified function and returns the deployed object.
 	DeployFunction(ctx context.Context, fn *knServing.Service) (*knServing.Service, error)
 
@@ -38,19 +42,29 @@ type FunctionDeploymentManager interface {
 //
 // IMPORTANT: Currently we use use a raw client, but at some point the KnServingClient from knative.dev/client-pkg/pkg/serving/v1 could be useful.
 type functionDeploymentManagerImpl struct {
-	client knServingClient.ServingV1Interface
+	client         knServingClient.ServingV1Interface
+	objNameTracker *kubeutil.ObjectNameTracker
 }
 
 // Creates a new instance of the default FunctionDeploymentManager implementation.
 func NewFunctionDeploymentManager(client knServingClient.ServingV1Interface) FunctionDeploymentManager {
 	mgr := &functionDeploymentManagerImpl{
-		client: client,
+		client:         client,
+		objNameTracker: kubeutil.NewObjectNameTracker(),
 	}
 	return mgr
 }
 
+func (mgr *functionDeploymentManagerImpl) GetUniqueFunctionName(proposedName string) string {
+	return mgr.objNameTracker.GetNewObjectName(proposedName)
+}
+
 func (mgr *functionDeploymentManagerImpl) DeleteFunction(ctx context.Context, fn *knServing.Service) error {
-	return mgr.client.Services(fn.Namespace).Delete(ctx, fn.Name, meta.DeleteOptions{})
+	err := mgr.client.Services(fn.Namespace).Delete(ctx, fn.Name, meta.DeleteOptions{})
+	if err == nil {
+		mgr.objNameTracker.ReleaseObjectName(fn.Name)
+	}
+	return err
 }
 
 func (mgr *functionDeploymentManagerImpl) DeployFunction(ctx context.Context, fn *knServing.Service) (*knServing.Service, error) {

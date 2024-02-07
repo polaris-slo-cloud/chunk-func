@@ -6,7 +6,6 @@ import (
 	"time"
 
 	core "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/util/uuid"
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
@@ -29,13 +28,14 @@ func CreateKnativeServiceWithProfile(
 	fn *function.FunctionWithDescription,
 	targetNamespace string,
 	resourceProfile *function.ResourceProfile,
+	deploymentMgr FunctionDeploymentManager,
 ) (*knServing.Service, error) {
 	ret := &knServing.Service{
 		ObjectMeta: *kubeutil.DeepCopyObjectMetaForNewObject(&fn.Function.ObjectMeta),
 		Spec:       *fn.Function.Spec.DeepCopy(),
 	}
 	ret.ObjectMeta.Namespace = targetNamespace
-	ret.ObjectMeta.Name = fn.Function.Name + "-" + resourceProfile.StringifyForK8sObj() + "-" + string(uuid.NewUUID())
+	ret.ObjectMeta.Name = deploymentMgr.GetUniqueFunctionName(fn.Function.Name + "-" + resourceProfile.StringifyForK8sObj())
 
 	if ret.ObjectMeta.Labels == nil {
 		ret.ObjectMeta.Labels = make(map[string]string)
@@ -75,7 +75,7 @@ func CreateAndWaitForService(
 	deploymentMgr FunctionDeploymentManager,
 	timeout time.Duration,
 ) (*knServing.Service, error) {
-	svc, err := CreateKnativeServiceWithProfile(fn, targetNamespace, resourceProfile)
+	svc, err := CreateKnativeServiceWithProfile(fn, targetNamespace, resourceProfile, deploymentMgr)
 	if err != nil {
 		return nil, err
 	}
