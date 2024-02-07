@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	_ TimedFunctionTrigger[any] = (*MockedResultsTrigger)(nil)
+	_                  TimedFunctionTrigger[any] = (*MockedResultsTrigger)(nil)
+	timeoutDuration, _                           = time.ParseDuration("1h")
 )
 
 // A TimedFunctionTrigger that returns mocked results for services, whose information is present in the mocked data
@@ -62,7 +63,7 @@ func (mrt *MockedResultsTrigger) TriggerFunction(ctx context.Context, fn *knServ
 		ret := &FunctionExecutionResult[any]{
 			StatusCode:   function.TimeoutStatusCode,
 			Response:     nil,
-			ResponseTime: time.Duration(100000 * 1e6),
+			ResponseTime: timeoutDuration,
 		}
 		return ret, nil
 	}

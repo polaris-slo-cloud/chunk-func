@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"sync"
+	"time"
 
 	"github.com/go-logr/logr"
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
@@ -12,15 +13,15 @@ import (
 )
 
 const (
-	// This execution time will be stored in a BO model if the respective profiling attempt has failed.
-	execTimeForFailure = math.MaxFloat64
-
 	// If the BO returns a probability of improvement below this threshold, profiling for the respective input size is marked as complete.
 	poiThreshold = 0.05
 )
 
 var (
 	_ ProfilingStrategy = (*BayesianOptProfilingStrategy)(nil)
+
+	// This execution time will be stored in a BO model if the respective profiling attempt has failed.
+	execDurationForFailure, _ = time.ParseDuration("1h")
 
 	profiledResultType = function.ProfilingResultProfiled
 	inferredResultType = function.ProfilingResultInferred
@@ -250,7 +251,7 @@ func (bops *BayesianOptProfilingStrategy) onProfilingDone(ctx context.Context, j
 	if len(results.Results) == 1 {
 		execTimeMs = float64(results.Results[0].ExecutionTimeMs)
 	} else {
-		execTimeMs = execTimeForFailure
+		execTimeMs = float64(execDurationForFailure.Milliseconds())
 	}
 	bops.getAndQueueNextProfile(ctx, input, job.ResourceProfile(), &execTimeMs)
 }
