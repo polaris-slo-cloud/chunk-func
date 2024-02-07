@@ -67,7 +67,7 @@ func (mrt *MockedResultsTrigger) TriggerFunction(ctx context.Context, fn *knServ
 		return ret, nil
 	}
 
-	resultForInput := profileResults.FindResultForInputSize(input.SizeBytes)
+	resultForInput := profileResults.FindUnfilteredResultForInputSize(input.SizeBytes)
 	if resultForInput == nil {
 		return nil, fmt.Errorf("no mocked result found for %s, ResourceProfile %s, and inputSize %v", key, profileID, input.SizeBytes)
 	}

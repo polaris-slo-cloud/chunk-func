@@ -110,13 +110,23 @@ type ProfilingSessionResults struct {
 
 // Returns the result that matches the specified input size or nil.
 func (rpr *ResourceProfileResults) FindResultForInputSize(inputSizeBytes int64) *ProfilingResult {
+	return findResultForInputSizeInternal(inputSizeBytes, rpr.Results)
+}
+
+// Returns the unfiltered result that matches the specified input size or nil.
+func (rpr *ResourceProfileResults) FindUnfilteredResultForInputSize(inputSizeBytes int64) *ProfilingResult {
+	return findResultForInputSizeInternal(inputSizeBytes, rpr.UnfilteredResults)
+}
+
+// Returns the result that matches the specified input size from the specified list of results or nil.
+func findResultForInputSizeInternal(inputSizeBytes int64, results []*ProfilingResult) *ProfilingResult {
 	index := sort.Search(
-		len(rpr.Results),
-		func(i int) bool { return rpr.Results[i].InputSizeBytes >= inputSizeBytes },
+		len(results),
+		func(i int) bool { return results[i].InputSizeBytes >= inputSizeBytes },
 	)
 
-	if index < len(rpr.Results) {
-		result := rpr.Results[index]
+	if index < len(results) {
+		result := results[index]
 		if result.InputSizeBytes == inputSizeBytes {
 			return result
 		}
