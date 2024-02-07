@@ -329,7 +329,7 @@ func (bops *BayesianOptProfilingStrategy) getInferredResult(ctx context.Context,
 
 	req := &bayesianopt.InferYRequest{
 		ModelId: *boModelId,
-		X:       uint64(input.SizeBytes),
+		X:       uint64(resProfile.MemoryMiB),
 	}
 
 	result, err := bops.boClient.InferY(ctx, req)

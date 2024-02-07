@@ -165,4 +165,4 @@ class IntegerBayesianOptimizer:
             index = bisect_left(possible_x_values, x)
             if index != len(possible_x_values) and possible_x_values[index] == x:
                 return float(index)
-            raise ValueError('Could not find the parameter {param}')
+            raise ValueError(f'Could not find the parameter {x}')
