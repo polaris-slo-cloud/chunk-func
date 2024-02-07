@@ -104,7 +104,7 @@ spec:
           - name: PROFILER
             value: BayesianOpt
           - name: BAYESIAN_OPT_SERVER
-            value: bayesian-optimizer:9000
+            value: localhost:9000
 
       - name: bayesian-optimizer
         image: bayesian-optimizer:latest
