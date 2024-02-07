@@ -1,9 +1,9 @@
 PROJECT_VERSION=0.0.4
-VERSION=v$(PROJECT_VERSION)
+VERSION=$(PROJECT_VERSION)
 
 # RELEASE_REGISTRY is the container registry to push into.
 RELEASE_REGISTRY?=polarissloc
-RELEASE_VERSION?=v$(PROJECT_VERSION)
+RELEASE_VERSION?=$(PROJECT_VERSION)
 
 # Destination folder for the generated Protobuf and gRPC code.
 PROTOBUF_DEST="./bayesian_optimizer/pb"
