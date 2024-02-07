@@ -88,3 +88,22 @@ func mergeResults(a *function.ResourceProfileResults, b *function.ResourceProfil
 
 	return ret
 }
+
+// Counts and sets the number of profiled and number of inferred configurations (ResourceProfile-InputSize combinations).
+func countProfiledAndInferredConfigurations(results *function.ProfilingSessionResults) {
+	var profiled int32 = 0
+	var inferred int32 = 0
+
+	for _, resProfileResult := range results.Results {
+		for _, inputResult := range resProfileResult.UnfilteredResults {
+			if inputResult.ResultType != nil && *inputResult.ResultType == function.ProfilingResultInferred {
+				inferred++
+			} else {
+				profiled++
+			}
+		}
+	}
+
+	results.ConfigurationsProfiled = profiled
+	results.ConfigurationsInferred = inferred
+}

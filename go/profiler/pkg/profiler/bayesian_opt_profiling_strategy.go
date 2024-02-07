@@ -101,6 +101,7 @@ func (bops *BayesianOptProfilingStrategy) AggregateAllResults(ctx context.Contex
 		}
 		ret.Results[i] = resProfileResults
 	}
+	countProfiledAndInferredConfigurations(ret)
 
 	return ret, nil
 }

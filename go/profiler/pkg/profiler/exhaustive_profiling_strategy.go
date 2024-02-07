@@ -45,6 +45,7 @@ func (efps *ExhaustiveProfilingStrategy) AggregateAllResults(ctx context.Context
 		resProfileResults := resultsMap[resProfile.ID()]
 		ret.Results[i] = resProfileResults
 	}
+	countProfiledAndInferredConfigurations(ret)
 
 	return ret, nil
 }

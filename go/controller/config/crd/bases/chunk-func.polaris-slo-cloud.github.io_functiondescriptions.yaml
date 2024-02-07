@@ -136,6 +136,16 @@ spec:
               profilingResults:
                 description: The results of the profiling session.
                 properties:
+                  configurationsInferred:
+                    description: The number of ResourceProfile-InputSize combinations
+                      (= configurations) that were inferred instead of profiled.
+                    format: int32
+                    type: integer
+                  configurationsProfiled:
+                    description: The number of ResourceProfile-InputSize combinations
+                      (= configurations) that were profiled.
+                    format: int32
+                    type: integer
                   profilingDurationSeconds:
                     description: The number of seconds that the profiling session
                       lasted.
@@ -261,6 +271,8 @@ spec:
                       type: object
                     type: array
                 required:
+                - configurationsInferred
+                - configurationsProfiled
                 - profilingDurationSeconds
                 - profilingStarted
                 - results

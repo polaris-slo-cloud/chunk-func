@@ -98,6 +98,12 @@ type ProfilingSessionResults struct {
 	// The number of seconds that the profiling session lasted.
 	ProfilingDurationSeconds int32 `json:"profilingDurationSeconds" yaml:"profilingDurationSeconds"`
 
+	// The number of ResourceProfile-InputSize combinations (= configurations) that were profiled.
+	ConfigurationsProfiled int32 `json:"configurationsProfiled" yaml:"configurationsProfiled"`
+
+	// The number of ResourceProfile-InputSize combinations (= configurations) that were inferred instead of profiled.
+	ConfigurationsInferred int32 `json:"configurationsInferred" yaml:"configurationsInferred"`
+
 	// The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (price per 100ms).
 	Results []*ResourceProfileResults `json:"results" yaml:"results"`
 }

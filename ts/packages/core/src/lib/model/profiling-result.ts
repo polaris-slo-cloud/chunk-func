@@ -13,6 +13,14 @@ export enum FunctionDeploymentStatus {
 }
 
 /**
+ * Describes whether a profiling result is the result of a profiling run or of model inference.
+ */
+export enum ProfilingResultType {
+    ProfilingResultProfiled = 'Profiled',
+    ProfilingResultInferred = 'Inferred',
+}
+
+/**
  * Collects the result of a single profiling session.
  */
 export interface ProfilingResult {
@@ -24,6 +32,13 @@ export interface ProfilingResult {
      * exit code of the function converted into an HTTP status code.
      */
     statusCode: number;
+
+    /**
+     * Describes whether the profiling result is the result of
+     * a profiling run or of model inference.
+     * If this is not set, the result comes from profiling.
+     */
+    resultType?: ProfilingResultType;
 
     /**
      * The execution time of the function in milliseconds.
@@ -95,6 +110,16 @@ export interface ProfilingSessionResults {
      * The number of seconds that the profiling session lasted.
      */
     profilingDurationSeconds: number;
+
+    /**
+     * The number of ResourceProfile-InputSize combinations (= configurations) that were profiled.
+     */
+    configurationsProfiled?: number;
+
+    /**
+     * 	he number of ResourceProfile-InputSize combinations (= configurations) that were inferred instead of profiled.
+     */
+    configurationsInferred?: number;
 
     /**
      * The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (per 100ms).
