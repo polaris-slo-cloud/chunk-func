@@ -216,6 +216,7 @@ func (bops *BayesianOptProfilingStrategy) getAndQueueNextProfile(
 	suggestion, err := bops.boClient.GetBoSuggestion(ctx, req)
 	if err != nil {
 		bops.abortOnErrorFn(fmt.Errorf("GetBoSuggestion error %v", err))
+		return
 	}
 
 	if suggestion.Suggestion.Poi < poiThreshold {
