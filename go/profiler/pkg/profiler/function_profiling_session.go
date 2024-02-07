@@ -189,16 +189,16 @@ func (fps *FunctionProfilingSession) evaluateResourceProfileWithInputs(
 
 	fnTrigger := fps.fnTriggerFactoryFn()
 	results.DeploymentStatus = function.DeploymentSuccess
-	results.UnfilteredResults = make([]*function.ProfilingResult, len(fps.fn.Description.TypicalInputs))
+	results.UnfilteredResults = make([]*function.ProfilingResult, len(inputs))
 
 	// Warm the function up.
-	_, err = fps.profileFunctionCall(ctx, fnTrigger, targetFn, fps.fn.Description.TypicalInputs[0])
+	_, err = fps.profileFunctionCall(ctx, fnTrigger, targetFn, inputs[0])
 	if err != nil {
 		return nil, err
 	}
 	fps.logger.Info("Successfully warmed Knative Service", "service", targetFnName)
 
-	for i, input := range fps.fn.Description.TypicalInputs {
+	for i, input := range inputs {
 		fps.logger.Info("Executing iterations for input", "service", targetFnName, "inputSize", input.SizeBytes, "iterations", fps.profilingConfig.IterationsPerInputAndProfile)
 
 		resultForInput, err := fps.profileWithInput(ctx, fnTrigger, targetFn, input)
