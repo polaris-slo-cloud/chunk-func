@@ -5,8 +5,8 @@ WORKDIR /usr/apps/chunk-func
 COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN adduser appuser
-USER appuser
+RUN addgroup --gid 4711 appuser && adduser --uid 4711 --ingroup appuser appuser
+USER 4711:4711
 
 COPY ./bayesian_optimizer ./bayesian_optimizer
 

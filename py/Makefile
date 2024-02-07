@@ -1,4 +1,4 @@
-PROJECT_VERSION=0.0.5
+PROJECT_VERSION=0.0.6
 VERSION=$(PROJECT_VERSION)
 
 # RELEASE_REGISTRY is the container registry to push into.
