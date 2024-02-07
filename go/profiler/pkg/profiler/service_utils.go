@@ -40,7 +40,8 @@ func CreateKnativeServiceWithProfile(
 	if ret.ObjectMeta.Labels == nil {
 		ret.ObjectMeta.Labels = make(map[string]string)
 	}
-	ret.ObjectMeta.Labels[kubeutil.ResourceProfileLabel] = resourceProfile.ID()
+	kubeutil.SetAnnotation(ret, kubeutil.ResourceProfileAnnotation, resourceProfile.ID())
+	kubeutil.SetAnnotation(ret, kubeutil.ProfiledServiceAnnotation, fn.Function.Namespace+"."+fn.Function.Name)
 
 	container := kubeutil.FindContainer(ret.Spec.Template.Spec.Containers, fn.Description.FunctionContainer)
 	if container == nil {

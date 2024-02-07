@@ -6,8 +6,11 @@ import (
 )
 
 const (
-	// The pod label, where the ResourceProfile.ID is stored.
-	ResourceProfileLabel = "polaris-slo-cloud.github.io/chunk-func.resource-profile"
+	// The Knative service annotation, where the ResourceProfile.ID is stored.
+	ResourceProfileAnnotation = "polaris-slo-cloud.github.io/chunk-func.resource-profile"
+
+	// The Knative service annotation, where "namespace.name" of the original service object is stored.
+	ProfiledServiceAnnotation = "polaris-slo-cloud.github.io/chunk-func.orig-service"
 )
 
 // GetLabel returns the label with the specified key.

@@ -39,12 +39,16 @@ func NewMockedResultsTriggerFactory(mockedResults map[string]*function.Profiling
 }
 
 func (mrt *MockedResultsTrigger) TriggerFunction(ctx context.Context, fn *knServing.Service, input *function.FunctionInput) (*FunctionExecutionResult[any], error) {
+	key, err := mrt.getResultsKeyForFunction(fn)
+	if err != nil {
+		return nil, err
+	}
+
 	profileID, err := mrt.getResourceProfileID(fn)
 	if err != nil {
 		return nil, err
 	}
 
-	key := fmt.Sprintf("%s.%s", fn.Namespace, fn.Name)
 	mockedResults, ok := mrt.mockedResults[key]
 	if !ok {
 		return nil, fmt.Errorf("no mocked result found for %s", key)
@@ -76,11 +80,18 @@ func (mrt *MockedResultsTrigger) TriggerFunction(ctx context.Context, fn *knServ
 	return ret, nil
 }
 
+func (mrt *MockedResultsTrigger) getResultsKeyForFunction(fn *knServing.Service) (string, error) {
+	if key, ok := kubeutil.GetAnnotation(fn, kubeutil.ProfiledServiceAnnotation); ok {
+		return key, nil
+	}
+	return "", fmt.Errorf("the Knative service %s.%s is missing the annotation %s", fn.Namespace, fn.Name, kubeutil.ProfiledServiceAnnotation)
+}
+
 func (mrt *MockedResultsTrigger) getResourceProfileID(fn *knServing.Service) (string, error) {
-	if profileID, ok := kubeutil.GetLabel(fn, kubeutil.ResourceProfileLabel); ok {
+	if profileID, ok := kubeutil.GetAnnotation(fn, kubeutil.ResourceProfileAnnotation); ok {
 		return profileID, nil
 	}
-	return "", fmt.Errorf("the Knative service %s.%s is missing the label %s", fn.Namespace, fn.Name, kubeutil.ResourceProfileLabel)
+	return "", fmt.Errorf("the Knative service %s.%s is missing the annotation %s", fn.Namespace, fn.Name, kubeutil.ResourceProfileAnnotation)
 }
 
 func (mrt *MockedResultsTrigger) findResultsForProfile(profileID string, sessionResults *function.ProfilingSessionResults) *function.ResourceProfileResults {
