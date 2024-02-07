@@ -36,8 +36,8 @@ type BayesianOptProfilingStrategy struct {
 	// Stores the resources profiles indexed by their memory size
 	profilesByMem map[uint64]*function.ResourceProfile
 
-	// Stores the inputs indexed by their size.
-	fnInputs map[int64]*function.FunctionInput
+	// The function that we are profiling.
+	fn *function.FunctionWithDescription
 
 	// Stores the function inputs, for which profiling has already completed.
 	completedInputs      []*function.FunctionInput
@@ -77,7 +77,7 @@ func (bops *BayesianOptProfilingStrategy) SetUpProfilingQueue(
 ) (chan ProfilingJob, error) {
 	bops.abortOnErrorFn = abortOnErrorFn
 	bops.availableProfiles = availableProfiles
-	bops.fnInputs = bops.createInputsMap(fn.Description.TypicalInputs)
+	bops.fn = fn
 	bops.completedInputs = make([]*function.FunctionInput, 0, len(fn.Description.TypicalInputs))
 	bops.profilingQueue = make(chan ProfilingJob, len(fn.Description.TypicalInputs))
 
@@ -129,14 +129,6 @@ func (bops *BayesianOptProfilingStrategy) Cleanup() {
 	bops.boModelIds = nil
 }
 
-func (bops *BayesianOptProfilingStrategy) createInputsMap(fnInputs []*function.FunctionInput) map[int64]*function.FunctionInput {
-	inputsMap := make(map[int64]*function.FunctionInput, len(fnInputs))
-	for _, input := range fnInputs {
-		inputsMap[input.SizeBytes] = input
-	}
-	return inputsMap
-}
-
 func (bops *BayesianOptProfilingStrategy) setUpProfilesList(availableProfiles []*function.ResourceProfile) []uint64 {
 	bops.profilesByMem = make(map[uint64]*function.ResourceProfile, len(availableProfiles))
 	memorySizes := make([]uint64, len(availableProfiles))
@@ -151,10 +143,10 @@ func (bops *BayesianOptProfilingStrategy) setUpProfilesList(availableProfiles []
 }
 
 func (bops *BayesianOptProfilingStrategy) setUpBoModels(ctx context.Context) error {
-	bops.boModelIds = make(map[int64]string, len(bops.fnInputs))
+	bops.boModelIds = make(map[int64]string, len(bops.fn.Description.TypicalInputs))
 	profilesList := bops.setUpProfilesList(bops.availableProfiles)
 
-	for inputSize := range bops.fnInputs {
+	for _, input := range bops.fn.Description.TypicalInputs {
 		initData := &bayesianopt.BoModelInitData{
 			PossibleXValues: profilesList,
 		}
@@ -165,8 +157,8 @@ func (bops *BayesianOptProfilingStrategy) setUpBoModels(ctx context.Context) err
 		if boModelId.ModelId == "" {
 			return fmt.Errorf("CreateBoModel returned an empty modelId")
 		}
-		bops.boModelIds[inputSize] = boModelId.ModelId
-		bops.logger.Info("Successfully created BO model", "inputSize", inputSize, "boModelId", boModelId.ModelId)
+		bops.boModelIds[input.SizeBytes] = boModelId.ModelId
+		bops.logger.Info("Successfully created BO model", "inputSize", input.SizeBytes, "boModelId", boModelId.ModelId)
 	}
 
 	return nil
@@ -184,7 +176,7 @@ func (bops *BayesianOptProfilingStrategy) getBoModelId(inputSize int64) *string 
 }
 
 func (bops *BayesianOptProfilingStrategy) runQueueingLoop(ctx context.Context) {
-	for _, input := range bops.fnInputs {
+	for _, input := range bops.fn.Description.TypicalInputs {
 		go bops.getAndQueueNextProfile(ctx, input, nil, nil)
 	}
 }
@@ -274,7 +266,7 @@ func (bops *BayesianOptProfilingStrategy) markInputAsComplete(input *function.Fu
 	defer bops.completedInputsMutex.Unlock()
 
 	bops.completedInputs = append(bops.completedInputs, input)
-	if len(bops.completedInputs) == len(bops.fnInputs) {
+	if len(bops.completedInputs) == len(bops.fn.Description.TypicalInputs) {
 		close(bops.profilingQueue)
 	}
 }
@@ -295,14 +287,14 @@ func (bops *BayesianOptProfilingStrategy) assembleResultsForProfile(
 	ret := &function.ResourceProfileResults{
 		ResourceProfileId: resProfile.ID(),
 		DeploymentStatus:  function.DeploymentSuccess,
-		UnfilteredResults: make([]*function.ProfilingResult, len(bops.fnInputs)),
+		UnfilteredResults: make([]*function.ProfilingResult, len(bops.fn.Description.TypicalInputs)),
 	}
 
 	// Input size of the current index in unfilteredProfilingResults.
 	// This is -1 if there are no more items in that slice.
 	currProfiledIndex, currProfiledInputSize := getNextProfiledInputSize(unfilteredProfilingResults, -1)
 
-	for i, fnInput := range bops.fnInputs {
+	for i, fnInput := range bops.fn.Description.TypicalInputs {
 		if fnInput.SizeBytes == currProfiledInputSize {
 			result := unfilteredProfilingResults[currProfiledIndex]
 			result.ResultType = &profiledResultType
