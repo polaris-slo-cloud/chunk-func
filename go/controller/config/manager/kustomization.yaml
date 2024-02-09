@@ -5,7 +5,7 @@ kind: Kustomization
 images:
 - name: bayesian-optimizer
   newName: polarissloc/chunk-func-bayesian-optimizer
-  newTag: 0.0.6
+  newTag: 0.0.7
 - name: controller
   newName: polarissloc/chunk-func-controller
   newTag: 0.0.29

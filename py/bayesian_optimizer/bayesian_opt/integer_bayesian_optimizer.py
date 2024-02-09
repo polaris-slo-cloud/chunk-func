@@ -36,15 +36,18 @@ class IntegerBayesianOptimizer:
     However, all public methods use the parameter domain.
     """
 
-    def __init__(self, possible_x_values: list[int] | IntegerInterval, kappa: float | None, xi: float | None):
+    def __init__(self, modelId: str, possible_x_values: list[int] | IntegerInterval, kappa: float | None, xi: float | None):
+        self.__modelId = modelId
         # After __init__ either __possible_x_values or __xInterval has to be set.
         self.__possible_x_values: list[int] | None = None
         self.__xInterval: IntegerInterval | None = None
         bounds = self.__determineInputBounds(possible_x_values)
 
-        # Since BO suggests floating point values for X, we might get multiple suggestions that map to the same integer X'.
-        # If we already have an observed value for the integer X', we register that value for the suggested float X.
         self.__observed_values: dict[int, float] = {}
+        """
+        Since BO suggests floating point values for X, we might get multiple suggestions that map to the same integer X'.
+        If we already have an observed value for the integer X', we register that value for the suggested float X.
+        """
 
         if kappa is None:
             kappa = 2.576
@@ -59,30 +62,35 @@ class IntegerBayesianOptimizer:
         )
         self.__optimizer.set_gp_params(alpha=1e-3)
 
-        # We use expected improvement to determine the next suggestion by the BO.
         self.__eiFn = UtilityFunction(kind='ei', kappa=kappa, xi=xi) # type: ignore (TypeHint for xi is wrong, it should be a float)
+        """We use expected improvement to determine the next suggestion by the BO."""
 
-        # The probability of improvement is only used for the BoSuggestion returned as a result.
         self.__poiFn = UtilityFunction(kind='poi', kappa=kappa, xi=xi) # type: ignore (TypeHint for xi is wrong, it should be a float)
+        """The probability of improvement is only used for the BoSuggestion returned as a result."""
 
 
     def suggest(self) -> BoSuggestion:
         """
         Makes a new suggestion for X and also returns its expected improvement.
         """
-        if self.__is_input_domain_exhausted():
+        remaining_input_domain_size = self.__remaining_input_domain_size()
+        if remaining_input_domain_size == 0:
             return BoSuggestion(x=-1, poi=0.0)
 
         x_suggestion = self.__compute_new_suggestion()
         poi = 1.0
 
-        max_y = self.__optimizer.get_max_y()
-        if max_y is not None:
-            x = numpy.array([ [x_suggestion] ], numpy.float64)
-            utility_poi = self.__poiFn.utility(x, self.__optimizer.gp, self.__optimizer.get_max_y())
-            if utility_poi is None:
-                raise AssertionError('Could not compute EI')
-            poi = utility_poi.max()
+        if remaining_input_domain_size > 1:
+            max_y = self.__optimizer.get_max_y()
+            if max_y is not None:
+                x = numpy.array([ [x_suggestion] ], numpy.float64)
+                utility_poi = self.__poiFn.utility(x, self.__optimizer.gp, self.__optimizer.get_max_y())
+                if utility_poi is None:
+                    raise AssertionError('Could not compute EI')
+                poi = utility_poi.max()
+        else:
+            # If only 1 value was left from the input domain, it is exhausted now.
+            poi = 0.0
 
         return BoSuggestion(x=x_suggestion, poi=poi)
 
@@ -121,7 +129,7 @@ class IntegerBayesianOptimizer:
         observed = self.__observed_values.get(x_int)
 
         while observed is not None:
-            logging.info('Suggested float maps to already observed x=%d, registering y=%f', x_int, observed)
+            logging.info('BO %s: Suggested float %f maps to already observed x=%d, registering y=%f', self.__modelId, suggestion['x'], x_int, observed)
             self.__optimizer.register(params=suggestion, target=observed)
 
             suggestion = self.__optimizer.suggest(self.__eiFn)
@@ -131,7 +139,7 @@ class IntegerBayesianOptimizer:
         return x_int
 
 
-    def __is_input_domain_exhausted(self) -> bool:
+    def __remaining_input_domain_size(self) -> int:
         input_domain_size: int
 
         if self.__xInterval is not None:
@@ -140,7 +148,7 @@ class IntegerBayesianOptimizer:
             possible_x_values = cast(list[int], self.__possible_x_values)
             input_domain_size = len(possible_x_values)
 
-        return len(self.__observed_values) == input_domain_size
+        return input_domain_size - len(self.__observed_values)
 
 
     def __suggestion_space_to_param_domain(self, suggestion: float) -> int:

@@ -41,7 +41,7 @@ class BayesianOptimizerServer(BayesianOptimizerServiceServicer):
         modelId = str(uuid1())
         init_data = self.__extract_bo_init_data(request)
         logging.info('Creating new BoModel %s for %s', modelId, init_data.possible_x_values)
-        optimizer = IntegerBayesianOptimizer(init_data.possible_x_values, init_data.kappa, init_data.xi)
+        optimizer = IntegerBayesianOptimizer(modelId, init_data.possible_x_values, init_data.kappa, init_data.xi)
         lockable = LockableBayesianOptimizer(Lock(), optimizer)
 
         with self.__optimizers_lock:
