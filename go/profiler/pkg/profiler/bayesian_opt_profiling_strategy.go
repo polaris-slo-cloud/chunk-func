@@ -54,7 +54,11 @@ type BayesianOptProfilingStrategy struct {
 	completedInputsMutex sync.Mutex
 
 	// The channel that emits new ProfilingJobs to the profiling session.
-	profilingQueue chan ProfilingJob
+	profilingQueue       chan ProfilingJob
+	profilingQueueClosed bool
+
+	// We need a mutex, because we need to be able to check if the profilingQueue has been closed due to an error.
+	profilingQueueMutex sync.Mutex
 
 	// Stores the IDs of the BO models indexed by input size.
 	// Each input size has its own Bayesian Optimizer.
@@ -74,6 +78,7 @@ func NewBayesianOptProfilingStrategy(boClient bayesianopt.BayesianOptimizerServi
 		boClient:             boClient,
 		completedInputsMutex: sync.Mutex{},
 		boModelIdsMutex:      sync.Mutex{},
+		profilingQueueMutex:  sync.Mutex{},
 		logger:               logger,
 	}
 }
@@ -220,7 +225,7 @@ func (bops *BayesianOptProfilingStrategy) getAndQueueNextProfile(
 
 	suggestion, err := bops.boClient.GetBoSuggestion(ctx, req)
 	if err != nil {
-		bops.abortOnErrorFn(fmt.Errorf("GetBoSuggestion error %v", err))
+		bops.signalError(fmt.Errorf("GetBoSuggestion error %v", err))
 		return
 	}
 
@@ -230,9 +235,10 @@ func (bops *BayesianOptProfilingStrategy) getAndQueueNextProfile(
 	}
 
 	if nextProfile, ok := bops.profilesByMem[suggestion.Suggestion.X]; ok {
-		bops.profilingQueue <- bops.createNewProfilingJob(input, nextProfile)
+		nextJob := bops.createNewProfilingJob(input, nextProfile)
+		bops.queueJob(nextJob)
 	} else {
-		bops.abortOnErrorFn(fmt.Errorf("GetBoSuggestion returned unknown memory size %v", suggestion.Suggestion.X))
+		bops.signalError(fmt.Errorf("GetBoSuggestion returned unknown memory size %v", suggestion.Suggestion.X))
 	}
 }
 
@@ -245,10 +251,20 @@ func (bops *BayesianOptProfilingStrategy) createNewProfilingJob(input *function.
 	)
 }
 
+func (bops *BayesianOptProfilingStrategy) queueJob(job ProfilingJob) {
+	bops.profilingQueueMutex.Lock()
+	defer bops.profilingQueueMutex.Unlock()
+
+	// If the queue channel has already been closed, there has been an error, which was already signalled.
+	if !bops.profilingQueueClosed {
+		bops.profilingQueue <- job
+	}
+}
+
 func (bops *BayesianOptProfilingStrategy) onProfilingDone(ctx context.Context, job ProfilingJob, results *function.ResourceProfileResults) {
 	input := job.Inputs()[0]
 	if len(results.UnfilteredResults) > 1 {
-		bops.abortOnErrorFn(
+		bops.signalError(
 			fmt.Errorf(
 				"profiling %s with input %v returned more than one result, len(UnfilteredResults)=%v",
 				job.ResourceProfile().ID(),
@@ -268,7 +284,12 @@ func (bops *BayesianOptProfilingStrategy) onProfilingDone(ctx context.Context, j
 }
 
 func (bops *BayesianOptProfilingStrategy) onProfilingError(job ProfilingJob, err error) {
+	bops.signalError(err)
+}
+
+func (bops *BayesianOptProfilingStrategy) signalError(err error) {
 	bops.abortOnErrorFn(err)
+	bops.closeProfilingQueue()
 }
 
 // Marks the specified input as complete.
@@ -279,7 +300,16 @@ func (bops *BayesianOptProfilingStrategy) markInputAsComplete(input *function.Fu
 
 	bops.completedInputs = append(bops.completedInputs, input)
 	if len(bops.completedInputs) == len(bops.fn.Description.TypicalInputs) {
+		bops.closeProfilingQueue()
+	}
+}
+
+func (bops *BayesianOptProfilingStrategy) closeProfilingQueue() {
+	bops.profilingQueueMutex.Lock()
+	defer bops.profilingQueueMutex.Unlock()
+	if !bops.profilingQueueClosed {
 		close(bops.profilingQueue)
+		bops.profilingQueueClosed = true
 	}
 }
 
