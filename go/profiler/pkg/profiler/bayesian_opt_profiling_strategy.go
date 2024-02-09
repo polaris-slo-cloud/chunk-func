@@ -18,6 +18,15 @@ const (
 )
 
 var (
+	// We set kappa and xi for the BO acquisition function to higher values, because we want to favor exploration
+	// to ensure that we get good estimates for all memory sizes.
+	// This also allows us to avoid the "Data point {x} is not unique" issue when the BO gets stuck
+	// suggesting floats (maybe even exactly the same) from the same region in an infinite loop.
+	kappa = 10.0
+	xi    = 2.0
+)
+
+var (
 	_ ProfilingStrategy = (*BayesianOptProfilingStrategy)(nil)
 
 	// This execution time will be stored in a BO model if the respective profiling attempt has failed.
@@ -150,6 +159,8 @@ func (bops *BayesianOptProfilingStrategy) setUpBoModels(ctx context.Context) err
 	for _, input := range bops.fn.Description.TypicalInputs {
 		initData := &bayesianopt.BoModelInitData{
 			PossibleXValues: profilesList,
+			Kappa:           &kappa,
+			Xi:              &xi,
 		}
 		boModelId, err := bops.boClient.CreateBoModel(ctx, initData)
 		if err != nil {
