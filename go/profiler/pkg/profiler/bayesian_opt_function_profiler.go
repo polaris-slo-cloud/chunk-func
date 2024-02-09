@@ -22,10 +22,11 @@ var (
 // A FunctionProfiler that uses Bayesian Optimization to reduce the number resource profiles
 // that need to be evaluated.
 type BayesianOptFunctionProfiler struct {
-	servingClient      knServingClient.ServingV1Interface
-	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any]
-	boServerAddress    string
-	logger             *logr.Logger
+	servingClient        knServingClient.ServingV1Interface
+	fnTriggerFactoryFn   trigger.TimedFunctionTriggerFactoryFn[any]
+	deploymentMgrFactory FunctionDeploymentManagerFactoryFn
+	boServerAddress      string
+	logger               *logr.Logger
 }
 
 // Creates a new FunctionProfiler with the specified REST config and logger.
@@ -37,14 +38,16 @@ func NewBayesianOptFunctionProfiler(
 	k8sConfig *rest.Config,
 	boServerAddress string,
 	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any],
+	deploymentMgrFactory FunctionDeploymentManagerFactoryFn,
 	logger *logr.Logger,
 ) *BayesianOptFunctionProfiler {
 	modifiableConfig := rest.CopyConfig(k8sConfig)
 	efp := &BayesianOptFunctionProfiler{
-		servingClient:      knServingClient.NewForConfigOrDie(modifiableConfig),
-		fnTriggerFactoryFn: fnTriggerFactoryFn,
-		boServerAddress:    boServerAddress,
-		logger:             logger,
+		servingClient:        knServingClient.NewForConfigOrDie(modifiableConfig),
+		fnTriggerFactoryFn:   fnTriggerFactoryFn,
+		deploymentMgrFactory: deploymentMgrFactory,
+		boServerAddress:      boServerAddress,
+		logger:               logger,
 	}
 	return efp
 }
@@ -69,7 +72,7 @@ func (bfp *BayesianOptFunctionProfiler) ProfileFunction(ctx context.Context, fn 
 	boClient := bayesianopt.NewBayesianOptimizerServiceClient(conn)
 
 	profilingStrategy := NewBayesianOptProfilingStrategy(boClient, bfp.logger)
-	fps := NewFunctionProfilingSession(fn, profilingConfig, profilingStrategy, bfp.fnTriggerFactoryFn, bfp.servingClient, bfp.logger)
+	fps := NewFunctionProfilingSession(fn, profilingConfig, profilingStrategy, bfp.fnTriggerFactoryFn, bfp.servingClient, bfp.deploymentMgrFactory, bfp.logger)
 	return fps.ExecuteProfilingSession(ctx)
 }
 

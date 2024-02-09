@@ -152,7 +152,7 @@ func (fdr *FunctionDescriptionReconciler) SetupWithManager(mgr ctrl.Manager) err
 }
 
 func (fdr *FunctionDescriptionReconciler) createProfiler(k8sConfig *rest.Config, logger *logr.Logger) (profiler.FunctionProfiler, error) {
-	fnTriggerFactory, err := fdr.createFunctionTriggerFactory(logger)
+	fnTriggerFactory, deploymentMgrFactory, err := fdr.createDeploymentAndTriggerFactories(logger)
 	if err != nil {
 		return nil, err
 	}
@@ -165,31 +165,31 @@ func (fdr *FunctionDescriptionReconciler) createProfiler(k8sConfig *rest.Config,
 			return nil, fmt.Errorf("the BAYESIAN_OPT_SERVER environment variable must be set to the address of the Bayesian Optimizer server, e.g., \"localhost:9000\"")
 		}
 		logger.Info("Creating BayesianOptFunctionProfiler", "targetAddress", address)
-		return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, fnTriggerFactory, logger), nil
+		return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, fnTriggerFactory, deploymentMgrFactory, logger), nil
 
 	case "exhaustive":
 		fallthrough
 	default:
 		logger.Info("Creating ExhaustiveFunctionProfiler")
-		return profiler.NewExhaustiveFunctionProfiler(k8sConfig, fnTriggerFactory, logger), nil
+		return profiler.NewExhaustiveFunctionProfiler(k8sConfig, fnTriggerFactory, deploymentMgrFactory, logger), nil
 	}
 }
 
-func (fdr *FunctionDescriptionReconciler) createFunctionTriggerFactory(logger *logr.Logger) (trigger.TimedFunctionTriggerFactoryFn[any], error) {
+func (fdr *FunctionDescriptionReconciler) createDeploymentAndTriggerFactories(logger *logr.Logger) (trigger.TimedFunctionTriggerFactoryFn[any], profiler.FunctionDeploymentManagerFactoryFn, error) {
 	triggerType := strings.ToLower(os.Getenv("FUNCTION_TRIGGER"))
 	switch triggerType {
 	case "mockedresults":
 		mockedResults, err := util.LoadMockedProfilingResults("./config/mockedresults")
 		if err != nil {
-			return nil, fmt.Errorf("error loading mocked profiling results from ./config/mockedresults: %v", err)
+			return nil, nil, fmt.Errorf("error loading mocked profiling results from ./config/mockedresults: %v", err)
 		}
 		logger.Info("Using MockedResultsTriggerFactory with", "mockedResults", len(mockedResults))
-		return trigger.NewMockedResultsTriggerFactory(mockedResults), nil
+		return trigger.NewMockedResultsTriggerFactory(mockedResults), profiler.NewMockedFunctionDeploymentManager, nil
 	case "rest":
 		fallthrough
 	default:
 		logger.Info("Using RestTriggerFactory")
-		return trigger.RestTriggerFactory, nil
+		return trigger.RestTriggerFactory, profiler.NewFunctionDeploymentManager, nil
 	}
 }
 

@@ -54,6 +54,7 @@ func NewFunctionProfilingSession(
 	profilingStrategy ProfilingStrategy,
 	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any],
 	servingClient knServingClient.ServingV1Interface,
+	deploymentMgrFactory FunctionDeploymentManagerFactoryFn,
 	logger *logr.Logger,
 ) *FunctionProfilingSession {
 	fps := &FunctionProfilingSession{
@@ -63,7 +64,7 @@ func NewFunctionProfilingSession(
 		servingClient:      servingClient,
 		results:            make(map[string]*function.ResourceProfileResults, len(profilingConfig.CandidateProfiles)),
 		resultsMutex:       sync.Mutex{},
-		deploymentMgr:      NewFunctionDeploymentManager(servingClient),
+		deploymentMgr:      deploymentMgrFactory(servingClient),
 		fnTriggerFactoryFn: fnTriggerFactoryFn,
 		logger:             logger,
 	}

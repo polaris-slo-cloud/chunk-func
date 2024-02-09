@@ -18,9 +18,10 @@ var (
 
 // FunctionProfiler that tries out all candidate profiles (like an exhaustive search).
 type ExhaustiveFunctionProfiler struct {
-	servingClient      knServingClient.ServingV1Interface
-	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any]
-	logger             *logr.Logger
+	servingClient        knServingClient.ServingV1Interface
+	fnTriggerFactoryFn   trigger.TimedFunctionTriggerFactoryFn[any]
+	deploymentMgrFactory FunctionDeploymentManagerFactoryFn
+	logger               *logr.Logger
 }
 
 // Creates a new FunctionProfiler with the specified REST config and logger.
@@ -31,13 +32,15 @@ type ExhaustiveFunctionProfiler struct {
 func NewExhaustiveFunctionProfiler(
 	k8sConfig *rest.Config,
 	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any],
+	deploymentMgrFactory FunctionDeploymentManagerFactoryFn,
 	logger *logr.Logger,
 ) *ExhaustiveFunctionProfiler {
 	modifiableConfig := rest.CopyConfig(k8sConfig)
 	efp := &ExhaustiveFunctionProfiler{
-		servingClient:      knServingClient.NewForConfigOrDie(modifiableConfig),
-		fnTriggerFactoryFn: fnTriggerFactoryFn,
-		logger:             logger,
+		servingClient:        knServingClient.NewForConfigOrDie(modifiableConfig),
+		fnTriggerFactoryFn:   fnTriggerFactoryFn,
+		deploymentMgrFactory: deploymentMgrFactory,
+		logger:               logger,
 	}
 	return efp
 }
@@ -55,6 +58,6 @@ func (efp *ExhaustiveFunctionProfiler) ProfileFunction(ctx context.Context, fn *
 	}
 
 	profilingStrategy := NewExhaustiveProfilingStrategy()
-	fps := NewFunctionProfilingSession(fn, profilingConfig, profilingStrategy, efp.fnTriggerFactoryFn, efp.servingClient, efp.logger)
+	fps := NewFunctionProfilingSession(fn, profilingConfig, profilingStrategy, efp.fnTriggerFactoryFn, efp.servingClient, efp.deploymentMgrFactory, efp.logger)
 	return fps.ExecuteProfilingSession(ctx)
 }
