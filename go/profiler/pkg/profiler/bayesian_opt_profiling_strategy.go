@@ -18,12 +18,10 @@ const (
 )
 
 var (
-	// We set kappa and xi for the BO acquisition function to higher values, because we want to favor exploration
-	// to ensure that we get good estimates for all memory sizes.
-	// This also allows us to avoid the "Data point {x} is not unique" issue when the BO gets stuck
-	// suggesting floats (maybe even exactly the same) from the same region in an infinite loop.
-	kappa = 10.0
-	xi    = 2.0
+	// We want to set xi to favor exploration a little more than exploitation, because we need good estimates
+	// for the entire range of resource profiles.
+	kappa = 2.576
+	xi    = 0.1
 )
 
 var (
