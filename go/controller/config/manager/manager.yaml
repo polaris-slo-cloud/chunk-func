@@ -97,6 +97,9 @@ spec:
             cpu: 10m
             memory: 64Mi
         env:
+          # RESOURCE_PROFILES can be either "AWS" or "GCF"
+          - name: RESOURCE_PROFILES
+            value: GCF
           # FUNCTION_TRIGGER can be either "REST" or "MockedResults"
           - name: FUNCTION_TRIGGER
             value: REST

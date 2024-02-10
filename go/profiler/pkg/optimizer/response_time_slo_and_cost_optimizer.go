@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"polaris-slo-cloud.github.io/chunk-func/common/pkg/function"
-	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/profile"
 )
 
 const (
@@ -21,10 +20,9 @@ type ResponseTimeSloAndCostOptimizer struct {
 }
 
 // Creates a new ResponseTimeSloAndCostOptimizer.
-func NewResponseTimeSloAndCostOptimizer() *ResponseTimeSloAndCostOptimizer {
-	profiles := profile.GetAvailableResourceProfiles()
-	availableProfilesMap := make(map[string]*function.ResourceProfile, len(profiles))
-	for _, profile := range profiles {
+func NewResponseTimeSloAndCostOptimizer(availableProfiles []*function.ResourceProfile) *ResponseTimeSloAndCostOptimizer {
+	availableProfilesMap := make(map[string]*function.ResourceProfile, len(availableProfiles))
+	for _, profile := range availableProfiles {
 		availableProfilesMap[profile.ID()] = profile
 	}
 

@@ -53,8 +53,9 @@ type FunctionDescriptionReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	fnProfiler  profiler.FunctionProfiler
-	fnOptimizer optimizer.FunctionOptimizer
+	getAvailableResourceProfiles profile.AvailableResourceProfilesFactoryFn
+	fnProfiler                   profiler.FunctionProfiler
+	fnOptimizer                  optimizer.FunctionOptimizer
 }
 
 // Permissions on ChunkFunc FunctionDescriptions:
@@ -137,13 +138,17 @@ func (fdr *FunctionDescriptionReconciler) Reconcile(ctx context.Context, req ctr
 // SetupWithManager sets up the controller with the Manager.
 func (fdr *FunctionDescriptionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	k8sConfig := mgr.GetConfig()
+	if err := fdr.setUpResourceProfilesFactory(); err != nil {
+		return err
+	}
+
 	profilerLog := mgr.GetLogger().WithName("profiler")
 	profiler, err := fdr.createProfiler(k8sConfig, &profilerLog)
 	if err != nil {
 		return err
 	}
 	fdr.fnProfiler = profiler
-	fdr.fnOptimizer = optimizer.NewResponseTimeSloAndCostOptimizer()
+	fdr.fnOptimizer = optimizer.NewResponseTimeSloAndCostOptimizer(fdr.getAvailableResourceProfiles())
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&chunkFunc.FunctionDescription{}).
@@ -205,6 +210,18 @@ func (fdr *FunctionDescriptionReconciler) fetchKnativeService(ctx context.Contex
 	return &svc, nil
 }
 
+func (fdr *FunctionDescriptionReconciler) setUpResourceProfilesFactory() error {
+	resProfilesType := strings.ToUpper(os.Getenv("RESOURCE_PROFILES"))
+	if resProfilesType != "" {
+		if resProfilesFactory := profile.GetAvailableResourceProfilesFactory(resProfilesType); resProfilesFactory != nil {
+			fdr.getAvailableResourceProfiles = resProfilesFactory
+			return nil
+		}
+	}
+	supportedResProfileTypes := profile.GetSupportedResourceProfileTypes()
+	return fmt.Errorf("Unknown resource profiles factory: %s Please set the RESOURCE_PROFILES environment variable to one of: %v", resProfilesType, supportedResProfileTypes)
+}
+
 func (fdr *FunctionDescriptionReconciler) getProfilingConfig(profilingNamespace string) *profiler.ProfilingConfig {
 	timeout, err := time.ParseDuration("2m")
 	if err != nil {
@@ -212,7 +229,7 @@ func (fdr *FunctionDescriptionReconciler) getProfilingConfig(profilingNamespace 
 	}
 
 	config := &profiler.ProfilingConfig{
-		CandidateProfiles:            profile.GetAvailableResourceProfiles(),
+		CandidateProfiles:            fdr.getAvailableResourceProfiles(),
 		IterationsPerInputAndProfile: 5,
 		ConcurrentProfiles:           3,
 		ProfilingNamespace:           profilingNamespace,

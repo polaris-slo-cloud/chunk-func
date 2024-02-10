@@ -6,10 +6,10 @@ import (
 
 // Gets a list of resource profiles that are available on the underlying platform.
 //
-// Currently returns a list of profiles based on
+// Returns a list of profiles based on Google Cloud Functions:
 // https://cloud.google.com/functions/docs/configuring/memory
 // and https://cloud.google.com/functions/pricing (tier 2 prices)
-func GetAvailableResourceProfiles() []*function.ResourceProfile {
+func GetAvailableGCFResourceProfiles() []*function.ResourceProfile {
 	return []*function.ResourceProfile{
 		{
 			ResourceConfiguration: function.ResourceConfiguration{
