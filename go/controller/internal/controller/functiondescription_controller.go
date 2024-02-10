@@ -219,7 +219,7 @@ func (fdr *FunctionDescriptionReconciler) setUpResourceProfilesFactory() error {
 		}
 	}
 	supportedResProfileTypes := profile.GetSupportedResourceProfileTypes()
-	return fmt.Errorf("Unknown resource profiles factory: %s Please set the RESOURCE_PROFILES environment variable to one of: %v", resProfilesType, supportedResProfileTypes)
+	return fmt.Errorf("unknown resource profiles factory: %s Please set the RESOURCE_PROFILES environment variable to one of: %v", resProfilesType, supportedResProfileTypes)
 }
 
 func (fdr *FunctionDescriptionReconciler) getProfilingConfig(profilingNamespace string) *profiler.ProfilingConfig {
@@ -231,7 +231,7 @@ func (fdr *FunctionDescriptionReconciler) getProfilingConfig(profilingNamespace 
 	config := &profiler.ProfilingConfig{
 		CandidateProfiles:            fdr.getAvailableResourceProfiles(),
 		IterationsPerInputAndProfile: 5,
-		ConcurrentProfiles:           3,
+		ConcurrentProfiles:           2,
 		ProfilingNamespace:           profilingNamespace,
 		FunctionReadyTimeout:         timeout,
 	}
