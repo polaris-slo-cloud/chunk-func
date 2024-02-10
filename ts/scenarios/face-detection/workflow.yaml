@@ -4,28 +4,36 @@ endStep: mark-faces
 availableResourceProfiles:
   - memoryMiB: 128
     milliCpu: 83
-    price100Ms: 0.000000324
+    pricePerUnit: 0.000000324
+    billingUnitMs: 100
   - memoryMiB: 256
     milliCpu: 167
-    price100Ms: 0.000000648
+    pricePerUnit: 0.000000648
+    billingUnitMs: 100
   - memoryMiB: 512
     milliCpu: 333
-    price100Ms: 0.000001295
+    pricePerUnit: 0.000001295
+    billingUnitMs: 100
   - memoryMiB: 1024
     milliCpu: 583
-    price100Ms: 0.000002310
+    pricePerUnit: 0.000002310
+    billingUnitMs: 100
   - memoryMiB: 2048
     milliCpu: 1000
-    price100Ms: 0.000004060
+    pricePerUnit: 0.000004060
+    billingUnitMs: 100
   - memoryMiB: 4096
     milliCpu: 2000
-    price100Ms: 0.000008120
+    pricePerUnit: 0.000008120
+    billingUnitMs: 100
   - memoryMiB: 8192
     milliCpu: 2000
-    price100Ms: 0.000009520
+    pricePerUnit: 0.000009520
+    billingUnitMs: 100
   - memoryMiB: 16384
     milliCpu: 4000
-    price100Ms: 0.000190400
+    pricePerUnit: 0.000190400
+    billingUnitMs: 100
 steps:
   - name: validate-video-face-recog
     type: function

@@ -9,42 +9,50 @@ export const workflowHeader: WorkflowDescription = {
         {
             memoryMiB: 128,
             milliCpu: 83,
-            price100Ms: 3.24e-7
+            pricePerUnit: 3.24e-7,
+            billingUnitMs: 100,
         },
         {
             memoryMiB: 256,
             milliCpu: 167,
-            price100Ms: 6.48e-7
+            pricePerUnit: 6.48e-7,
+            billingUnitMs: 100,
         },
         {
             memoryMiB: 512,
             milliCpu: 333,
-            price100Ms: 0.000001295
+            pricePerUnit: 0.000001295,
+            billingUnitMs: 100,
         },
         {
             memoryMiB: 1024,
             milliCpu: 583,
-            price100Ms: 0.00000231
+            pricePerUnit: 0.00000231,
+            billingUnitMs: 100,
         },
         {
             memoryMiB: 2048,
             milliCpu: 1000,
-            price100Ms: 0.00000406
+            pricePerUnit: 0.00000406,
+            billingUnitMs: 100,
         },
         {
             memoryMiB: 4096,
             milliCpu: 2000,
-            price100Ms: 0.00000812
+            pricePerUnit: 0.00000812,
+            billingUnitMs: 100,
         },
         {
             memoryMiB: 8192,
             milliCpu: 2000,
-            price100Ms: 0.00000952
+            pricePerUnit: 0.00000952,
+            billingUnitMs: 100,
         },
         {
             memoryMiB: 16384,
             milliCpu: 4000,
-            price100Ms: 0.0001904
+            pricePerUnit: 0.0001904,
+            billingUnitMs: 100,
         }
     ],
     steps: [],
