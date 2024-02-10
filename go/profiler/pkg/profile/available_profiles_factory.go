@@ -7,6 +7,7 @@ import (
 
 var (
 	resourceProfileListFactories = map[string]AvailableResourceProfilesFactoryFn{
+		"AWS": GetAvailableAWSResourceProfiles,
 		"GCF": GetAvailableGCFResourceProfiles,
 	}
 )

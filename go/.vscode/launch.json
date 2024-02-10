@@ -12,6 +12,7 @@
             "program": "${workspaceFolder}/controller/cmd/main.go",
             "cwd": "${workspaceFolder}/controller",
             "env": {
+              "RESOURCE_PROFILES": "AWS",
               "FUNCTION_TRIGGER": "MockedResults",
               "PROFILER": "BayesianOpt",
               "BAYESIAN_OPT_SERVER": "localhost:9000"
