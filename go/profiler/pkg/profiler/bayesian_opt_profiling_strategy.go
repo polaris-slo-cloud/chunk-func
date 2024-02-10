@@ -21,7 +21,7 @@ var (
 	// We want to set xi to favor exploration a little more than exploitation, because we need good estimates
 	// for the entire range of resource profiles.
 	kappa = 2.576
-	xi    = 0.1
+	xi    = 0.000001
 )
 
 var (
