@@ -57,7 +57,7 @@ func (efp *ExhaustiveFunctionProfiler) ProfileFunction(ctx context.Context, fn *
 		return nil, fmt.Errorf("the FunctionWithDescription does not contain any TypicalInputs")
 	}
 
-	profilingStrategy := NewExhaustiveProfilingStrategy()
+	profilingStrategy := NewExhaustiveProfilingStrategy(efp.logger)
 	fps := NewFunctionProfilingSession(fn, profilingConfig, profilingStrategy, efp.fnTriggerFactoryFn, efp.servingClient, efp.deploymentMgrFactory, efp.logger)
 	return fps.ExecuteProfilingSession(ctx)
 }
