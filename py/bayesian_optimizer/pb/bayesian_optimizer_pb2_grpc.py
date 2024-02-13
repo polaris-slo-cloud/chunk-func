@@ -30,6 +30,11 @@ class BayesianOptimizerServiceStub(object):
                 request_serializer=bayesian__optimizer__pb2.InferYRequest.SerializeToString,
                 response_deserializer=bayesian__optimizer__pb2.InferYResponse.FromString,
                 )
+        self.ShrinkInputDomain = channel.unary_unary(
+                '/bayesianopt.BayesianOptimizerService/ShrinkInputDomain',
+                request_serializer=bayesian__optimizer__pb2.ShrinkInputDomainRequest.SerializeToString,
+                response_deserializer=bayesian__optimizer__pb2.ShrinkInputDomainResponse.FromString,
+                )
         self.DeleteBoModel = channel.unary_unary(
                 '/bayesianopt.BayesianOptimizerService/DeleteBoModel',
                 request_serializer=bayesian__optimizer__pb2.BoModelId.SerializeToString,
@@ -62,6 +67,13 @@ class BayesianOptimizerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ShrinkInputDomain(self, request, context):
+        """Shrinks the input domain of a BO model.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def DeleteBoModel(self, request, context):
         """Delete the specified model.
         """
@@ -86,6 +98,11 @@ def add_BayesianOptimizerServiceServicer_to_server(servicer, server):
                     servicer.InferY,
                     request_deserializer=bayesian__optimizer__pb2.InferYRequest.FromString,
                     response_serializer=bayesian__optimizer__pb2.InferYResponse.SerializeToString,
+            ),
+            'ShrinkInputDomain': grpc.unary_unary_rpc_method_handler(
+                    servicer.ShrinkInputDomain,
+                    request_deserializer=bayesian__optimizer__pb2.ShrinkInputDomainRequest.FromString,
+                    response_serializer=bayesian__optimizer__pb2.ShrinkInputDomainResponse.SerializeToString,
             ),
             'DeleteBoModel': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteBoModel,
@@ -151,6 +168,23 @@ class BayesianOptimizerService(object):
         return grpc.experimental.unary_unary(request, target, '/bayesianopt.BayesianOptimizerService/InferY',
             bayesian__optimizer__pb2.InferYRequest.SerializeToString,
             bayesian__optimizer__pb2.InferYResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ShrinkInputDomain(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/bayesianopt.BayesianOptimizerService/ShrinkInputDomain',
+            bayesian__optimizer__pb2.ShrinkInputDomainRequest.SerializeToString,
+            bayesian__optimizer__pb2.ShrinkInputDomainResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

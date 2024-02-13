@@ -7,7 +7,8 @@ from uuid import uuid1
 
 from google.protobuf.message import Message as ProtobufMessage
 
-from pb.bayesian_optimizer_pb2 import BoModelId, BoModelInitData, BoSuggestion as PbufBoSuggestion, GetBoSuggestionRequest, GetBoSuggestionResponse, InferYRequest, InferYResponse
+from pb.bayesian_optimizer_pb2 import BoModelId, BoModelInitData, BoSuggestion as PbufBoSuggestion, GetBoSuggestionRequest, GetBoSuggestionResponse, \
+    InferYRequest, InferYResponse, ShrinkInputDomainRequest, ShrinkInputDomainResponse
 from pb.bayesian_optimizer_pb2_grpc import BayesianOptimizerServiceServicer
 from bayesian_opt import IntegerBayesianOptimizer, IntegerInterval
 
@@ -75,6 +76,17 @@ class BayesianOptimizerServer(BayesianOptimizerServiceServicer):
             return InferYResponse(modelId=modelId, x=request.x, y=y)
 
 
+    def ShrinkInputDomain(self, request: ShrinkInputDomainRequest, context) -> ShrinkInputDomainResponse:
+        modelId = self.__extractModelId(request)
+        new_input_domain = self.__extract_input_domain_shrink_data(request)
+        logging.info('Shrinking input domain for %s, new input domain: %s', modelId, new_input_domain)
+
+        remainingInputDomainSize: int = 0
+        with self.__getLockedOptimizer(modelId) as optimizer:
+            remainingInputDomainSize = optimizer.shrink_input_domain(new_input_domain)
+        return ShrinkInputDomainResponse(modelId=modelId, remainingXValuesCount=remainingInputDomainSize)
+
+
     def DeleteBoModel(self, request: BoModelId, context) -> BoModelId:
         modelId = self.__extractModelId(request)
         logging.info('Deleting BoModel %s', modelId)
@@ -138,3 +150,12 @@ class BayesianOptimizerServer(BayesianOptimizerServiceServicer):
             yield optimizer.optimizer
         finally:
             optimizer.lock.release()
+
+
+    def __extract_input_domain_shrink_data(self, request: ShrinkInputDomainRequest) ->  list[int] | IntegerInterval:
+        if len(request.possibleXValues) > 0:
+            return list(request.possibleXValues)
+        elif request.HasField('interval'):
+            return IntegerInterval(lower_bound=request.interval.lowerBound, upper_bound=request.interval.upperBound)
+        else:
+            raise ValueError('Either possibleXValues or interval must be set.')

@@ -80,3 +80,21 @@ class InferYResponse(_message.Message):
     x: int
     y: float
     def __init__(self, modelId: _Optional[str] = ..., x: _Optional[int] = ..., y: _Optional[float] = ...) -> None: ...
+
+class ShrinkInputDomainRequest(_message.Message):
+    __slots__ = ("modelId", "possibleXValues", "interval")
+    MODELID_FIELD_NUMBER: _ClassVar[int]
+    POSSIBLEXVALUES_FIELD_NUMBER: _ClassVar[int]
+    INTERVAL_FIELD_NUMBER: _ClassVar[int]
+    modelId: str
+    possibleXValues: _containers.RepeatedScalarFieldContainer[int]
+    interval: IntInterval
+    def __init__(self, modelId: _Optional[str] = ..., possibleXValues: _Optional[_Iterable[int]] = ..., interval: _Optional[_Union[IntInterval, _Mapping]] = ...) -> None: ...
+
+class ShrinkInputDomainResponse(_message.Message):
+    __slots__ = ("modelId", "remainingXValuesCount")
+    MODELID_FIELD_NUMBER: _ClassVar[int]
+    REMAININGXVALUESCOUNT_FIELD_NUMBER: _ClassVar[int]
+    modelId: str
+    remainingXValuesCount: int
+    def __init__(self, modelId: _Optional[str] = ..., remainingXValuesCount: _Optional[int] = ...) -> None: ...

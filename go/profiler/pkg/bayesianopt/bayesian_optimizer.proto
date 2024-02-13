@@ -83,6 +83,27 @@ message InferYResponse {
     double y = 3;
 }
 
+// Shrinks the input domain of an existing BO model.
+message ShrinkInputDomainRequest {
+    // The ID of the model to be used.
+    string modelId = 1;
+
+    // The discrete set of possible values of X.
+    repeated uint64 possibleXValues = 2;
+
+    // An inclusive integer interval for the possible values of X.
+    optional IntInterval interval = 3;
+}
+
+// Response to shrinking the input domain.
+message ShrinkInputDomainResponse {
+    // The ID of the model to be used.
+    string modelId = 1;
+
+    // The number of remaining values in the input domain, for which no observation had been made.
+    uint64 remainingXValuesCount = 2;
+}
+
 // A service for utilizing a BO model.
 service BayesianOptimizerService {
     // Creates a new BO model and returns its ID.
@@ -93,6 +114,9 @@ service BayesianOptimizerService {
 
     // Requests an inference of Y for a specific X.
     rpc InferY(InferYRequest) returns (InferYResponse) {}
+
+    // Shrinks the input domain of a BO model.
+    rpc ShrinkInputDomain(ShrinkInputDomainRequest) returns (ShrinkInputDomainResponse) {}
 
     // Delete the specified model.
     rpc DeleteBoModel(BoModelId) returns (BoModelId) {}

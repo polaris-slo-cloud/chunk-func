@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"slices"
 	"sync"
 	"time"
 
@@ -27,8 +28,8 @@ var (
 var (
 	_ ProfilingStrategy = (*BayesianOptProfilingStrategy)(nil)
 
-	// This execution time will be stored in a BO model if the respective profiling attempt has failed.
-	execDurationForFailure, _ = time.ParseDuration("1h")
+	// This execution time will be stored for an unfiltered inferred result, if the corresponding resource profile has been pruned.
+	execDurationForPrunedProfile, _ = time.ParseDuration("1h")
 
 	profiledResultType = function.ProfilingResultProfiled
 	inferredResultType = function.ProfilingResultInferred
@@ -37,12 +38,27 @@ var (
 // A ProfilingStrategy that uses Bayesian Optimization to reduce the number resource profiles
 // that need to be evaluated.
 type BayesianOptProfilingStrategy struct {
-	// The available profiles that should be tried out.
+	// The available profiles on the underlying platform.
 	// These profiles are ordered by increasing memory size and base cost (per 100ms).
 	availableProfiles []*function.ResourceProfile
 
 	// Stores the resources profiles indexed by their memory size
 	profilesByMem map[uint64]*function.ResourceProfile
+
+	// List of all the memory sizes of all ResourceProfiles in availableProfiles.
+	// This is the base list of all possible X values for the BO.
+	profileMemorySizes []uint64
+
+	// Stores the minimum resource profile for each input size.
+	// Initially, this is the lowest of the availableProfiles for all input sizes,
+	// but if the ResourceProfile domain is shrunk
+	// due to pruning timed out profiles, this changes to a higher profile.
+	// Keys: input size, Values: minResourceProfile
+	minResourceProfileByInput map[int64]*function.ResourceProfile
+
+	// RW lock for minResourceProfileMemoryByInput.
+	// Locking protocol: no other lock must be held when acquiring this lock.
+	minResourceProfileByInputLock sync.RWMutex
 
 	// The function that we are profiling.
 	fn *function.FunctionWithDescription
@@ -56,11 +72,15 @@ type BayesianOptProfilingStrategy struct {
 	profilingQueueClosed bool
 
 	// We need a mutex, because we need to be able to check if the profilingQueue has been closed due to an error.
+	// Locking protocol: no other lock must be held when acquiring this mutex.
 	profilingQueueMutex sync.Mutex
 
 	// Stores the IDs of the BO models indexed by input size.
 	// Each input size has its own Bayesian Optimizer.
-	boModelIds      map[int64]string
+	boModelIds map[int64]string
+
+	// Mutex for boModelIds
+	// Locking protocol: no other lock must be held when acquiring this mutex.
 	boModelIdsMutex sync.Mutex
 
 	boClient bayesianopt.BayesianOptimizerServiceClient
@@ -73,11 +93,12 @@ type BayesianOptProfilingStrategy struct {
 
 func NewBayesianOptProfilingStrategy(boClient bayesianopt.BayesianOptimizerServiceClient, logger *logr.Logger) *BayesianOptProfilingStrategy {
 	return &BayesianOptProfilingStrategy{
-		boClient:             boClient,
-		completedInputsMutex: sync.Mutex{},
-		boModelIdsMutex:      sync.Mutex{},
-		profilingQueueMutex:  sync.Mutex{},
-		logger:               logger,
+		boClient:                      boClient,
+		minResourceProfileByInputLock: sync.RWMutex{},
+		completedInputsMutex:          sync.Mutex{},
+		boModelIdsMutex:               sync.Mutex{},
+		profilingQueueMutex:           sync.Mutex{},
+		logger:                        logger,
 	}
 }
 
@@ -144,15 +165,21 @@ func (bops *BayesianOptProfilingStrategy) Cleanup() {
 
 func (bops *BayesianOptProfilingStrategy) setUpProfilesList(availableProfiles []*function.ResourceProfile) []uint64 {
 	bops.profilesByMem = make(map[uint64]*function.ResourceProfile, len(availableProfiles))
-	memorySizes := make([]uint64, len(availableProfiles))
+	bops.minResourceProfileByInput = make(map[int64]*function.ResourceProfile, len(bops.fn.Description.TypicalInputs))
+	bops.profileMemorySizes = make([]uint64, len(availableProfiles))
 
 	for i, resProfile := range availableProfiles {
 		memSize := uint64(resProfile.MemoryMiB)
-		memorySizes[i] = memSize
+		bops.profileMemorySizes[i] = memSize
 		bops.profilesByMem[memSize] = resProfile
 	}
 
-	return memorySizes
+	minProfile := availableProfiles[0]
+	for _, input := range bops.fn.Description.TypicalInputs {
+		bops.minResourceProfileByInput[input.SizeBytes] = minProfile
+	}
+
+	return bops.profileMemorySizes
 }
 
 func (bops *BayesianOptProfilingStrategy) setUpBoModels(ctx context.Context) error {
@@ -197,7 +224,8 @@ func (bops *BayesianOptProfilingStrategy) runQueueingLoop(ctx context.Context) {
 }
 
 // Gets the next ResourceProfile to be evaluated for the specified input form the BO and queues it.
-// The lastProfileEvaluated and lastProfileExecTimeMs may be nil, if this is the first call for this input.
+// The lastProfileEvaluated and lastProfileExecTimeMs may be nil, if this is the first call for this input
+// or if the ResourceProfile domain for this input has been shrunk.
 // If the probability of improvement is below the threshold, the this input size is marked as complete.
 func (bops *BayesianOptProfilingStrategy) getAndQueueNextProfile(
 	ctx context.Context,
@@ -211,17 +239,7 @@ func (bops *BayesianOptProfilingStrategy) getAndQueueNextProfile(
 		return
 	}
 
-	req := &bayesianopt.GetBoSuggestionRequest{
-		ModelId: *boModelId,
-	}
-	if lastProfileEvaluated != nil {
-		req.Observation = &bayesianopt.BoObservation{
-			X:           uint64(lastProfileEvaluated.MemoryMiB),
-			Observation: *lastProfileExecTimeMs,
-		}
-	}
-
-	suggestion, err := bops.boClient.GetBoSuggestion(ctx, req)
+	suggestion, err := bops.getBoSuggestion(ctx, *boModelId, input, lastProfileEvaluated, lastProfileExecTimeMs)
 	if err != nil {
 		bops.signalError(fmt.Errorf("GetBoSuggestion error %v", err))
 		return
@@ -238,6 +256,41 @@ func (bops *BayesianOptProfilingStrategy) getAndQueueNextProfile(
 	} else {
 		bops.signalError(fmt.Errorf("GetBoSuggestion returned unknown memory size %v", suggestion.Suggestion.X))
 	}
+}
+
+func (bops *BayesianOptProfilingStrategy) getBoSuggestion(
+	ctx context.Context,
+	boModelId string,
+	input *function.FunctionInput,
+	lastProfileEvaluated *function.ResourceProfile,
+	lastProfileExecTimeMs *float64,
+) (*bayesianopt.GetBoSuggestionResponse, error) {
+	req := &bayesianopt.GetBoSuggestionRequest{
+		ModelId: boModelId,
+	}
+
+	if lastProfileEvaluated != nil {
+		// Before reporting the latest observation, we check if it is still within the ResourceProfile domain of that input size
+		// just in case another job's timeout has caused the input size's ResourceProfile to shrink.
+		// The Unlock() is executed when this method returns (defer is bound to the func, not the block), which is correct,
+		// because we want to protect the call to the BO server as well.
+		// If there is no lastProfileEvaluated, we don't need the lock.
+		//
+		// Instead using the RW lock, another option would be to send meaningful error codes from
+		// the BO server and to retry GetBoSuggestion, if the observation is out of scope.
+		bops.minResourceProfileByInputLock.RLock()
+		defer bops.minResourceProfileByInputLock.RUnlock()
+
+		minResourceProfile := bops.minResourceProfileByInput[input.SizeBytes]
+		if lastProfileEvaluated.MemoryMiB >= minResourceProfile.MemoryMiB {
+			req.Observation = &bayesianopt.BoObservation{
+				X:           uint64(lastProfileEvaluated.MemoryMiB),
+				Observation: *lastProfileExecTimeMs,
+			}
+		}
+	}
+
+	return bops.boClient.GetBoSuggestion(ctx, req)
 }
 
 func (bops *BayesianOptProfilingStrategy) createNewProfilingJob(input *function.FunctionInput, resProfile *function.ResourceProfile) ProfilingJob {
@@ -272,13 +325,26 @@ func (bops *BayesianOptProfilingStrategy) onProfilingDone(ctx context.Context, j
 		)
 	}
 
-	var execTimeMs float64
-	if len(results.Results) == 1 {
-		execTimeMs = float64(results.Results[0].ExecutionTimeMs)
+	if len(results.Results) == 1 && function.IsSuccessStatusCode(results.Results[0].StatusCode) {
+		execTimeMs := float64(results.Results[0].ExecutionTimeMs)
+		bops.getAndQueueNextProfile(ctx, input, job.ResourceProfile(), &execTimeMs)
 	} else {
-		execTimeMs = float64(execDurationForFailure.Milliseconds())
+		// Since the current resource profile failed to process the input, we assume that
+		// all weaker profiles would fail too. So, we prune them for this input size.
+		// This is necessary, because exec times or timeouts from failed executions confuse the BO
+		// and may cause it to get stuck in a certain region.
+		shrinkRes, err := bops.shrinkResourceProfileDomain(ctx, job.ResourceProfile(), input)
+		if err != nil {
+			bops.signalError(err)
+		}
+		if shrinkRes != nil {
+			if shrinkRes.RemainingXValuesCount > 0 {
+				bops.getAndQueueNextProfile(ctx, input, nil, nil)
+			} else {
+				bops.markInputAsComplete(input)
+			}
+		}
 	}
-	bops.getAndQueueNextProfile(ctx, input, job.ResourceProfile(), &execTimeMs)
 }
 
 func (bops *BayesianOptProfilingStrategy) onProfilingError(job ProfilingJob, err error) {
@@ -300,6 +366,56 @@ func (bops *BayesianOptProfilingStrategy) markInputAsComplete(input *function.Fu
 	if len(bops.completedInputs) == len(bops.fn.Description.TypicalInputs) {
 		bops.closeProfilingQueue()
 	}
+}
+
+// Returns the ShrinkInputDomainResponse or an error.
+// If Cleanup() has already been called or the ResourceProfile domain has already been shrunk,
+// both return values are nil.
+func (bops *BayesianOptProfilingStrategy) shrinkResourceProfileDomain(
+	ctx context.Context,
+	failedResProfile *function.ResourceProfile,
+	input *function.FunctionInput,
+) (*bayesianopt.ShrinkInputDomainResponse, error) {
+	boModelId := bops.getBoModelId(input.SizeBytes)
+	if boModelId == nil {
+		// Apparently Cleanup() has already been called due to an error during profiling.
+		return nil, nil
+	}
+
+	bops.minResourceProfileByInputLock.Lock()
+	defer bops.minResourceProfileByInputLock.Unlock()
+
+	// If another goroutine has already shrunk the ResourceProfile domain further than we would, we ignore this request.
+	prevMinResProfile := bops.minResourceProfileByInput[input.SizeBytes]
+	if failedResProfile.MemoryMiB < prevMinResProfile.MemoryMiB {
+		return nil, nil
+	}
+
+	prunedMemSizes, newMinResProfile := bops.getPrunedMemorySizesAndProfile(failedResProfile)
+	req := &bayesianopt.ShrinkInputDomainRequest{
+		ModelId:         *boModelId,
+		PossibleXValues: prunedMemSizes,
+	}
+
+	res, err := bops.boClient.ShrinkInputDomain(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	bops.minResourceProfileByInput[input.SizeBytes] = newMinResProfile
+	return res, nil
+}
+
+func (bops *BayesianOptProfilingStrategy) getPrunedMemorySizesAndProfile(failedResProfile *function.ResourceProfile) (prunedList []uint64, newMinResProfile *function.ResourceProfile) {
+	index, _ := slices.BinarySearch(bops.profileMemorySizes, uint64(failedResProfile.MemoryMiB))
+	if index < len(bops.profileMemorySizes)-1 {
+		newMinProfileIndex := index + 1
+		newMinResProfile = bops.availableProfiles[newMinProfileIndex]
+		prunedList = bops.profileMemorySizes[newMinProfileIndex:len(bops.profileMemorySizes)]
+	} else {
+		panic("ToDo: handle situation where no resourceProfile is able to handle the function.")
+	}
+	return prunedList, newMinResProfile
 }
 
 func (bops *BayesianOptProfilingStrategy) closeProfilingQueue() {
@@ -355,6 +471,20 @@ func (bops *BayesianOptProfilingStrategy) assembleResultsForProfile(
 }
 
 func (bops *BayesianOptProfilingStrategy) getInferredResult(ctx context.Context, input *function.FunctionInput, resProfile *function.ResourceProfile) (*function.ProfilingResult, error) {
+	ret := &function.ProfilingResult{
+		StatusCode:     200,
+		ResultType:     &inferredResultType,
+		InputSizeBytes: input.SizeBytes,
+	}
+
+	// At this point, we no longer need to lock the map.
+	minResProfileForInput := bops.minResourceProfileByInput[input.SizeBytes]
+	if resProfile.MemoryMiB < minResProfileForInput.MemoryMiB {
+		ret.StatusCode = 504 // Gateway timeout
+		ret.ExecutionTimeMs = int64(execDurationForPrunedProfile.Milliseconds())
+		return ret, nil
+	}
+
 	boModelId := bops.getBoModelId(input.SizeBytes)
 	if boModelId == nil {
 		return nil, fmt.Errorf("cannot call BO service, because model IDs have already been cleaned up")
@@ -369,13 +499,8 @@ func (bops *BayesianOptProfilingStrategy) getInferredResult(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
+	ret.ExecutionTimeMs = int64(math.Round(result.Y))
 
-	ret := &function.ProfilingResult{
-		StatusCode:      200,
-		ResultType:      &inferredResultType,
-		InputSizeBytes:  input.SizeBytes,
-		ExecutionTimeMs: int64(math.Round(result.Y)),
-	}
 	return ret, nil
 }
 

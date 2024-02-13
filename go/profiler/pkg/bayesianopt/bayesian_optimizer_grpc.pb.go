@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	BayesianOptimizerService_CreateBoModel_FullMethodName   = "/bayesianopt.BayesianOptimizerService/CreateBoModel"
-	BayesianOptimizerService_GetBoSuggestion_FullMethodName = "/bayesianopt.BayesianOptimizerService/GetBoSuggestion"
-	BayesianOptimizerService_InferY_FullMethodName          = "/bayesianopt.BayesianOptimizerService/InferY"
-	BayesianOptimizerService_DeleteBoModel_FullMethodName   = "/bayesianopt.BayesianOptimizerService/DeleteBoModel"
+	BayesianOptimizerService_CreateBoModel_FullMethodName     = "/bayesianopt.BayesianOptimizerService/CreateBoModel"
+	BayesianOptimizerService_GetBoSuggestion_FullMethodName   = "/bayesianopt.BayesianOptimizerService/GetBoSuggestion"
+	BayesianOptimizerService_InferY_FullMethodName            = "/bayesianopt.BayesianOptimizerService/InferY"
+	BayesianOptimizerService_ShrinkInputDomain_FullMethodName = "/bayesianopt.BayesianOptimizerService/ShrinkInputDomain"
+	BayesianOptimizerService_DeleteBoModel_FullMethodName     = "/bayesianopt.BayesianOptimizerService/DeleteBoModel"
 )
 
 // BayesianOptimizerServiceClient is the client API for BayesianOptimizerService service.
@@ -35,6 +36,8 @@ type BayesianOptimizerServiceClient interface {
 	GetBoSuggestion(ctx context.Context, in *GetBoSuggestionRequest, opts ...grpc.CallOption) (*GetBoSuggestionResponse, error)
 	// Requests an inference of Y for a specific X.
 	InferY(ctx context.Context, in *InferYRequest, opts ...grpc.CallOption) (*InferYResponse, error)
+	// Shrinks the input domain of a BO model.
+	ShrinkInputDomain(ctx context.Context, in *ShrinkInputDomainRequest, opts ...grpc.CallOption) (*ShrinkInputDomainResponse, error)
 	// Delete the specified model.
 	DeleteBoModel(ctx context.Context, in *BoModelId, opts ...grpc.CallOption) (*BoModelId, error)
 }
@@ -74,6 +77,15 @@ func (c *bayesianOptimizerServiceClient) InferY(ctx context.Context, in *InferYR
 	return out, nil
 }
 
+func (c *bayesianOptimizerServiceClient) ShrinkInputDomain(ctx context.Context, in *ShrinkInputDomainRequest, opts ...grpc.CallOption) (*ShrinkInputDomainResponse, error) {
+	out := new(ShrinkInputDomainResponse)
+	err := c.cc.Invoke(ctx, BayesianOptimizerService_ShrinkInputDomain_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *bayesianOptimizerServiceClient) DeleteBoModel(ctx context.Context, in *BoModelId, opts ...grpc.CallOption) (*BoModelId, error) {
 	out := new(BoModelId)
 	err := c.cc.Invoke(ctx, BayesianOptimizerService_DeleteBoModel_FullMethodName, in, out, opts...)
@@ -93,6 +105,8 @@ type BayesianOptimizerServiceServer interface {
 	GetBoSuggestion(context.Context, *GetBoSuggestionRequest) (*GetBoSuggestionResponse, error)
 	// Requests an inference of Y for a specific X.
 	InferY(context.Context, *InferYRequest) (*InferYResponse, error)
+	// Shrinks the input domain of a BO model.
+	ShrinkInputDomain(context.Context, *ShrinkInputDomainRequest) (*ShrinkInputDomainResponse, error)
 	// Delete the specified model.
 	DeleteBoModel(context.Context, *BoModelId) (*BoModelId, error)
 	mustEmbedUnimplementedBayesianOptimizerServiceServer()
@@ -110,6 +124,9 @@ func (UnimplementedBayesianOptimizerServiceServer) GetBoSuggestion(context.Conte
 }
 func (UnimplementedBayesianOptimizerServiceServer) InferY(context.Context, *InferYRequest) (*InferYResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InferY not implemented")
+}
+func (UnimplementedBayesianOptimizerServiceServer) ShrinkInputDomain(context.Context, *ShrinkInputDomainRequest) (*ShrinkInputDomainResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ShrinkInputDomain not implemented")
 }
 func (UnimplementedBayesianOptimizerServiceServer) DeleteBoModel(context.Context, *BoModelId) (*BoModelId, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteBoModel not implemented")
@@ -182,6 +199,24 @@ func _BayesianOptimizerService_InferY_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BayesianOptimizerService_ShrinkInputDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShrinkInputDomainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BayesianOptimizerServiceServer).ShrinkInputDomain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BayesianOptimizerService_ShrinkInputDomain_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BayesianOptimizerServiceServer).ShrinkInputDomain(ctx, req.(*ShrinkInputDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BayesianOptimizerService_DeleteBoModel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BoModelId)
 	if err := dec(in); err != nil {
@@ -218,6 +253,10 @@ var BayesianOptimizerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InferY",
 			Handler:    _BayesianOptimizerService_InferY_Handler,
+		},
+		{
+			MethodName: "ShrinkInputDomain",
+			Handler:    _BayesianOptimizerService_ShrinkInputDomain_Handler,
 		},
 		{
 			MethodName: "DeleteBoModel",
