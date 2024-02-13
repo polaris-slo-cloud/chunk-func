@@ -117,9 +117,14 @@ export interface ProfilingSessionResults {
     configurationsProfiled?: number;
 
     /**
-     * 	he number of ResourceProfile-InputSize combinations (= configurations) that were inferred instead of profiled.
+     * The number of ResourceProfile-InputSize combinations (= configurations) that were inferred instead of profiled.
      */
     configurationsInferred?: number;
+
+    /**
+     * The number of profiling iterations for each ResourceProfile-InputSize combination.
+     */
+    iterationsPerInputAndProfile: number;
 
     /**
      * The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (per 100ms).

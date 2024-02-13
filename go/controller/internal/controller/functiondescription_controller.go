@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -56,6 +57,9 @@ type FunctionDescriptionReconciler struct {
 	getAvailableResourceProfiles profile.AvailableResourceProfilesFactoryFn
 	fnProfiler                   profiler.FunctionProfiler
 	fnOptimizer                  optimizer.FunctionOptimizer
+
+	iterationsPerInputAndProfile int
+	concurrentProfileEvaluations int
 }
 
 // Permissions on ChunkFunc FunctionDescriptions:
@@ -141,6 +145,9 @@ func (fdr *FunctionDescriptionReconciler) SetupWithManager(mgr ctrl.Manager) err
 	if err := fdr.setUpResourceProfilesFactory(); err != nil {
 		return err
 	}
+	if err := fdr.readProfilingConfigValues(); err != nil {
+		return err
+	}
 
 	profilerLog := mgr.GetLogger().WithName("profiler")
 	profiler, err := fdr.createProfiler(k8sConfig, &profilerLog)
@@ -222,6 +229,30 @@ func (fdr *FunctionDescriptionReconciler) setUpResourceProfilesFactory() error {
 	return fmt.Errorf("unknown resource profiles factory: %s Please set the RESOURCE_PROFILES environment variable to one of: %v", resProfilesType, supportedResProfileTypes)
 }
 
+func (fdr *FunctionDescriptionReconciler) readProfilingConfigValues() error {
+	iterationsPerInputAndProfileStr := os.Getenv("ITERATIONS_PER_CONFIGURATION")
+	if iterationsPerInputAndProfileStr == "" {
+		return fmt.Errorf("please set the ITERATIONS_PER_CONFIGURATION environment variable to the number of profiling iterations that should be done for each resource profile and input size combination")
+	}
+	iterationsPerInputAndProfile, err := strconv.Atoi(iterationsPerInputAndProfileStr)
+	if err != nil {
+		return fmt.Errorf("the ITERATIONS_PER_CONFIGURATION environment variable is not a valid integer")
+	}
+	fdr.iterationsPerInputAndProfile = iterationsPerInputAndProfile
+
+	concurrentProfileEvaluationsStr := os.Getenv("CONCURRENT_PROFILES")
+	if concurrentProfileEvaluationsStr == "" {
+		return fmt.Errorf("please set the CONCURRENT_PROFILES environment variable to the number of profiling iterations that should be done for each resource profile and input size combination")
+	}
+	concurrentProfileEvaluations, err := strconv.Atoi(concurrentProfileEvaluationsStr)
+	if err != nil {
+		return fmt.Errorf("the CONCURRENT_PROFILES environment variable is not a valid integer")
+	}
+	fdr.concurrentProfileEvaluations = concurrentProfileEvaluations
+
+	return nil
+}
+
 func (fdr *FunctionDescriptionReconciler) getProfilingConfig(profilingNamespace string) *profiler.ProfilingConfig {
 	timeout, err := time.ParseDuration("2m")
 	if err != nil {
@@ -230,8 +261,8 @@ func (fdr *FunctionDescriptionReconciler) getProfilingConfig(profilingNamespace 
 
 	config := &profiler.ProfilingConfig{
 		CandidateProfiles:            fdr.getAvailableResourceProfiles(),
-		IterationsPerInputAndProfile: 5,
-		ConcurrentProfiles:           2,
+		IterationsPerInputAndProfile: fdr.iterationsPerInputAndProfile,
+		ConcurrentProfiles:           fdr.concurrentProfileEvaluations,
 		ProfilingNamespace:           profilingNamespace,
 		FunctionReadyTimeout:         timeout,
 	}

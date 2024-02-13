@@ -90,3 +90,7 @@ docker-build-controller:
 .PHONY: docker-push-controller
 docker-push-controller:
 	cd controller && make docker-push
+
+.PHONY: deploy-controller
+deploy-controller:
+	cd controller && make deploy

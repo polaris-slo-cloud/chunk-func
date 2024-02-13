@@ -104,6 +104,9 @@ type ProfilingSessionResults struct {
 	// The number of ResourceProfile-InputSize combinations (= configurations) that were inferred instead of profiled.
 	ConfigurationsInferred int32 `json:"configurationsInferred" yaml:"configurationsInferred"`
 
+	// The number of profiling iterations for each ResourceProfile-InputSize combination.
+	IterationsPerInputAndProfile int32 `json:"iterationsPerInputAndProfile" yaml:"iterationsPerInputAndProfile"`
+
 	// The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (price per 100ms).
 	Results []*ResourceProfileResults `json:"results" yaml:"results"`
 }

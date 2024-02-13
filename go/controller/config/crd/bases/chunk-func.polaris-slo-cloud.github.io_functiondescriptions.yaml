@@ -146,6 +146,11 @@ spec:
                       (= configurations) that were profiled.
                     format: int32
                     type: integer
+                  iterationsPerInputAndProfile:
+                    description: The number of profiling iterations for each ResourceProfile-InputSize
+                      combination.
+                    format: int32
+                    type: integer
                   profilingDurationSeconds:
                     description: The number of seconds that the profiling session
                       lasted.
@@ -273,6 +278,7 @@ spec:
                 required:
                 - configurationsInferred
                 - configurationsProfiled
+                - iterationsPerInputAndProfile
                 - profilingDurationSeconds
                 - profilingStarted
                 - results
