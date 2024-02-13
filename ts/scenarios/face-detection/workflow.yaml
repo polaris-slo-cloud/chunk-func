@@ -38,6 +38,7 @@ steps:
   - name: validate-video-face-recog
     type: function
     profilingResults:
+      iterationsPerInputAndProfile: 5
       profilingDurationSeconds: 142
       profilingStarted: "2024-01-22T17:34:00Z"
       results:
@@ -463,6 +464,7 @@ steps:
   - name: transform-video
     type: function
     profilingResults:
+      iterationsPerInputAndProfile: 5
       profilingDurationSeconds: 6870
       profilingStarted: "2024-01-23T13:13:27Z"
       results:
@@ -806,6 +808,7 @@ steps:
   - name: detect-faces
     type: function
     profilingResults:
+      iterationsPerInputAndProfile: 5
       profilingDurationSeconds: 21393
       profilingStarted: "2024-01-23T15:25:33Z"
       results:
@@ -1119,6 +1122,7 @@ steps:
   - name: mark-faces
     type: function
     profilingResults:
+      iterationsPerInputAndProfile: 5
       profilingDurationSeconds: 1318
       profilingStarted: "2024-01-23T21:22:06Z"
       results:

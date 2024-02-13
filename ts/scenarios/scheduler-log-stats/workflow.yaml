@@ -38,6 +38,7 @@ steps:
   - name: validate-log
     type: function
     profilingResults:
+      iterationsPerInputAndProfile: 5
       profilingDurationSeconds: 226
       profilingStarted: "2023-08-17T15:20:54Z"
       results:
@@ -154,6 +155,7 @@ steps:
   - name: extract-basic-stats
     type: function
     profilingResults:
+      iterationsPerInputAndProfile: 5
       profilingDurationSeconds: 294
       profilingStarted: "2023-08-17T09:39:43Z"
       results:
@@ -270,6 +272,7 @@ steps:
   - name: extract-successes
     type: function
     profilingResults:
+      iterationsPerInputAndProfile: 5
       profilingDurationSeconds: 257
       profilingStarted: "2023-08-16T10:44:01Z"
       results:
@@ -386,6 +389,7 @@ steps:
   - name: extract-success-stats
     type: function
     profilingResults:
+      iterationsPerInputAndProfile: 5
       profilingDurationSeconds: 162
       profilingStarted: "2023-08-18T09:15:09Z"
       results:

@@ -146,6 +146,7 @@ status:
   - inputSizeBytes: 1620000
     optimizedFor: response-time-slo-and-min-cost
   profilingResults:
+    iterationsPerInputAndProfile: 5
     profilingDurationSeconds: 1318
     profilingStarted: "2024-01-23T21:22:06Z"
     results:
