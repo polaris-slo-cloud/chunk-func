@@ -25,10 +25,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	core "k8s.io/api/core/v1"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/uuid"
 	"k8s.io/client-go/rest"
 	knServing "knative.dev/serving/pkg/apis/serving/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -57,6 +54,8 @@ type FunctionDescriptionReconciler struct {
 	getAvailableResourceProfiles profile.AvailableResourceProfilesFactoryFn
 	fnProfiler                   profiler.FunctionProfiler
 	fnOptimizer                  optimizer.FunctionOptimizer
+
+	namespaceMgr NamespaceManager
 
 	iterationsPerInputAndProfile int
 	concurrentProfileEvaluations int
@@ -108,12 +107,12 @@ func (fdr *FunctionDescriptionReconciler) Reconcile(ctx context.Context, req ctr
 	}
 
 	log.Info("Starting profiling of function", "name", fnDesc.Spec.FunctionDescription.FunctionName)
-	profilingNamespace, err := fdr.createProfilingNamespace(ctx)
+	profilingNamespace, err := fdr.namespaceMgr.CreateProfilingNamespace(ctx)
 	if err != nil {
 		log.Error(err, "Unable to create profiling namespace", "namespace", profilingNamespace)
 		return ctrl.Result{}, err
 	}
-	defer fdr.Delete(context.Background(), profilingNamespace)
+	defer fdr.namespaceMgr.DeleteProfilingNamespace(context.Background(), profilingNamespace)
 
 	profilingResults, err := fdr.fnProfiler.ProfileFunction(ctx, fnWidthDesc, fdr.getProfilingConfig(profilingNamespace.Name))
 	if err != nil {
@@ -196,11 +195,13 @@ func (fdr *FunctionDescriptionReconciler) createDeploymentAndTriggerFactories(lo
 			return nil, nil, fmt.Errorf("error loading mocked profiling results from ./config/mockedresults: %v", err)
 		}
 		logger.Info("Using MockedResultsTriggerFactory with", "mockedResults", len(mockedResults))
+		fdr.namespaceMgr = NewMockedNamespaceManager()
 		return trigger.NewMockedResultsTriggerFactory(mockedResults), profiler.NewMockedFunctionDeploymentManager, nil
 	case "rest":
 		fallthrough
 	default:
 		logger.Info("Using RestTriggerFactory")
+		fdr.namespaceMgr = NewK8sNamespaceManager(fdr.Client)
 		return trigger.RestTriggerFactory, profiler.NewFunctionDeploymentManager, nil
 	}
 }
@@ -267,22 +268,4 @@ func (fdr *FunctionDescriptionReconciler) getProfilingConfig(profilingNamespace 
 		FunctionReadyTimeout:         timeout,
 	}
 	return config
-}
-
-func generateRandomNamespace() string {
-	return string(uuid.NewUUID())
-}
-
-func (fdr *FunctionDescriptionReconciler) createProfilingNamespace(ctx context.Context) (*core.Namespace, error) {
-	profilingNamespace := core.Namespace{
-		ObjectMeta: meta.ObjectMeta{
-			Name: generateRandomNamespace(),
-		},
-		Spec: core.NamespaceSpec{},
-	}
-
-	if err := fdr.Client.Create(ctx, &profilingNamespace); err != nil {
-		return nil, err
-	}
-	return &profilingNamespace, nil
 }
