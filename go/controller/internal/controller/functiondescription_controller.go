@@ -190,9 +190,10 @@ func (fdr *FunctionDescriptionReconciler) createDeploymentAndTriggerFactories(lo
 	triggerType := strings.ToLower(os.Getenv("FUNCTION_TRIGGER"))
 	switch triggerType {
 	case "mockedresults":
-		mockedResults, err := util.LoadMockedProfilingResults("./config/mockedresults")
+		mockResultsDir := "./config/mockedresults/" + strings.ToLower(os.Getenv("RESOURCE_PROFILES"))
+		mockedResults, err := util.LoadMockedProfilingResults(mockResultsDir)
 		if err != nil {
-			return nil, nil, fmt.Errorf("error loading mocked profiling results from ./config/mockedresults: %v", err)
+			return nil, nil, fmt.Errorf("error loading mocked profiling results from %s: %v", mockResultsDir, err)
 		}
 		logger.Info("Using MockedResultsTriggerFactory with", "mockedResults", len(mockedResults))
 		fdr.namespaceMgr = NewMockedNamespaceManager()
