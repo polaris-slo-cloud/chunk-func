@@ -47,7 +47,6 @@ class InputParameterDomain:
         """
         index = randint(0, self.__last_unused_value_index)
         value = self.__unused_values[index]
-        self.mark_value_used(value)
         return value
 
 

@@ -8,8 +8,10 @@ import numpy
 
 from .accessible_bayesian_optimization import AccessibleBayesianOptimization
 from .input_parameter_domain import InputParameterDomain
-from .util import IntegerInterval, is_subsequence
+from .util import IntegerInterval
 
+# The max number of times we try getting a new suggestion if it always maps to the same bucket.
+MAX_SUGGESTION_TRIES = 10
 
 @dataclass
 class BoSuggestion:
@@ -126,14 +128,24 @@ class IntegerBayesianOptimizer:
         suggestion = self.__optimizer.suggest(self.__eiFn)
         x_int = self.__input_domain.map_gp_x_to_input_domain(suggestion['x'])
         observed = self.__observed_values.get(x_int)
+        tries = 1
 
-        while observed is not None:
+        # If the corresponding x_int has already been observed, register that observation for the suggested x_float
+        # and try getting a new suggestion for at most MAX_SUGGESTION_TRIES attempts.
+        while observed is not None and tries <= MAX_SUGGESTION_TRIES:
             logging.info('BO %s: Suggested float %f maps to already observed x=%d, registering y=%f', self.__modelId, suggestion['x'], x_int, observed)
             self.__optimizer.register(params=suggestion, target=observed)
 
             suggestion = self.__optimizer.suggest(self.__eiFn)
             x_int = self.__input_domain.map_gp_x_to_input_domain(suggestion['x'])
             observed = self.__observed_values.get(x_int)
+            tries += 1
+
+        # If all suggestions mapped to an existing x_int, the GP likely got stuck in that bucket,
+        # so we pick a random unused value.
+        if observed is not None:
+            x_int = self.__input_domain.pick_random_value()
+            logging.info('BO %s: Suggestion mapped to a used value %d times. Got random, unused X: %d', self.__modelId, MAX_SUGGESTION_TRIES, x_int)
 
         # We intentionally do not mark x_int as used in the input_domain - we do that
         # when an observation is registered.
