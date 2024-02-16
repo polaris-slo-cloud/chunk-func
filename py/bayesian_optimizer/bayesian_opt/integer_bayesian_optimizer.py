@@ -168,5 +168,5 @@ class IntegerBayesianOptimizer:
         old_observed = self.__observed_values
         self.__observed_values = {}
         for x, y in old_observed.items():
-            if x >= lower_bound or x <= upper_bound:
+            if x >= lower_bound and x <= upper_bound:
                 self.__register_observation__without_marking_used(x, y)
