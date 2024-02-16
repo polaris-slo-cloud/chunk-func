@@ -34,12 +34,16 @@ class BayesianOptimizerServer(BayesianOptimizerServiceServicer):
     def __init__(self):
         self.__optimizers: dict[str, LockableBayesianOptimizer] = {}
         self.__optimizers_lock = Lock()
+        self.__nextModelId = 0
 
 
     def CreateBoModel(self, request: BoModelInitData, context) -> BoModelId:
         """Creates a new IntegerBayesianOptimizer and stores it in the __optimizers dictionary."""
 
-        modelId = str(uuid1())
+        modelId = ''
+        with self.__optimizers_lock:
+            modelId = f'{self.__nextModelId}'
+            self.__nextModelId += 1
         init_data = self.__extract_bo_init_data(request)
         logging.info('Creating new BoModel %s for %s', modelId, init_data.possible_x_values)
         optimizer = IntegerBayesianOptimizer(modelId, init_data.possible_x_values, init_data.kappa, init_data.xi)
