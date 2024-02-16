@@ -1,5 +1,13 @@
 from bisect import bisect_left
-from typing import Sequence
+from typing import Sequence, TypedDict
+
+class IntegerInterval(TypedDict):
+    """
+    Defines an inclusive integer interval.
+    """
+    lower_bound: int
+    upper_bound: int
+
 
 def is_subsequence(a: Sequence[int], b: Sequence[int]) -> bool:
     """
