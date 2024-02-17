@@ -13,6 +13,10 @@ from .util import IntegerInterval
 # The max number of times we try getting a new suggestion if it always maps to the same bucket.
 MAX_SUGGESTION_TRIES = 10
 
+# The positions of the initial samples as a percentage of the input domain.
+# These samples are used to bootstrap the BO surrogate model.
+INITIAL_SAMPLES = [ 0.2, 0.4, 0.6, 0.8 ]
+
 @dataclass
 class BoSuggestion:
     x: int
@@ -38,6 +42,9 @@ class IntegerBayesianOptimizer:
         self.__input_domain = InputParameterDomain(possible_x_values)
         bounds = self.__input_domain.get_gp_bounds()
 
+        self.__bootstrap_suggestions = self.__compute_bootstrap_suggestions()
+        """These X values are returned as the initial suggestions to bootstrap the BO surrogate model."""
+
         self.__observed_values: dict[int, float] = {}
         """
         Since BO suggests floating point values for X, we might get multiple suggestions that map to the same integer X'.
@@ -49,7 +56,7 @@ class IntegerBayesianOptimizer:
         if xi is None:
             xi = 0.01
 
-        self.__optimizer = self.__createBOModel(bounds)
+        self.__optimizer = self.__create_bo_model(bounds)
 
         self.__eiFn = UtilityFunction(kind='ei', kappa=kappa, xi=xi) # type: ignore (TypeHint for xi is wrong, it should be a float)
         """We use expected improvement to determine the next suggestion by the BO."""
@@ -65,6 +72,9 @@ class IntegerBayesianOptimizer:
         remaining_input_domain_size = self.__input_domain.get_unused_values_count()
         if remaining_input_domain_size == 0:
             return BoSuggestion(x=-1, poi=0.0)
+
+        if len(self.__bootstrap_suggestions) > 0:
+            return self.__get_bootstrap_suggestion()
 
         x_suggestion = self.__compute_new_suggestion()
         poi = 1.0
@@ -108,12 +118,27 @@ class IntegerBayesianOptimizer:
         """
         lower_x, upper_x = self.__input_domain.shrink_input_domain(possible_x_values)
         bounds_float = self.__input_domain.get_gp_bounds()
-        self.__optimizer = self.__createBOModel(bounds_float)
+        self.__optimizer = self.__create_bo_model(bounds_float)
         self.__replay_observed_values_to_bo_and_prune(lower_bound=lower_x, upper_bound=upper_x)
         return self.__input_domain.get_unused_values_count()
 
 
-    def __createBOModel(self, bounds: tuple[float, float]) -> AccessibleBayesianOptimization:
+    def __compute_bootstrap_suggestions(self) -> list[int]:
+        ret: list[int] = []
+        if self.__input_domain.size < len(INITIAL_SAMPLES):
+            return ret
+        highest_index = self.__input_domain.size - 1
+
+        # We want the list to go from highest to lowest value to avoid
+        # having to check for input domain shrinking when getting a bootstrap suggestion.
+        for percentage in reversed(INITIAL_SAMPLES):
+            index = int(highest_index * percentage)
+            ret.append(self.__input_domain[index])
+
+        return ret
+
+
+    def __create_bo_model(self, bounds: tuple[float, float]) -> AccessibleBayesianOptimization:
         bo = AccessibleBayesianOptimization(
             f=None,
             pbounds={ 'x': bounds },
@@ -122,6 +147,11 @@ class IntegerBayesianOptimizer:
         )
         bo.set_gp_params(alpha=1e-3)
         return bo
+
+
+    def __get_bootstrap_suggestion(self) -> BoSuggestion:
+        x = self.__bootstrap_suggestions.pop()
+        return BoSuggestion(x=x, poi=1.0)
 
 
     def __compute_new_suggestion(self) -> int:

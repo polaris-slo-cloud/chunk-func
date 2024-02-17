@@ -33,6 +33,21 @@ class InputParameterDomain:
         self.__set_up_unused_values()
 
 
+    @property
+    def size(self) -> int:
+        """
+        Gets the total number of values in the input domain (used + unused).
+        """
+        return len(self.__all_values)
+
+
+    def __getitem__(self, index: int) -> int:
+        """
+        Gets the input parameter value at the specified index.
+        """
+        return self.__all_values[index]
+
+
     def mark_value_used(self, used_value: int):
         """
         Marks the specified value as used.
