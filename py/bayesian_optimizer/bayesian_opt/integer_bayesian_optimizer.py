@@ -200,3 +200,5 @@ class IntegerBayesianOptimizer:
         for x, y in old_observed.items():
             if x >= lower_bound and x <= upper_bound:
                 self.__register_observation__without_marking_used(x, y)
+            else:
+                logging.warning('BO %s: Pruning valid observation for X=%d, while shrinking input domain to [%d, %d].', self.__modelId, x, lower_bound, upper_bound)
