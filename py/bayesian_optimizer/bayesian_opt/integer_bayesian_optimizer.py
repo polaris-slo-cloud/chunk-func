@@ -15,7 +15,7 @@ MAX_SUGGESTION_TRIES = 10
 
 # The positions of the initial samples as a percentage of the input domain.
 # These samples are used to bootstrap the BO surrogate model.
-INITIAL_SAMPLES = [ 0.2, 0.4, 0.6, 0.8 ]
+INITIAL_SAMPLES = [ 0.1, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 ]
 
 @dataclass
 class BoSuggestion:
@@ -144,6 +144,7 @@ class IntegerBayesianOptimizer:
             pbounds={ 'x': bounds },
             verbose=2,
             random_state=1,
+            allow_duplicate_points=True, # Workaround for BO sometimes suggesting an already observed point: https://github.com/bayesian-optimization/BayesianOptimization/issues/158
         )
         bo.set_gp_params(alpha=1e-3)
         return bo
