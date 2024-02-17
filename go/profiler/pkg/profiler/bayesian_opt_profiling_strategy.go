@@ -19,10 +19,10 @@ const (
 )
 
 var (
-	// We want to set xi to favor exploration a little more than exploitation, because we need good estimates
-	// for the entire range of resource profiles.
+	// We use default values for the hyperparameters for the acquisition functions of BO.
+	// For EI and POI only xi is relevant, kappa would be relevant for UCB.
 	kappa = 2.576
-	xi    = 0.000001
+	xi    = 0.01
 )
 
 var (

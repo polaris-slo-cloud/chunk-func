@@ -47,7 +47,7 @@ class IntegerBayesianOptimizer:
         if kappa is None:
             kappa = 2.576
         if xi is None:
-            xi = 0.0
+            xi = 0.01
 
         self.__optimizer = self.__createBOModel(bounds)
 
