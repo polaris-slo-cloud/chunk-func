@@ -23,6 +23,8 @@ var (
 	// For EI and POI only xi is relevant, kappa would be relevant for UCB.
 	kappa = 2.576
 	xi    = 0.01
+
+	maxSamplesPercent = 0.4
 )
 
 var (
@@ -188,9 +190,10 @@ func (bops *BayesianOptProfilingStrategy) setUpBoModels(ctx context.Context) err
 
 	for _, input := range bops.fn.Description.TypicalInputs {
 		initData := &bayesianopt.BoModelInitData{
-			PossibleXValues: profilesList,
-			Kappa:           &kappa,
-			Xi:              &xi,
+			PossibleXValues:   profilesList,
+			Kappa:             &kappa,
+			Xi:                &xi,
+			MaxSamplesPercent: maxSamplesPercent,
 		}
 		boModelId, err := bops.boClient.CreateBoModel(ctx, initData)
 		if err != nil {

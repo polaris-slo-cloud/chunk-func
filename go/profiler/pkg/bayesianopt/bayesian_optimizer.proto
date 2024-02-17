@@ -20,6 +20,11 @@ message BoModelInitData {
 
     optional double kappa = 3;
     optional double xi = 4;
+
+    // The maximum number of samples after which BO should stop (poi will drop to zero).
+    // This number is expressed as a percentage of the number of values in the input domain.
+    // The valid range is [0.0, 1.0] with 0.0 mapping to the default of 1.0.
+    double maxSamplesPercent = 5;
 }
 
 message BoModelId {

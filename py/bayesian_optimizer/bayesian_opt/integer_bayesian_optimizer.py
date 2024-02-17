@@ -37,7 +37,7 @@ class IntegerBayesianOptimizer:
     However, all public methods use the parameter domain.
     """
 
-    def __init__(self, modelId: str, possible_x_values: list[int] | IntegerInterval, kappa: float | None, xi: float | None):
+    def __init__(self, modelId: str, possible_x_values: list[int] | IntegerInterval, kappa: float | None, xi: float | None, max_samples_percent: float | None):
         self.__modelId = modelId
         self.__input_domain = InputParameterDomain(possible_x_values)
         bounds = self.__input_domain.get_gp_bounds()
@@ -50,6 +50,12 @@ class IntegerBayesianOptimizer:
         Since BO suggests floating point values for X, we might get multiple suggestions that map to the same integer X'.
         If we already have an observed value for the integer X', we register that value for the suggested float X.
         """
+
+        if max_samples_percent is None or max_samples_percent == 0.0:
+            max_samples_percent = 1.0
+        if max_samples_percent < 0.0 or max_samples_percent > 1.0:
+            raise ValueError(f'Invalid maxSamplesPercent: {max_samples_percent}. Value must be in the range [0.0, 1.0].')
+        self.__max_samples_percent = max_samples_percent
 
         if kappa is None:
             kappa = 2.576
@@ -70,7 +76,8 @@ class IntegerBayesianOptimizer:
         Makes a new suggestion for X and also returns its expected improvement.
         """
         remaining_input_domain_size = self.__input_domain.get_unused_values_count()
-        if remaining_input_domain_size == 0:
+        percentage_sampled = 1.0 - float(remaining_input_domain_size) / float(self.__input_domain.size)
+        if remaining_input_domain_size == 0 or percentage_sampled > self.__max_samples_percent:
             return BoSuggestion(x=-1, poi=0.0)
 
         if len(self.__bootstrap_suggestions) > 0:

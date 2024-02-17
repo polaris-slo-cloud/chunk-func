@@ -22,6 +22,7 @@ class ProcessedBoInitData:
     possible_x_values: list[int] | IntegerInterval
     kappa: float | None
     xi: float | None
+    max_samples_percent: float
 
 class ModelRefMessage(ProtobufMessage):
     """Helper interface that describes any request with a modelId"""
@@ -46,7 +47,7 @@ class BayesianOptimizerServer(BayesianOptimizerServiceServicer):
             self.__nextModelId += 1
         init_data = self.__extract_bo_init_data(request)
         logging.info('Creating new BoModel %s for %s', modelId, init_data.possible_x_values)
-        optimizer = IntegerBayesianOptimizer(modelId, init_data.possible_x_values, init_data.kappa, init_data.xi)
+        optimizer = IntegerBayesianOptimizer(modelId, init_data.possible_x_values, init_data.kappa, init_data.xi, init_data.max_samples_percent)
         lockable = LockableBayesianOptimizer(Lock(), optimizer)
 
         with self.__optimizers_lock:
@@ -112,7 +113,12 @@ class BayesianOptimizerServer(BayesianOptimizerServiceServicer):
         else:
             raise ValueError('Either possibleXValues or interval must be set.')
 
-        ret = ProcessedBoInitData(possible_x_values, None, None)
+        ret = ProcessedBoInitData(
+            possible_x_values=possible_x_values,
+            kappa=None,
+            xi=None,
+            max_samples_percent=request.maxSamplesPercent,
+        )
 
         if request.kappa > 0.0:
             ret.kappa = request.kappa

@@ -14,16 +14,18 @@ class IntInterval(_message.Message):
     def __init__(self, lowerBound: _Optional[int] = ..., upperBound: _Optional[int] = ...) -> None: ...
 
 class BoModelInitData(_message.Message):
-    __slots__ = ("possibleXValues", "interval", "kappa", "xi")
+    __slots__ = ("possibleXValues", "interval", "kappa", "xi", "maxSamplesPercent")
     POSSIBLEXVALUES_FIELD_NUMBER: _ClassVar[int]
     INTERVAL_FIELD_NUMBER: _ClassVar[int]
     KAPPA_FIELD_NUMBER: _ClassVar[int]
     XI_FIELD_NUMBER: _ClassVar[int]
+    MAXSAMPLESPERCENT_FIELD_NUMBER: _ClassVar[int]
     possibleXValues: _containers.RepeatedScalarFieldContainer[int]
     interval: IntInterval
     kappa: float
     xi: float
-    def __init__(self, possibleXValues: _Optional[_Iterable[int]] = ..., interval: _Optional[_Union[IntInterval, _Mapping]] = ..., kappa: _Optional[float] = ..., xi: _Optional[float] = ...) -> None: ...
+    maxSamplesPercent: float
+    def __init__(self, possibleXValues: _Optional[_Iterable[int]] = ..., interval: _Optional[_Union[IntInterval, _Mapping]] = ..., kappa: _Optional[float] = ..., xi: _Optional[float] = ..., maxSamplesPercent: _Optional[float] = ...) -> None: ...
 
 class BoModelId(_message.Message):
     __slots__ = ("modelId",)
