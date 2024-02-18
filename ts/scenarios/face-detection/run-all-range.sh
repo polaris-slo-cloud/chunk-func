@@ -1,7 +1,7 @@
 #!/bin/bash
 # set -x
 
-BASE_SLO_MS=435375 # fastest(scenario-01) + (cheapest(scenario-01) - fastest(scenario(01)) / 2
+BASE_SLO_MS=439133 # fastest(scenario-01) + (cheapest(scenario-01) - fastest(scenario(01)) / 2
 SLO_RANGE_PERCENT=40
 SLO_STEP_PERCENT=1
 
