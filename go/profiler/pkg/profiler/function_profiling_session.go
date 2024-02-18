@@ -119,6 +119,7 @@ func (fps *FunctionProfilingSession) ExecuteProfilingSession(ctx context.Context
 
 	stopwatch.Stop()
 	startTime := meta.NewTime(stopwatch.StartTime())
+	sessionResults.IterationsPerInputAndProfile = int32(fps.profilingConfig.IterationsPerInputAndProfile)
 	sessionResults.ProfilingStarted = &startTime
 	sessionResults.ProfilingDurationSeconds = int32(stopwatch.Duration().Seconds())
 	return sessionResults, nil
