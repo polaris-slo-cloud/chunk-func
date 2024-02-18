@@ -36,6 +36,7 @@ message BoSuggestion {
     uint64 x = 1;
 
     // Probability of improvement for the next profiling run.
+    // If this is zero, the value of X must be disregarded, because the input domain has been exhausted.
     double poi = 2;
 }
 

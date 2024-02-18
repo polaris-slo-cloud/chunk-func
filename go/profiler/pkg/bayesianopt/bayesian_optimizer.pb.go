@@ -217,6 +217,7 @@ type BoSuggestion struct {
 	// The suggested value of X for the next profiling run.
 	X uint64 `protobuf:"varint,1,opt,name=x,proto3" json:"x,omitempty"`
 	// Probability of improvement for the next profiling run.
+	// If this is zero, the value of X must be disregarded, because the input domain has been exhausted.
 	Poi float64 `protobuf:"fixed64,2,opt,name=poi,proto3" json:"poi,omitempty"`
 }
 

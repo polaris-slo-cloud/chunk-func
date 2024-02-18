@@ -78,7 +78,7 @@ class IntegerBayesianOptimizer:
         remaining_input_domain_size = self.__input_domain.get_unused_values_count()
         percentage_sampled = 1.0 - float(remaining_input_domain_size) / float(self.__input_domain.size)
         if remaining_input_domain_size == 0 or percentage_sampled > self.__max_samples_percent:
-            return BoSuggestion(x=-1, poi=0.0)
+            return BoSuggestion(x=0, poi=0.0)
 
         if len(self.__bootstrap_suggestions) > 0:
             return self.__get_bootstrap_suggestion()
@@ -86,17 +86,13 @@ class IntegerBayesianOptimizer:
         x_suggestion = self.__compute_new_suggestion()
         poi = 1.0
 
-        if remaining_input_domain_size > 1:
-            max_y = self.__optimizer.get_max_y()
-            if max_y is not None:
-                x = numpy.array([ [x_suggestion] ], numpy.float64)
-                utility_poi = self.__poiFn.utility(x, self.__optimizer.gp, self.__optimizer.get_max_y())
-                if utility_poi is None:
-                    raise AssertionError('Could not compute EI')
-                poi = utility_poi.max()
-        else:
-            # If only 1 value was left from the input domain, it is exhausted now.
-            poi = 0.0
+        max_y = self.__optimizer.get_max_y()
+        if max_y is not None:
+            x = numpy.array([ [x_suggestion] ], numpy.float64)
+            utility_poi = self.__poiFn.utility(x, self.__optimizer.gp, self.__optimizer.get_max_y())
+            if utility_poi is None:
+                raise AssertionError('Could not compute EI')
+            poi = utility_poi.max()
 
         return BoSuggestion(x=x_suggestion, poi=poi)
 
