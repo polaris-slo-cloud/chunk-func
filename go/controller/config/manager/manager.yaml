@@ -110,7 +110,7 @@ spec:
             value: localhost:9000
           # The number of profiling iterations that should be done for each resource profile and input size combination/configuration.
           - name: ITERATIONS_PER_CONFIGURATION
-            value: '1'
+            value: '5'
           # The number resource profiles that should be evaluated concurrently.
           - name: CONCURRENT_PROFILES
             value: '2'
