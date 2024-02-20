@@ -19,7 +19,7 @@ spec:
       - sizeBytes: 345600 # 20s * 720p * 24fps
         message:
           input:
-            url: http://10.152.183.192
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
             user: Km64uOPSzqaR3nEy
             password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
@@ -30,7 +30,7 @@ spec:
       - sizeBytes: 518400 # 20s * 1080p * 24fps
         message:
           input:
-            url: http://10.152.183.192
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
             user: Km64uOPSzqaR3nEy
             password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
@@ -41,7 +41,7 @@ spec:
       - sizeBytes: 864000 # 40s * 720p * 30fps
         message:
           input:
-            url: http://10.152.183.192
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
             user: Km64uOPSzqaR3nEy
             password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
@@ -52,7 +52,7 @@ spec:
       - sizeBytes: 1080000 # 60s * 720p * 25fps
         message:
           input:
-            url: http://10.152.183.192
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
             user: Km64uOPSzqaR3nEy
             password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
@@ -63,7 +63,7 @@ spec:
       - sizeBytes: 1296000 # 40s * 1080p * 30fps
         message:
           input:
-            url: http://10.152.183.192
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
             user: Km64uOPSzqaR3nEy
             password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
@@ -74,7 +74,7 @@ spec:
       - sizeBytes: 1620000 #  60s * 1080p * 25fps
         message:
           input:
-            url: http://10.152.183.192
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
             user: Km64uOPSzqaR3nEy
             password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
