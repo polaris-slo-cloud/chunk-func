@@ -15,7 +15,7 @@ MAX_SUGGESTION_TRIES = 10
 
 # The positions of the initial samples as a percentage of the input domain.
 # These samples are used to bootstrap the BO surrogate model.
-INITIAL_SAMPLES = [ 0.1, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 ]
+INITIAL_SAMPLES = [ 0.1, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 ]
 
 @dataclass
 class BoSuggestion:
