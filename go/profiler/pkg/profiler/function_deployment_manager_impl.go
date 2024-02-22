@@ -77,7 +77,7 @@ func (mgr *functionDeploymentManagerImpl) WaitForFunctionToBeReady(ctx context.C
 				// ToDo: There is a race condition with the K8s DNS service.
 				// After the Knative Service is in RoutesReady, DNS needs a short time
 				// to pick it up. Sleeping is so far the only solution I found.
-				sleepDuration, err := time.ParseDuration("2s")
+				sleepDuration, err := time.ParseDuration("5s")
 				if err != nil {
 					panic(err)
 				}
