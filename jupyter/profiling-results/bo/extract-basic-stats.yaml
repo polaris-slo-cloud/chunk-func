@@ -4,7 +4,7 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"chunk-func.polaris-slo-cloud.github.io/v1","kind":"FunctionDescription","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"extract-basic-stats","app.kubernetes.io/name":"functiondescription","app.kubernetes.io/part-of":"chunk-func-controller"},"name":"extract-basic-stats","namespace":"func-test"},"spec":{"functionDescription":{"functionContainer":"user-container","functionName":"extract-basic-stats","maxResponseTimeMs":4000,"typicalInputs":[{"message":{"bucket":"logs","objectKey":"scheduler-scalability-jobs-01.log","objectSizeBytes":2467840,"password":"sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP","url":"http://10.152.183.26","user":"3IbgCHdvv7Yo82F4"},"sizeBytes":2467840},{"message":{"bucket":"logs","objectKey":"scheduler-scalability-jobs-13.log","objectSizeBytes":56909824,"password":"sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP","url":"http://10.152.183.26","user":"3IbgCHdvv7Yo82F4"},"sizeBytes":56909824},{"message":{"bucket":"logs","objectKey":"scheduler-scalability-jobs-15.log","objectSizeBytes":100449280,"password":"sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP","url":"http://10.152.183.26","user":"3IbgCHdvv7Yo82F4"},"sizeBytes":100449280}]}}}
-  creationTimestamp: "2024-02-24T17:33:43Z"
+  creationTimestamp: "2024-02-24T18:31:25Z"
   generation: 1
   labels:
     app.kubernetes.io/instance: extract-basic-stats
@@ -12,8 +12,8 @@ metadata:
     app.kubernetes.io/part-of: chunk-func-controller
   name: extract-basic-stats
   namespace: func-test
-  resourceVersion: "1857173"
-  uid: 832d08a0-fd95-4f28-9512-833609bb8df8
+  resourceVersion: "1877874"
+  uid: 076b59d8-48a3-438f-888c-fb0d54b27ba8
 spec:
   functionDescription:
     functionContainer: user-container
@@ -62,17 +62,17 @@ status:
     inputSizeBytes: 100449280
     optimizedFor: response-time-slo-and-min-cost
   profilingResults:
-    configurationsInferred: 320
-    configurationsProfiled: 157
+    configurationsInferred: 315
+    configurationsProfiled: 162
     iterationsPerInputAndProfile: 1
-    profilingDurationSeconds: 56
-    profilingStarted: "2024-02-24T17:33:43Z"
+    profilingDurationSeconds: 54
+    profilingStarted: "2024-02-24T18:47:34Z"
     results:
     - deploymentStatus: Success
       resourceProfileId: 128mib-1000m
       results:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -88,7 +88,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -106,7 +106,7 @@ status:
       resourceProfileId: 192mib-1000m
       results:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -122,7 +122,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -140,9 +140,9 @@ status:
       resourceProfileId: 256mib-1000m
       results:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 47
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000005"
         executionTimeMs: 1115
@@ -156,9 +156,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 47
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000005"
         executionTimeMs: 1115
@@ -174,7 +174,7 @@ status:
       resourceProfileId: 320mib-1000m
       results:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -190,7 +190,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -208,7 +208,7 @@ status:
       resourceProfileId: 384mib-1000m
       results:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -224,7 +224,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -242,7 +242,7 @@ status:
       resourceProfileId: 448mib-1000m
       results:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -258,7 +258,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -276,7 +276,7 @@ status:
       resourceProfileId: 512mib-1000m
       results:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -292,7 +292,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -310,7 +310,7 @@ status:
       resourceProfileId: 576mib-1000m
       results:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -326,7 +326,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000000"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -344,7 +344,7 @@ status:
       resourceProfileId: 640mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -360,7 +360,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -378,7 +378,7 @@ status:
       resourceProfileId: 704mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -388,13 +388,13 @@ status:
         resultType: Profiled
         statusCode: 200
       - executionCost: "0.000023"
-        executionTimeMs: 1975
+        executionTimeMs: 1974
         inputSizeBytes: 100449280
         resultType: Inferred
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -404,7 +404,7 @@ status:
         resultType: Profiled
         statusCode: 200
       - executionCost: "0.000023"
-        executionTimeMs: 1975
+        executionTimeMs: 1974
         inputSizeBytes: 100449280
         resultType: Inferred
         statusCode: 200
@@ -446,9 +446,9 @@ status:
       resourceProfileId: 832mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 47
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000015"
         executionTimeMs: 1124
@@ -462,9 +462,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 47
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000015"
         executionTimeMs: 1124
@@ -480,9 +480,9 @@ status:
       resourceProfileId: 896mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 51
+        executionTimeMs: 48
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000016"
         executionTimeMs: 1124
@@ -496,9 +496,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 51
+        executionTimeMs: 48
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000016"
         executionTimeMs: 1124
@@ -514,7 +514,7 @@ status:
       resourceProfileId: 960mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -530,7 +530,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -684,9 +684,9 @@ status:
       resourceProfileId: 1280mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 49
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000023"
         executionTimeMs: 1119
@@ -700,9 +700,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 49
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000023"
         executionTimeMs: 1119
@@ -718,7 +718,7 @@ status:
       resourceProfileId: 1344mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -734,7 +734,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -752,9 +752,9 @@ status:
       resourceProfileId: 1408mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 47
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000026"
         executionTimeMs: 1119
@@ -768,9 +768,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 47
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000026"
         executionTimeMs: 1119
@@ -786,7 +786,7 @@ status:
       resourceProfileId: 1472mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -802,7 +802,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -820,7 +820,7 @@ status:
       resourceProfileId: 1536mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -836,7 +836,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -854,7 +854,7 @@ status:
       resourceProfileId: 1600mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -870,7 +870,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -888,7 +888,7 @@ status:
       resourceProfileId: 1664mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -904,7 +904,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -922,7 +922,7 @@ status:
       resourceProfileId: 1728mib-1000m
       results:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -938,7 +938,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000001"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -955,8 +955,8 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 1792mib-2000m
       results:
-      - executionCost: "0.000002"
-        executionTimeMs: 52
+      - executionCost: "0.000001"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -971,8 +971,8 @@ status:
         resultType: Inferred
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000002"
-        executionTimeMs: 52
+      - executionCost: "0.000001"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -990,7 +990,7 @@ status:
       resourceProfileId: 1856mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1006,7 +1006,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1024,7 +1024,7 @@ status:
       resourceProfileId: 1920mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1040,7 +1040,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1058,7 +1058,7 @@ status:
       resourceProfileId: 1984mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1074,7 +1074,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1092,7 +1092,7 @@ status:
       resourceProfileId: 2048mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1108,7 +1108,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1160,7 +1160,7 @@ status:
       resourceProfileId: 2176mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1176,7 +1176,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1194,7 +1194,7 @@ status:
       resourceProfileId: 2240mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1210,7 +1210,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1228,7 +1228,7 @@ status:
       resourceProfileId: 2304mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1244,7 +1244,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1262,7 +1262,7 @@ status:
       resourceProfileId: 2368mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1278,7 +1278,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1296,7 +1296,7 @@ status:
       resourceProfileId: 2432mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1312,7 +1312,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1330,7 +1330,7 @@ status:
       resourceProfileId: 2496mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1346,7 +1346,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1364,7 +1364,7 @@ status:
       resourceProfileId: 2560mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1380,7 +1380,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1398,7 +1398,7 @@ status:
       resourceProfileId: 2624mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1414,7 +1414,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1466,9 +1466,9 @@ status:
       resourceProfileId: 2752mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 47
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000051"
         executionTimeMs: 1142
@@ -1482,9 +1482,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 47
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000051"
         executionTimeMs: 1142
@@ -1534,7 +1534,7 @@ status:
       resourceProfileId: 2880mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1550,7 +1550,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1568,7 +1568,7 @@ status:
       resourceProfileId: 2944mib-2000m
       results:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1584,7 +1584,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000002"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1601,8 +1601,8 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 3008mib-2000m
       results:
-      - executionCost: "0.000003"
-        executionTimeMs: 52
+      - executionCost: "0.000002"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1617,8 +1617,8 @@ status:
         resultType: Inferred
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000003"
-        executionTimeMs: 52
+      - executionCost: "0.000002"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1636,7 +1636,7 @@ status:
       resourceProfileId: 3072mib-2000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1652,7 +1652,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1670,7 +1670,7 @@ status:
       resourceProfileId: 3136mib-2000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1686,7 +1686,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1704,7 +1704,7 @@ status:
       resourceProfileId: 3200mib-2000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1720,7 +1720,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1738,7 +1738,7 @@ status:
       resourceProfileId: 3264mib-2000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1754,7 +1754,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1772,7 +1772,7 @@ status:
       resourceProfileId: 3328mib-2000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1788,7 +1788,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1840,9 +1840,9 @@ status:
       resourceProfileId: 3456mib-2000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 47
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000063"
         executionTimeMs: 1123
@@ -1856,9 +1856,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 47
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000063"
         executionTimeMs: 1123
@@ -1908,7 +1908,7 @@ status:
       resourceProfileId: 3584mib-3000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1924,7 +1924,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1942,7 +1942,7 @@ status:
       resourceProfileId: 3648mib-3000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1958,7 +1958,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1976,7 +1976,7 @@ status:
       resourceProfileId: 3712mib-3000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -1992,7 +1992,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2010,7 +2010,7 @@ status:
       resourceProfileId: 3776mib-3000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2026,7 +2026,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2044,7 +2044,7 @@ status:
       resourceProfileId: 3840mib-3000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2060,7 +2060,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2078,7 +2078,7 @@ status:
       resourceProfileId: 3904mib-3000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2094,7 +2094,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2112,7 +2112,7 @@ status:
       resourceProfileId: 3968mib-3000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2128,7 +2128,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2146,7 +2146,7 @@ status:
       resourceProfileId: 4032mib-3000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2162,7 +2162,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2180,7 +2180,7 @@ status:
       resourceProfileId: 4096mib-3000m
       results:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2196,7 +2196,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000003"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2247,10 +2247,10 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 4224mib-3000m
       results:
-      - executionCost: "0.000004"
-        executionTimeMs: 52
+      - executionCost: "0.000003"
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000077"
         executionTimeMs: 1121
@@ -2263,10 +2263,10 @@ status:
         resultType: Profiled
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000004"
-        executionTimeMs: 52
+      - executionCost: "0.000003"
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000077"
         executionTimeMs: 1121
@@ -2282,7 +2282,7 @@ status:
       resourceProfileId: 4288mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2298,7 +2298,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2316,7 +2316,7 @@ status:
       resourceProfileId: 4352mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2332,7 +2332,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2350,7 +2350,7 @@ status:
       resourceProfileId: 4416mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2366,7 +2366,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2384,7 +2384,7 @@ status:
       resourceProfileId: 4480mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2400,7 +2400,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2418,7 +2418,7 @@ status:
       resourceProfileId: 4544mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2434,7 +2434,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2452,7 +2452,7 @@ status:
       resourceProfileId: 4608mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2468,7 +2468,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2486,7 +2486,7 @@ status:
       resourceProfileId: 4672mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2502,7 +2502,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2554,9 +2554,9 @@ status:
       resourceProfileId: 4800mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 49
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000087"
         executionTimeMs: 1119
@@ -2570,9 +2570,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 49
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000087"
         executionTimeMs: 1119
@@ -2622,7 +2622,7 @@ status:
       resourceProfileId: 4928mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2638,7 +2638,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2656,7 +2656,7 @@ status:
       resourceProfileId: 4992mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2672,7 +2672,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2690,9 +2690,9 @@ status:
       resourceProfileId: 5056mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000092"
         executionTimeMs: 1124
@@ -2706,9 +2706,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000092"
         executionTimeMs: 1124
@@ -2724,7 +2724,7 @@ status:
       resourceProfileId: 5120mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2740,7 +2740,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2792,7 +2792,7 @@ status:
       resourceProfileId: 5248mib-3000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2808,7 +2808,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2826,9 +2826,9 @@ status:
       resourceProfileId: 5312mib-4000m
       results:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000097"
         executionTimeMs: 1124
@@ -2842,9 +2842,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000004"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000097"
         executionTimeMs: 1124
@@ -2859,8 +2859,8 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 5376mib-4000m
       results:
-      - executionCost: "0.000005"
-        executionTimeMs: 52
+      - executionCost: "0.000004"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2875,8 +2875,8 @@ status:
         resultType: Profiled
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000005"
-        executionTimeMs: 52
+      - executionCost: "0.000004"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2894,7 +2894,7 @@ status:
       resourceProfileId: 5440mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2910,7 +2910,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2928,7 +2928,7 @@ status:
       resourceProfileId: 5504mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2944,7 +2944,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2962,7 +2962,7 @@ status:
       resourceProfileId: 5568mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2978,7 +2978,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -2996,7 +2996,7 @@ status:
       resourceProfileId: 5632mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3012,7 +3012,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3030,7 +3030,7 @@ status:
       resourceProfileId: 5696mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3046,7 +3046,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3064,7 +3064,7 @@ status:
       resourceProfileId: 5760mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3080,7 +3080,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3098,7 +3098,7 @@ status:
       resourceProfileId: 5824mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3114,7 +3114,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3132,7 +3132,7 @@ status:
       resourceProfileId: 5888mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3148,7 +3148,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3166,7 +3166,7 @@ status:
       resourceProfileId: 5952mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3182,7 +3182,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3200,7 +3200,7 @@ status:
       resourceProfileId: 6016mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3216,7 +3216,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3234,7 +3234,7 @@ status:
       resourceProfileId: 6080mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3250,7 +3250,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3302,7 +3302,7 @@ status:
       resourceProfileId: 6208mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3318,7 +3318,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3336,7 +3336,7 @@ status:
       resourceProfileId: 6272mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3352,7 +3352,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3370,7 +3370,7 @@ status:
       resourceProfileId: 6336mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3386,7 +3386,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3404,7 +3404,7 @@ status:
       resourceProfileId: 6400mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3420,7 +3420,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3438,7 +3438,7 @@ status:
       resourceProfileId: 6464mib-4000m
       results:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3454,7 +3454,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000005"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3471,8 +3471,8 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 6528mib-4000m
       results:
-      - executionCost: "0.000006"
-        executionTimeMs: 52
+      - executionCost: "0.000005"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3487,8 +3487,8 @@ status:
         resultType: Profiled
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000006"
-        executionTimeMs: 52
+      - executionCost: "0.000005"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3542,7 +3542,7 @@ status:
       - executionCost: "0.000006"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000125"
         executionTimeMs: 1150
@@ -3558,7 +3558,7 @@ status:
       - executionCost: "0.000006"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000125"
         executionTimeMs: 1150
@@ -3574,9 +3574,9 @@ status:
       resourceProfileId: 6720mib-4000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 59
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000118"
         executionTimeMs: 1080
@@ -3590,9 +3590,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 59
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000118"
         executionTimeMs: 1080
@@ -3608,9 +3608,9 @@ status:
       resourceProfileId: 6784mib-4000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 50
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000124"
         executionTimeMs: 1119
@@ -3624,9 +3624,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 50
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000124"
         executionTimeMs: 1119
@@ -3644,7 +3644,7 @@ status:
       - executionCost: "0.000006"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000125"
         executionTimeMs: 1124
@@ -3660,7 +3660,7 @@ status:
       - executionCost: "0.000006"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000125"
         executionTimeMs: 1124
@@ -3676,7 +3676,7 @@ status:
       resourceProfileId: 6912mib-4000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3692,7 +3692,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3778,9 +3778,9 @@ status:
       resourceProfileId: 7104mib-5000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 51
+        executionTimeMs: 53
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000127"
         executionTimeMs: 1099
@@ -3794,9 +3794,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 51
+        executionTimeMs: 53
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000127"
         executionTimeMs: 1099
@@ -3846,7 +3846,7 @@ status:
       resourceProfileId: 7232mib-5000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3862,7 +3862,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3882,7 +3882,7 @@ status:
       - executionCost: "0.000006"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000133"
         executionTimeMs: 1120
@@ -3898,7 +3898,7 @@ status:
       - executionCost: "0.000006"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000133"
         executionTimeMs: 1120
@@ -3914,7 +3914,7 @@ status:
       resourceProfileId: 7360mib-5000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3930,7 +3930,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3948,7 +3948,7 @@ status:
       resourceProfileId: 7424mib-5000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3964,7 +3964,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3982,7 +3982,7 @@ status:
       resourceProfileId: 7488mib-5000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -3998,7 +3998,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4016,7 +4016,7 @@ status:
       resourceProfileId: 7552mib-5000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4032,7 +4032,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4050,7 +4050,7 @@ status:
       resourceProfileId: 7616mib-5000m
       results:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4066,7 +4066,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000006"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4083,8 +4083,8 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 7680mib-5000m
       results:
-      - executionCost: "0.000007"
-        executionTimeMs: 52
+      - executionCost: "0.000006"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4099,8 +4099,8 @@ status:
         resultType: Inferred
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000007"
-        executionTimeMs: 52
+      - executionCost: "0.000006"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4117,8 +4117,8 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 7744mib-5000m
       results:
-      - executionCost: "0.000007"
-        executionTimeMs: 52
+      - executionCost: "0.000006"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4133,8 +4133,8 @@ status:
         resultType: Inferred
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000007"
-        executionTimeMs: 52
+      - executionCost: "0.000006"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4151,10 +4151,10 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 7808mib-5000m
       results:
-      - executionCost: "0.000007"
-        executionTimeMs: 52
+      - executionCost: "0.000006"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000142"
         executionTimeMs: 1114
@@ -4167,10 +4167,10 @@ status:
         resultType: Profiled
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000007"
-        executionTimeMs: 52
+      - executionCost: "0.000006"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000142"
         executionTimeMs: 1114
@@ -4219,10 +4219,10 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 7936mib-5000m
       results:
-      - executionCost: "0.000006"
-        executionTimeMs: 49
+      - executionCost: "0.000007"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000145"
         executionTimeMs: 1124
@@ -4235,10 +4235,10 @@ status:
         resultType: Profiled
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000006"
-        executionTimeMs: 49
+      - executionCost: "0.000007"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000145"
         executionTimeMs: 1124
@@ -4254,9 +4254,9 @@ status:
       resourceProfileId: 8000mib-5000m
       results:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000146"
         executionTimeMs: 1124
@@ -4270,9 +4270,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000146"
         executionTimeMs: 1124
@@ -4288,7 +4288,7 @@ status:
       resourceProfileId: 8064mib-5000m
       results:
       - executionCost: "0.000007"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4304,7 +4304,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000007"
-        executionTimeMs: 51
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4424,9 +4424,9 @@ status:
       resourceProfileId: 8320mib-5000m
       results:
       - executionCost: "0.000007"
-        executionTimeMs: 51
+        executionTimeMs: 49
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000151"
         executionTimeMs: 1119
@@ -4440,9 +4440,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000007"
-        executionTimeMs: 51
+        executionTimeMs: 49
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000151"
         executionTimeMs: 1119
@@ -4458,9 +4458,9 @@ status:
       resourceProfileId: 8384mib-5000m
       results:
       - executionCost: "0.000007"
-        executionTimeMs: 48
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000153"
         executionTimeMs: 1124
@@ -4474,9 +4474,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000007"
-        executionTimeMs: 48
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000153"
         executionTimeMs: 1124
@@ -4494,7 +4494,7 @@ status:
       - executionCost: "0.000007"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000154"
         executionTimeMs: 1121
@@ -4510,7 +4510,7 @@ status:
       - executionCost: "0.000007"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000154"
         executionTimeMs: 1121
@@ -4528,7 +4528,7 @@ status:
       - executionCost: "0.000007"
         executionTimeMs: 52
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000152"
         executionTimeMs: 1094
@@ -4544,7 +4544,7 @@ status:
       - executionCost: "0.000007"
         executionTimeMs: 52
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000152"
         executionTimeMs: 1094
@@ -4560,9 +4560,9 @@ status:
       resourceProfileId: 8576mib-5000m
       results:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 49
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000156"
         executionTimeMs: 1121
@@ -4576,9 +4576,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 49
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000156"
         executionTimeMs: 1121
@@ -4594,7 +4594,7 @@ status:
       resourceProfileId: 8640mib-5000m
       results:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4610,7 +4610,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4628,7 +4628,7 @@ status:
       resourceProfileId: 8704mib-5000m
       results:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4644,7 +4644,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4662,7 +4662,7 @@ status:
       resourceProfileId: 8768mib-5000m
       results:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4678,7 +4678,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4696,7 +4696,7 @@ status:
       resourceProfileId: 8832mib-5000m
       results:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4712,7 +4712,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000007"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4729,8 +4729,8 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 8896mib-6000m
       results:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4745,8 +4745,8 @@ status:
         resultType: Inferred
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4763,8 +4763,8 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 8960mib-6000m
       results:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4779,8 +4779,8 @@ status:
         resultType: Profiled
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4797,8 +4797,8 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 9024mib-6000m
       results:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4813,8 +4813,8 @@ status:
         resultType: Inferred
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4831,10 +4831,10 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 9088mib-6000m
       results:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000166"
         executionTimeMs: 1123
@@ -4847,10 +4847,10 @@ status:
         resultType: Inferred
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000166"
         executionTimeMs: 1123
@@ -4866,7 +4866,7 @@ status:
       resourceProfileId: 9152mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4882,7 +4882,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -4934,9 +4934,9 @@ status:
       resourceProfileId: 9280mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000163"
         executionTimeMs: 1077
@@ -4950,9 +4950,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000163"
         executionTimeMs: 1077
@@ -4968,9 +4968,9 @@ status:
       resourceProfileId: 9344mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 53
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000170"
         executionTimeMs: 1119
@@ -4984,9 +4984,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 53
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000170"
         executionTimeMs: 1119
@@ -5001,10 +5001,10 @@ status:
     - deploymentStatus: Success
       resourceProfileId: 9408mib-6000m
       results:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 48
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000172"
         executionTimeMs: 1124
@@ -5017,10 +5017,10 @@ status:
         resultType: Inferred
         statusCode: 200
       unfilteredResults:
-      - executionCost: "0.000008"
-        executionTimeMs: 52
+      - executionCost: "0.000007"
+        executionTimeMs: 48
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000172"
         executionTimeMs: 1124
@@ -5036,7 +5036,7 @@ status:
       resourceProfileId: 9472mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -5052,7 +5052,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 50
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -5070,7 +5070,7 @@ status:
       resourceProfileId: 9536mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -5086,7 +5086,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -5104,12 +5104,12 @@ status:
       resourceProfileId: 9600mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
       - executionCost: "0.000175"
-        executionTimeMs: 1121
+        executionTimeMs: 1122
         inputSizeBytes: 56909824
         resultType: Inferred
         statusCode: 200
@@ -5120,12 +5120,12 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
       - executionCost: "0.000175"
-        executionTimeMs: 1121
+        executionTimeMs: 1122
         inputSizeBytes: 56909824
         resultType: Inferred
         statusCode: 200
@@ -5138,7 +5138,7 @@ status:
       resourceProfileId: 9664mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -5154,7 +5154,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -5172,9 +5172,9 @@ status:
       resourceProfileId: 9728mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 49
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000183"
         executionTimeMs: 1155
@@ -5188,9 +5188,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 49
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000183"
         executionTimeMs: 1155
@@ -5206,7 +5206,7 @@ status:
       resourceProfileId: 9792mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -5222,7 +5222,7 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
@@ -5240,12 +5240,12 @@ status:
       resourceProfileId: 9856mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
       - executionCost: "0.000180"
-        executionTimeMs: 1122
+        executionTimeMs: 1121
         inputSizeBytes: 56909824
         resultType: Inferred
         statusCode: 200
@@ -5256,12 +5256,12 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 52
+        executionTimeMs: 51
         inputSizeBytes: 2467840
         resultType: Inferred
         statusCode: 200
       - executionCost: "0.000180"
-        executionTimeMs: 1122
+        executionTimeMs: 1121
         inputSizeBytes: 56909824
         resultType: Inferred
         statusCode: 200
@@ -5276,7 +5276,7 @@ status:
       - executionCost: "0.000008"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000182"
         executionTimeMs: 1124
@@ -5292,7 +5292,7 @@ status:
       - executionCost: "0.000008"
         executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000182"
         executionTimeMs: 1124
@@ -5308,9 +5308,9 @@ status:
       resourceProfileId: 9984mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 49
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000183"
         executionTimeMs: 1124
@@ -5324,9 +5324,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 49
+        executionTimeMs: 51
         inputSizeBytes: 2467840
-        resultType: Profiled
+        resultType: Inferred
         statusCode: 200
       - executionCost: "0.000183"
         executionTimeMs: 1124
@@ -5376,9 +5376,9 @@ status:
       resourceProfileId: 10112mib-6000m
       results:
       - executionCost: "0.000008"
-        executionTimeMs: 50
+        executionTimeMs: 49
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000184"
         executionTimeMs: 1120
@@ -5392,9 +5392,9 @@ status:
         statusCode: 200
       unfilteredResults:
       - executionCost: "0.000008"
-        executionTimeMs: 50
+        executionTimeMs: 49
         inputSizeBytes: 2467840
-        resultType: Inferred
+        resultType: Profiled
         statusCode: 200
       - executionCost: "0.000184"
         executionTimeMs: 1120
