@@ -1,17 +1,24 @@
 #!/bin/bash
 # set -x
 
-BASE_SLO_MS=5307604 # fastest(scenario-01) + (cheapest(scenario-01) - fastest(scenario(01)) / 2
+BASE_SLO_MS=0 # fastest(scenario-01) + (cheapest(scenario-01) - fastest(scenario(01)) / 2
 SLO_RANGE_PERCENT=40
 SLO_STEP_PERCENT=1
 
-WORKFLOW_PATH="workflow.yaml"
+WORKFLOW_PATH="workflow"
 OUTPUT_DIR="./simulation-logs"
-RESULTS_CSV="./simulation-results.csv"
+RESULTS_CSV="./simulation-results"
 TRAINING_SCENARIO_PATH="slam-scenario.yaml"
+
+PROFILES_TYPE="" # Set by first command line argument. Can be "gcf" or "aws".
 
 CHUNK_FUNC_SIM_JS="../../dist/packages/chunk-func-sim/main.js"
 RESULTS_CONVERTER_JS="../../dist/packages/results-converter/main.js"
+
+declare -A BASE_SLOS=(
+    ["gcf"]=5307604
+    ["aws"]=""
+)
 
 declare -A SCENARIOS=(
     ["scenario-01"]="scenario-01-template.yaml"
@@ -102,6 +109,18 @@ function simulateScenario() {
     simulateSloRange "$scenarioName" "$scenarioTemplateFile" "1"
 }
 
+
+if [ "$1" != "aws" ] && [ "$1" != "gcf" ]; then
+    echo "Usage: ./run-all-range.sh <profiles-type>"
+    echo "profiles-type can be \"aws\" or \"gcf\""
+    echo "Example: ./run-all-range.sh gcf"
+    exit 1
+fi
+
+PROFILES_TYPE=$1
+WORKFLOW_PATH="${WORKFLOW_PATH}-${PROFILES_TYPE}.yaml"
+RESULTS_CSV="${RESULTS_CSV}-${PROFILES_TYPE}.yaml"
+BASE_SLO_MS=${BASE_SLOS[${PROFILES_TYPE}]}
 
 mkdir -p "$OUTPUT_DIR"
 

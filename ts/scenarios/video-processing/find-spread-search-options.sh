@@ -5,8 +5,8 @@ BASE_SLO_MS=79000
 SLO_RANGE_PERCENT=40
 SLO_STEP_PERCENT=1
 
-WORKFLOW_PATH="workflow.yaml"
-RESULTS_CSV="./spread-search-options.csv"
+WORKFLOW_PATH="workflow-gcf.yaml"
+RESULTS_CSV="./spread-search-options-gcf.csv"
 
 CHUNK_FUNC_SIM_JS="../../dist/packages/chunk-func-sim/main.js"
 
