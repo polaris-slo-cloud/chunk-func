@@ -426,13 +426,16 @@ func (bops *BayesianOptProfilingStrategy) shrinkResourceProfileDomain(
 }
 
 func (bops *BayesianOptProfilingStrategy) getPrunedMemorySizesAndProfile(failedResProfile *function.ResourceProfile) (prunedList []uint64, newMinResProfile *function.ResourceProfile) {
-	index, _ := slices.BinarySearch(bops.profileMemorySizes, uint64(failedResProfile.MemoryMiB))
+	index, found := slices.BinarySearch(bops.profileMemorySizes, uint64(failedResProfile.MemoryMiB))
+	if !found {
+		panic(fmt.Sprintf("Unknown resource profile %s", failedResProfile.ID()))
+	}
 	if index < len(bops.profileMemorySizes)-1 {
 		newMinProfileIndex := index + 1
 		newMinResProfile = bops.availableProfiles[newMinProfileIndex]
 		prunedList = bops.profileMemorySizes[newMinProfileIndex:len(bops.profileMemorySizes)]
 	} else {
-		panic("ToDo: handle situation where no resourceProfile is able to handle the function.")
+		panic(fmt.Sprintf("ToDo: handle situation where no resourceProfile is able to handle the function. Failed profile: %s", failedResProfile.ID()))
 	}
 	return prunedList, newMinResProfile
 }
