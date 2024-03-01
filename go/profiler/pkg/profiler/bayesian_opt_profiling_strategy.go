@@ -15,7 +15,7 @@ import (
 
 var (
 	// If the BO returns a probability of improvement below this threshold, profiling for the respective input size is marked as complete.
-	DefaultBoPoiThreshold = 0.05
+	DefaultBoPoiThreshold = 0.02
 
 	// We use default values for the hyperparameters for the acquisition functions of BO.
 	// For EI and POI only xi is relevant, defaultKappa would be relevant for UCB.

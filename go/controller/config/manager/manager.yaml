@@ -124,7 +124,7 @@ spec:
             value: '0.01'
           # If the BO returns a probability of improvement below this threshold, profiling for the respective input size is marked as complete.
           - name: BAYESIAN_OPT_POI_THRESHOLD
-            value: '0.05'
+            value: '0.02'
 
       - name: bayesian-optimizer
         image: bayesian-optimizer:latest
