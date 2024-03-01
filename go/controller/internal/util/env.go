@@ -18,7 +18,7 @@ func GetFloatEnvVar(key string, defaultValue *float64) (float64, error) {
 
 	floatValue, err := strconv.ParseFloat(strValue, 64)
 	if err != nil {
-		return floatValue, nil
+		return 0.0, fmt.Errorf("the %s environment variable is not a proper float value", key)
 	}
-	return 0.0, fmt.Errorf("the %s environment variable is not a proper float value", key)
+	return floatValue, nil
 }
