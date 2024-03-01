@@ -171,13 +171,7 @@ func (fdr *FunctionDescriptionReconciler) createProfiler(k8sConfig *rest.Config,
 	profilerType := strings.ToLower(os.Getenv("PROFILER"))
 	switch profilerType {
 	case "bayesianopt":
-		address := os.Getenv("BAYESIAN_OPT_SERVER")
-		if address == "" {
-			return nil, fmt.Errorf("the BAYESIAN_OPT_SERVER environment variable must be set to the address of the Bayesian Optimizer server, e.g., \"localhost:9000\"")
-		}
-		logger.Info("Creating BayesianOptFunctionProfiler", "targetAddress", address)
-		return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, fnTriggerFactory, deploymentMgrFactory, logger), nil
-
+		return fdr.createBoFunctionProfiler(k8sConfig, fnTriggerFactory, deploymentMgrFactory, logger)
 	case "exhaustive":
 		fallthrough
 	default:
@@ -205,6 +199,33 @@ func (fdr *FunctionDescriptionReconciler) createDeploymentAndTriggerFactories(lo
 		fdr.namespaceMgr = NewK8sNamespaceManager(fdr.Client)
 		return trigger.RestTriggerFactory, profiler.NewFunctionDeploymentManager, nil
 	}
+}
+
+func (fdr *FunctionDescriptionReconciler) createBoFunctionProfiler(
+	k8sConfig *rest.Config,
+	fnTriggerFactory trigger.TimedFunctionTriggerFactoryFn[any],
+	deploymentMgrFactory profiler.FunctionDeploymentManagerFactoryFn,
+	logger *logr.Logger,
+) (*profiler.BayesianOptFunctionProfiler, error) {
+	address := os.Getenv("BAYESIAN_OPT_SERVER")
+	if address == "" {
+		return nil, fmt.Errorf("the BAYESIAN_OPT_SERVER environment variable must be set to the address of the Bayesian Optimizer server, e.g., \"localhost:9000\"")
+	}
+	maxSamplesPercent, err := util.GetFloatEnvVar("BAYESIAN_OPT_MAX_SAMPLES_PERCENT", &profiler.DefaultBoMaxSamplesPercent)
+	if err != nil {
+		return nil, err
+	}
+	xi, err := util.GetFloatEnvVar("BAYESIAN_OPT_XI", &profiler.DefaultBoXi)
+	if err != nil {
+		return nil, err
+	}
+	poiThreshold, err := util.GetFloatEnvVar("BAYESIAN_OPT_POI_THRESHOLD", &profiler.DefaultBoPoiThreshold)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Info("Creating BayesianOptFunctionProfiler", "targetAddress", address)
+	return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, fnTriggerFactory, deploymentMgrFactory, maxSamplesPercent, xi, poiThreshold, logger), nil
 }
 
 func (fdr *FunctionDescriptionReconciler) fetchKnativeService(ctx context.Context, fnDesc *chunkFunc.FunctionDescription) (*knServing.Service, error) {

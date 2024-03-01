@@ -26,6 +26,9 @@ type BayesianOptFunctionProfiler struct {
 	fnTriggerFactoryFn   trigger.TimedFunctionTriggerFactoryFn[any]
 	deploymentMgrFactory FunctionDeploymentManagerFactoryFn
 	boServerAddress      string
+	maxSamplesPercent    float64
+	xi                   float64
+	poiThreshold         float64
 	logger               *logr.Logger
 }
 
@@ -39,6 +42,9 @@ func NewBayesianOptFunctionProfiler(
 	boServerAddress string,
 	fnTriggerFactoryFn trigger.TimedFunctionTriggerFactoryFn[any],
 	deploymentMgrFactory FunctionDeploymentManagerFactoryFn,
+	maxSamplesPercent float64,
+	xi float64,
+	poiThreshold float64,
 	logger *logr.Logger,
 ) *BayesianOptFunctionProfiler {
 	modifiableConfig := rest.CopyConfig(k8sConfig)
@@ -47,6 +53,9 @@ func NewBayesianOptFunctionProfiler(
 		fnTriggerFactoryFn:   fnTriggerFactoryFn,
 		deploymentMgrFactory: deploymentMgrFactory,
 		boServerAddress:      boServerAddress,
+		maxSamplesPercent:    maxSamplesPercent,
+		xi:                   xi,
+		poiThreshold:         poiThreshold,
 		logger:               logger,
 	}
 	return efp
@@ -71,7 +80,7 @@ func (bfp *BayesianOptFunctionProfiler) ProfileFunction(ctx context.Context, fn 
 	defer conn.Close()
 	boClient := bayesianopt.NewBayesianOptimizerServiceClient(conn)
 
-	profilingStrategy := NewBayesianOptProfilingStrategy(boClient, bfp.logger)
+	profilingStrategy := NewBayesianOptProfilingStrategy(boClient, bfp.maxSamplesPercent, bfp.xi, bfp.poiThreshold, bfp.logger)
 	fps := NewFunctionProfilingSession(fn, profilingConfig, profilingStrategy, bfp.fnTriggerFactoryFn, bfp.servingClient, bfp.deploymentMgrFactory, bfp.logger)
 	return fps.ExecuteProfilingSession(ctx)
 }

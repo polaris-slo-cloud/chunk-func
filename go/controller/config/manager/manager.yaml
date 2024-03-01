@@ -106,14 +106,25 @@ spec:
           # PROFILER can be either "Exhaustive" or "BayesianOpt"
           - name: PROFILER
             value: Exhaustive
-          - name: BAYESIAN_OPT_SERVER
-            value: localhost:9000
           # The number of profiling iterations that should be done for each resource profile and input size combination/configuration.
           - name: ITERATIONS_PER_CONFIGURATION
             value: '5'
           # The number resource profiles that should be evaluated concurrently.
           - name: CONCURRENT_PROFILES
             value: '2'
+
+          # The address of the BO server.
+          - name: BAYESIAN_OPT_SERVER
+            value: localhost:9000
+          # The maximum number of samples that will be collected by BO, as a percentage of the total number of profiles.
+          - name: BAYESIAN_OPT_MAX_SAMPLES_PERCENT
+            value: '0.4'
+          # The xi hyperparameter for BO.
+          - name: BAYESIAN_OPT_XI
+            value: '0.01'
+          # If the BO returns a probability of improvement below this threshold, profiling for the respective input size is marked as complete.
+          - name: BAYESIAN_OPT_POI_THRESHOLD
+            value: '0.05'
 
       - name: bayesian-optimizer
         image: bayesian-optimizer:latest

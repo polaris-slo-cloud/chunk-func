@@ -15,9 +15,12 @@
               "RESOURCE_PROFILES": "AWS",
               "FUNCTION_TRIGGER": "MockedResults",
               "PROFILER": "BayesianOpt",
-              "BAYESIAN_OPT_SERVER": "localhost:9000",
               "ITERATIONS_PER_CONFIGURATION": "1",
-              "CONCURRENT_PROFILES": "2"
+              "CONCURRENT_PROFILES": "2",
+              "BAYESIAN_OPT_SERVER": "localhost:9000",
+              "BAYESIAN_OPT_MAX_SAMPLES_PERCENT": "0.4",
+              "BAYESIAN_OPT_XI": "0.01",
+              "BAYESIAN_OPT_POI_THRESHOLD": "0.05"
             },
             "args": []
         }

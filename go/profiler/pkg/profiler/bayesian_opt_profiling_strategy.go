@@ -13,18 +13,16 @@ import (
 	"polaris-slo-cloud.github.io/chunk-func/profiler/pkg/bayesianopt"
 )
 
-const (
-	// If the BO returns a probability of improvement below this threshold, profiling for the respective input size is marked as complete.
-	poiThreshold = 0.05
-)
-
 var (
-	// We use default values for the hyperparameters for the acquisition functions of BO.
-	// For EI and POI only xi is relevant, kappa would be relevant for UCB.
-	kappa = 2.576
-	xi    = 0.01
+	// If the BO returns a probability of improvement below this threshold, profiling for the respective input size is marked as complete.
+	DefaultBoPoiThreshold = 0.05
 
-	maxSamplesPercent = 0.4
+	// We use default values for the hyperparameters for the acquisition functions of BO.
+	// For EI and POI only xi is relevant, defaultKappa would be relevant for UCB.
+	defaultBoKappa = 2.576
+	DefaultBoXi    = 0.01
+
+	DefaultBoMaxSamplesPercent = 0.4
 )
 
 var (
@@ -77,6 +75,15 @@ type BayesianOptProfilingStrategy struct {
 	// Locking protocol: no other lock must be held when acquiring this mutex.
 	profilingQueueMutex sync.Mutex
 
+	// The maximum number of samples that will be collected, as a percentage of the total number of profiles.
+	maxSamplesPercent float64
+
+	// The xi hyperparameter for BO.
+	xi float64
+
+	// If the BO returns a probability of improvement below this threshold, profiling for the respective input size is marked as complete.
+	poiThreshold float64
+
 	// Stores the IDs of the BO models indexed by input size.
 	// Each input size has its own Bayesian Optimizer.
 	boModelIds map[int64]string
@@ -93,13 +100,22 @@ type BayesianOptProfilingStrategy struct {
 	logger *logr.Logger
 }
 
-func NewBayesianOptProfilingStrategy(boClient bayesianopt.BayesianOptimizerServiceClient, logger *logr.Logger) *BayesianOptProfilingStrategy {
+func NewBayesianOptProfilingStrategy(
+	boClient bayesianopt.BayesianOptimizerServiceClient,
+	maxSamplesPercent float64,
+	xi float64,
+	poiThreshold float64,
+	logger *logr.Logger,
+) *BayesianOptProfilingStrategy {
 	return &BayesianOptProfilingStrategy{
 		boClient:                      boClient,
 		minResourceProfileByInputLock: sync.RWMutex{},
 		completedInputsMutex:          sync.Mutex{},
 		boModelIdsMutex:               sync.Mutex{},
 		profilingQueueMutex:           sync.Mutex{},
+		maxSamplesPercent:             maxSamplesPercent,
+		xi:                            xi,
+		poiThreshold:                  poiThreshold,
 		logger:                        logger,
 	}
 }
@@ -191,9 +207,9 @@ func (bops *BayesianOptProfilingStrategy) setUpBoModels(ctx context.Context) err
 	for _, input := range bops.fn.Description.TypicalInputs {
 		initData := &bayesianopt.BoModelInitData{
 			PossibleXValues:   profilesList,
-			Kappa:             &kappa,
-			Xi:                &xi,
-			MaxSamplesPercent: maxSamplesPercent,
+			Kappa:             &defaultBoKappa,
+			Xi:                &bops.xi,
+			MaxSamplesPercent: bops.maxSamplesPercent,
 		}
 		boModelId, err := bops.boClient.CreateBoModel(ctx, initData)
 		if err != nil {
@@ -248,7 +264,7 @@ func (bops *BayesianOptProfilingStrategy) getAndQueueNextProfile(
 		return
 	}
 
-	if suggestion.Suggestion.Poi < poiThreshold {
+	if suggestion.Suggestion.Poi < bops.poiThreshold {
 		bops.markInputAsComplete(input)
 		return
 	}
