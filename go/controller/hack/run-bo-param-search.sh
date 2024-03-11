@@ -79,7 +79,7 @@ function cleanUp() {
 # Repeatedly checks which function have been profiled and returns when all have been profiled.
 function waitForAllResults() {
     local doneCount=0
-    while [ "$doneCount" -ne ${#FUNCTION_DESCRIPTIONS} ]; do
+    while [ "$doneCount" -ne ${#FUNCTION_DESCRIPTIONS[@]} ]; do
         doneCount=0
         echo "Sleeping $SLEEP_DURATION"
         sleep $SLEEP_DURATION
@@ -98,7 +98,7 @@ function waitForAllResults() {
             fi
         done
 
-        echo "$doneCount of ${#FUNCTION_DESCRIPTIONS} profiled"
+        echo "$(date "+%T"): $doneCount of ${#FUNCTION_DESCRIPTIONS[@]} profiled"
     done
 }
 
