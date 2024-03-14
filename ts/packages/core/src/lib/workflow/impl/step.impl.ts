@@ -55,6 +55,7 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
 
     override readonly type: WorkflowStepType.Function = WorkflowStepType.Function;
     profilingResults: ProfilingSessionResults;
+    exhaustiveProfilingResults: ProfilingSessionResults;
     maxExecutionTimeMs?: number;
 
     constructor (config: WorkflowStepDescription);
@@ -69,8 +70,10 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
         }
         if (config instanceof WorkflowFunctionStepImpl) {
             this.profilingResults = cloneDeep(config.profilingResults);
+            this.exhaustiveProfilingResults = cloneDeep(config.exhaustiveProfilingResults);
         } else {
             this.profilingResults = config.profilingResults;
+            this.exhaustiveProfilingResults = config.exhaustiveProfilingResults || cloneDeep(config.profilingResults);
         }
         this.maxExecutionTimeMs = config.maxExecutionTimeMs;
     }
@@ -81,7 +84,7 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
             throw new Error('resourceProfile must not be undefined for WorkflowSteps of type Function.')
         }
 
-        const profileResults = findResourceProfileResults(resourceProfile, this.profilingResults);
+        const profileResults = findResourceProfileResults(resourceProfile, this.exhaustiveProfilingResults);
         if (!profileResults || !profileResults.results) {
             throw new Error(`No Profiling results for ${getResourceProfileId(resourceProfile)}`);
         }

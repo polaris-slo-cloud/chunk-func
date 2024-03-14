@@ -69,8 +69,25 @@ export interface WorkflowFunctionStep extends WorkflowStep {
     /**
      * The results of the profiling of the serverless function that
      * is executed in this step.
+     *
+     * These results can be from exhaustive profiling or from Bayesian Optimization guided profiling.
+     *
+     * These results are used by the ResourceConfigurationStrategies to choose a resource profile for the current step.
      */
     profilingResults: ProfilingSessionResults;
+
+    /**
+     * The results from exhaustive profiling, if this step includes a serverless function.
+     *
+     * These results are used during workflow execution to determine the actual time of the step under the current profile.
+     * There are three possible relationships between the `exhaustiveProfilingResults` and the `profilingResults` above.
+     *
+     * 1. `profilingResults` and `exhaustiveProfilingResults` are the same.
+     * 2. `profilingResults` contain fewer profiled inputs than `exhaustiveProfilingResults`.
+     * 3. `profilingResults` are Bayesian Optimization guided, so some results are inferred, and `exhaustiveProfilingResults` contains
+     *    the results from the exhaustive (real) profiling runs.
+     */
+    exhaustiveProfilingResults: ProfilingSessionResults;
 
     /**
      * The maximum execution time SLO for this step.
