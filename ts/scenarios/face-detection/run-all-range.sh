@@ -16,7 +16,7 @@ CHUNK_FUNC_SIM_JS="../../dist/packages/chunk-func-sim/main.js"
 RESULTS_CONVERTER_JS="../../dist/packages/results-converter/main.js"
 
 declare -A BASE_SLOS=(
-    ["gcf"]=439133
+    ["gcf"]=439000
     ["aws"]=""
 )
 
