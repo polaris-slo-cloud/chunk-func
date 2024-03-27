@@ -17,7 +17,10 @@ RESULTS_CONVERTER_JS="../../dist/packages/results-converter/main.js"
 
 declare -A BASE_SLOS=(
     ["gcf"]=12000
-    ["aws"]=1557 # All AWS profiles have at least 1 vCPU, and Node.JS is single threaded, so there is not much difference between cheapest and fastest.
+
+    # All AWS profiles have at least 1 vCPU, and Node.JS is single threaded, so there is not much difference between cheapest and fastest.
+    # Actually this scenario does not make sense for AWS, because the fastest possible exec time is ~99.3% of the BASE_SLO.
+    ["aws"]=1557
 )
 
 declare -A SCENARIOS=(
