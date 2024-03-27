@@ -17,7 +17,7 @@ RESULTS_CONVERTER_JS="../../dist/packages/results-converter/main.js"
 
 declare -A BASE_SLOS=(
     ["gcf"]=12000
-    ["aws"]=""
+    ["aws"]=1557 # All AWS profiles have at least 1 vCPU, and Node.JS is single threaded, so there is not much difference between cheapest and fastest.
 )
 
 declare -A SCENARIOS=(
@@ -51,8 +51,8 @@ function runSloIndependentStrategies() {
     local scenarioFinalYamlFile="$(mktemp)"
     sed -e "s/{{ \.sloMs }}/100/" "$scenarioTemplateFile" > "$scenarioFinalYamlFile"
 
-    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "FastestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-fastest.json"
-    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "CheapestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-cheapest.json"
+    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "FastestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-${PROFILES_TYPE}-fastest.json"
+    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "CheapestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-${PROFILES_TYPE}-cheapest.json"
 
     rm "$scenarioFinalYamlFile"
 }
