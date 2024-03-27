@@ -51,8 +51,8 @@ function runSloIndependentStrategies() {
     local scenarioFinalYamlFile="$(mktemp)"
     sed -e "s/{{ \.sloMs }}/100/" "$scenarioTemplateFile" > "$scenarioFinalYamlFile"
 
-    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "FastestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-fastest.json"
-    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "CheapestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-cheapest.json"
+    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "FastestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-${PROFILES_TYPE}-fastest.json"
+    node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "CheapestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-${PROFILES_TYPE}-cheapest.json"
 
     rm "$scenarioFinalYamlFile"
 }
