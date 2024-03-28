@@ -24,5 +24,6 @@ function runSimulation() {
 echo "Removing all JSON files from output directory"
 rm ./simulation-logs/*.json
 
+# We only run AWS and GCF here, but not AWS-BO, because the fastest and cheapest strategies only rely on the exhaustiveProfilingResults.
 runSimulation "aws"
 runSimulation "gcf"
