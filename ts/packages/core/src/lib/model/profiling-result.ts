@@ -173,6 +173,10 @@ export function findResourceProfileResults(profile: ResourceProfile, profilingSe
  * If no profile with a success status code can be found, `undefined` is returned.
  */
 export function findResultForInput(inputSizeBytes: number, profileResults: ProfilingResult[]): ProfilingResult | undefined {
+    if (profileResults.length === 0) {
+        return undefined;
+    }
+
     let profilingResult = profileResults.find(result => inputSizeBytes <= result.inputSizeBytes && isSuccessStatusCode(result.statusCode));
     if (!profilingResult) {
         const largestInputResult = profileResults[profileResults.length - 1];
