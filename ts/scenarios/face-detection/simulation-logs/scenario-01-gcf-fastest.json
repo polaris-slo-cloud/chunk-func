@@ -2,7 +2,7 @@
   "scenarioName": "scenario-01-input-60s-1080p",
   "resourceConfigStrategy": "FastestConfigStrategy",
   "inputDataSizeMib": 1.544952392578125,
-  "sloMs": 100,
+  "sloMs": 200000,
   "workflowOutput": {
     "executionTimeMs": 178308,
     "totalCost": 0.339864,
@@ -41,7 +41,7 @@
         },
         "executionTimeMs": 131120,
         "executionCost": 0.249805,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "mark-faces": {
         "resourceProfile": {
@@ -55,7 +55,7 @@
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0
+    "avgResourceConfigStrategyExecutionTimeMs": 0.25
   },
-  "sloFulfilled": false
+  "sloFulfilled": true
 }

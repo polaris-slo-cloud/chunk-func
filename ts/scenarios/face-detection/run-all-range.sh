@@ -17,7 +17,7 @@ RESULTS_CONVERTER_JS="../../dist/packages/results-converter/main.js"
 
 declare -A BASE_SLOS=(
     ["gcf"]=439000
-    ["aws"]=""
+    ["aws"]=129823
 )
 
 declare -A SCENARIOS=(
@@ -121,6 +121,10 @@ PROFILES_TYPE=$1
 WORKFLOW_PATH="${WORKFLOW_PATH}-${PROFILES_TYPE}.yaml"
 RESULTS_CSV="${RESULTS_CSV}-${PROFILES_TYPE}.csv"
 BASE_SLO_MS=${BASE_SLOS[${PROFILES_TYPE}]}
+
+if [ "$PROFILES_TYPE" == "aws" ]; then
+    SLO_RANGE_PERCENT=35 # Otherwise, we would go below the fastest possible exec time.
+fi
 
 mkdir -p "$OUTPUT_DIR"
 

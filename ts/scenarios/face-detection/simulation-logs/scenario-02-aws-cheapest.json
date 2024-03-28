@@ -2,10 +2,10 @@
   "scenarioName": "scenario-02-input-40s-720p",
   "resourceConfigStrategy": "CheapestConfigStrategy",
   "inputDataSizeMib": 0.823974609375,
-  "sloMs": 100,
+  "sloMs": 150000,
   "workflowOutput": {
-    "executionTimeMs": 700027,
-    "totalCost": 0.017645,
+    "executionTimeMs": 178505,
+    "totalCost": 0.0006,
     "data": {
       "sizeBytes": 864000
     },
@@ -13,45 +13,45 @@
       "validate-video-face-recog": {
         "resourceProfile": {
           "memoryMiB": 512,
-          "milliCpu": 333,
-          "pricePerUnit": 0.000001295,
-          "billingUnitMs": 100
+          "milliCpu": 1000,
+          "pricePerUnit": 8.3e-9,
+          "billingUnitMs": 1
         },
-        "executionTimeMs": 258,
-        "executionCost": 0.000004,
+        "executionTimeMs": 47,
+        "executionCost": 0,
         "resourceConfigStrategyExecutionTimeMs": 1
       },
       "transform-video": {
         "resourceProfile": {
           "memoryMiB": 256,
-          "milliCpu": 167,
-          "pricePerUnit": 6.48e-7,
-          "billingUnitMs": 100
+          "milliCpu": 1000,
+          "pricePerUnit": 4.166666666666666e-9,
+          "billingUnitMs": 1
         },
-        "executionTimeMs": 224137,
-        "executionCost": 0.001453,
+        "executionTimeMs": 34271,
+        "executionCost": 0.000143,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "detect-faces": {
         "resourceProfile": {
-          "memoryMiB": 2048,
+          "memoryMiB": 192,
           "milliCpu": 1000,
-          "pricePerUnit": 0.00000406,
-          "billingUnitMs": 100
+          "pricePerUnit": 3.1333333333333333e-9,
+          "billingUnitMs": 1
         },
-        "executionTimeMs": 384074,
-        "executionCost": 0.015594,
+        "executionTimeMs": 138962,
+        "executionCost": 0.000435,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "mark-faces": {
         "resourceProfile": {
           "memoryMiB": 256,
-          "milliCpu": 167,
-          "pricePerUnit": 6.48e-7,
-          "billingUnitMs": 100
+          "milliCpu": 1000,
+          "pricePerUnit": 4.166666666666666e-9,
+          "billingUnitMs": 1
         },
-        "executionTimeMs": 91558,
-        "executionCost": 0.000594,
+        "executionTimeMs": 5225,
+        "executionCost": 0.000022,
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
