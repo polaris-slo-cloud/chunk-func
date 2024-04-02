@@ -1,22 +1,23 @@
 {
-  "scenarioName": "scenario-03-input-40-Mib",
+  "scenarioName": "scenario-02-input-227-Mib",
   "resourceConfigStrategy": "FastestConfigStrategy",
-  "inputDataSizeMib": 40.29701519012451,
-  "sloMs": 100,
+  "inputDataSizeMib": 227.84742832183838,
+  "sloMs": 37000,
   "workflowOutput": {
-    "executionTimeMs": 9014,
-    "totalCost": 0.030949,
+    "executionTimeMs": 29287,
+    "totalCost": 0.10562200000000001,
     "data": {
-      "sizeBytes": 18936989
+      "sizeBytes": 37873978
     },
     "stepLogs": {
       "validate-video": {
         "resourceProfile": {
           "memoryMiB": 8192,
           "milliCpu": 2000,
-          "price100Ms": 0.00000952
+          "pricePerUnit": 0.00000952,
+          "billingUnitMs": 100
         },
-        "executionTimeMs": 80,
+        "executionTimeMs": 79,
         "executionCost": 0.00001,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
@@ -24,34 +25,37 @@
         "resourceProfile": {
           "memoryMiB": 16384,
           "milliCpu": 4000,
-          "price100Ms": 0.0001904
+          "pricePerUnit": 0.0001904,
+          "billingUnitMs": 100
         },
-        "executionTimeMs": 8026,
-        "executionCost": 0.015422,
+        "executionTimeMs": 27616,
+        "executionCost": 0.052741,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "cut-video-segment-b": {
         "resourceProfile": {
           "memoryMiB": 16384,
           "milliCpu": 4000,
-          "price100Ms": 0.0001904
+          "pricePerUnit": 0.0001904,
+          "billingUnitMs": 100
         },
-        "executionTimeMs": 8026,
-        "executionCost": 0.015422,
+        "executionTimeMs": 27616,
+        "executionCost": 0.052741,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "merge-videos": {
         "resourceProfile": {
-          "memoryMiB": 8192,
+          "memoryMiB": 4096,
           "milliCpu": 2000,
-          "price100Ms": 0.00000952
+          "pricePerUnit": 0.00000812,
+          "billingUnitMs": 100
         },
-        "executionTimeMs": 908,
-        "executionCost": 0.000095,
+        "executionTimeMs": 1592,
+        "executionCost": 0.00013,
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
     "avgResourceConfigStrategyExecutionTimeMs": 0
   },
-  "sloFulfilled": false
+  "sloFulfilled": true
 }

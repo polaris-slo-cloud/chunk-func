@@ -2,7 +2,7 @@
   "scenarioName": "scenario-01-input-500-Mib",
   "resourceConfigStrategy": "FastestConfigStrategy",
   "inputDataSizeMib": 500.7261505126953,
-  "sloMs": 100,
+  "sloMs": 56000,
   "workflowOutput": {
     "executionTimeMs": 44788,
     "totalCost": 0.164635,
@@ -14,7 +14,8 @@
         "resourceProfile": {
           "memoryMiB": 16384,
           "milliCpu": 4000,
-          "price100Ms": 0.0001904
+          "pricePerUnit": 0.0001904,
+          "billingUnitMs": 100
         },
         "executionTimeMs": 101,
         "executionCost": 0.000381,
@@ -24,7 +25,8 @@
         "resourceProfile": {
           "memoryMiB": 16384,
           "milliCpu": 4000,
-          "price100Ms": 0.0001904
+          "pricePerUnit": 0.0001904,
+          "billingUnitMs": 100
         },
         "executionTimeMs": 43095,
         "executionCost": 0.082062,
@@ -34,7 +36,8 @@
         "resourceProfile": {
           "memoryMiB": 16384,
           "milliCpu": 4000,
-          "price100Ms": 0.0001904
+          "pricePerUnit": 0.0001904,
+          "billingUnitMs": 100
         },
         "executionTimeMs": 43095,
         "executionCost": 0.082062,
@@ -44,7 +47,8 @@
         "resourceProfile": {
           "memoryMiB": 4096,
           "milliCpu": 2000,
-          "price100Ms": 0.00000812
+          "pricePerUnit": 0.00000812,
+          "billingUnitMs": 100
         },
         "executionTimeMs": 1592,
         "executionCost": 0.00013,
@@ -53,5 +57,5 @@
     },
     "avgResourceConfigStrategyExecutionTimeMs": 0
   },
-  "sloFulfilled": false
+  "sloFulfilled": true
 }

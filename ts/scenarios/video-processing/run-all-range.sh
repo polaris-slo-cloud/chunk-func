@@ -17,8 +17,8 @@ RESULTS_CONVERTER_JS="../../dist/packages/results-converter/main.js"
 
 declare -A BASE_SLOS=(
     ["gcf"]=79000
-    ["aws"]=""
-    ["aws-bo"]=""
+    ["aws"]=54274
+    ["aws-bo"]=54274
 )
 
 declare -A SLO_RANGES_PERCENT=(
