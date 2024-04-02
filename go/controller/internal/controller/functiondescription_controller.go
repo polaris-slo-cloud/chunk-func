@@ -211,6 +211,10 @@ func (fdr *FunctionDescriptionReconciler) createBoFunctionProfiler(
 	if address == "" {
 		return nil, fmt.Errorf("the BAYESIAN_OPT_SERVER environment variable must be set to the address of the Bayesian Optimizer server, e.g., \"localhost:9000\"")
 	}
+	minSamplesPercent, err := util.GetFloatEnvVar("BAYESIAN_OPT_MIN_SAMPLES_PERCENT", &profiler.DefaultBoMinSamplesPercent)
+	if err != nil {
+		return nil, err
+	}
 	maxSamplesPercent, err := util.GetFloatEnvVar("BAYESIAN_OPT_MAX_SAMPLES_PERCENT", &profiler.DefaultBoMaxSamplesPercent)
 	if err != nil {
 		return nil, err
@@ -225,7 +229,7 @@ func (fdr *FunctionDescriptionReconciler) createBoFunctionProfiler(
 	}
 
 	logger.Info("Creating BayesianOptFunctionProfiler", "targetAddress", address)
-	return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, fnTriggerFactory, deploymentMgrFactory, maxSamplesPercent, xi, poiThreshold, logger), nil
+	return profiler.NewBayesianOptFunctionProfiler(k8sConfig, address, fnTriggerFactory, deploymentMgrFactory, minSamplesPercent, maxSamplesPercent, xi, poiThreshold, logger), nil
 }
 
 func (fdr *FunctionDescriptionReconciler) fetchKnativeService(ctx context.Context, fnDesc *chunkFunc.FunctionDescription) (*knServing.Service, error) {

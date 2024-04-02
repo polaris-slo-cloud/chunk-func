@@ -38,6 +38,11 @@ message BoSuggestion {
     // Probability of improvement for the next profiling run.
     // If this is zero, the value of X must be disregarded, because the input domain has been exhausted.
     double poi = 2;
+
+    // The percentage of all possible X-values, which were already sampled.
+    // This only includes X-values, for which a Y-value has already been observed.
+    // So, the X-value from this suggestion is not included.
+    double percentageSampled = 3;
 }
 
 // The observation made during a profiling run.

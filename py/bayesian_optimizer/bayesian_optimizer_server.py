@@ -67,7 +67,7 @@ class BayesianOptimizerServer(BayesianOptimizerServiceServicer):
 
             suggestion = optimizer.suggest()
             logging.info('Obtained suggestion for %s: x=%d, poi=%f', modelId, suggestion.x, suggestion.poi)
-            boSuggestion = PbufBoSuggestion(x=suggestion.x, poi=suggestion.poi)
+            boSuggestion = PbufBoSuggestion(x=suggestion.x, poi=suggestion.poi, percentageSampled=suggestion.percentage_sampled)
             return GetBoSuggestionResponse(modelId=modelId, suggestion=boSuggestion)
 
 

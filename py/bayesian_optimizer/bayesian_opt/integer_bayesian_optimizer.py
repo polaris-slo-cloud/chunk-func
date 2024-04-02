@@ -25,6 +25,9 @@ class BoSuggestion:
     poi: float
     """The probability of improvement."""
 
+    percentage_sampled: float
+    """The percentage of X values that were sampled (not including this one, because there is no Y observation for it yet)."""
+
 
 
 class IntegerBayesianOptimizer:
@@ -76,9 +79,9 @@ class IntegerBayesianOptimizer:
         Makes a new suggestion for X and also returns its expected improvement.
         """
         remaining_input_domain_size = self.__input_domain.get_unused_values_count()
-        percentage_sampled = 1.0 - float(remaining_input_domain_size) / float(self.__input_domain.size)
+        percentage_sampled = self.__get_percentage_sampled()
         if remaining_input_domain_size == 0 or percentage_sampled > self.__max_samples_percent:
-            return BoSuggestion(x=0, poi=0.0)
+            return BoSuggestion(x=0, poi=0.0, percentage_sampled=percentage_sampled)
 
         if len(self.__bootstrap_suggestions) > 0:
             return self.__get_bootstrap_suggestion()
@@ -94,7 +97,7 @@ class IntegerBayesianOptimizer:
                 raise AssertionError('Could not compute EI')
             poi = utility_poi.max()
 
-        return BoSuggestion(x=x_suggestion, poi=poi)
+        return BoSuggestion(x=x_suggestion, poi=poi, percentage_sampled=percentage_sampled)
 
 
     def register_observation(self, x: int, observation: float) -> None:
@@ -155,7 +158,8 @@ class IntegerBayesianOptimizer:
 
     def __get_bootstrap_suggestion(self) -> BoSuggestion:
         x = self.__bootstrap_suggestions.pop()
-        return BoSuggestion(x=x, poi=1.0)
+        percentage_sampled = self.__get_percentage_sampled()
+        return BoSuggestion(x=x, poi=1.0, percentage_sampled=percentage_sampled)
 
 
     def __compute_new_suggestion(self) -> int:
@@ -206,3 +210,13 @@ class IntegerBayesianOptimizer:
                 self.__register_observation__without_marking_used(x, y)
             else:
                 logging.warning('BO %s: Pruning valid observation for X=%d, while shrinking input domain to [%d, %d].', self.__modelId, x, lower_bound, upper_bound)
+
+
+    def __get_percentage_sampled(self) -> float:
+        """
+        Returns the percentage of X-values that have already been sampled.
+        This includes only values, for which a Y-value has been observed.
+        """
+        remaining_input_domain_size = self.__input_domain.get_unused_values_count()
+        percentage_sampled = 1.0 - float(remaining_input_domain_size) / float(self.__input_domain.size)
+        return percentage_sampled

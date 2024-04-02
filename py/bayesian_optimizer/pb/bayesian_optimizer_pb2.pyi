@@ -34,12 +34,14 @@ class BoModelId(_message.Message):
     def __init__(self, modelId: _Optional[str] = ...) -> None: ...
 
 class BoSuggestion(_message.Message):
-    __slots__ = ("x", "poi")
+    __slots__ = ("x", "poi", "percentageSampled")
     X_FIELD_NUMBER: _ClassVar[int]
     POI_FIELD_NUMBER: _ClassVar[int]
+    PERCENTAGESAMPLED_FIELD_NUMBER: _ClassVar[int]
     x: int
     poi: float
-    def __init__(self, x: _Optional[int] = ..., poi: _Optional[float] = ...) -> None: ...
+    percentageSampled: float
+    def __init__(self, x: _Optional[int] = ..., poi: _Optional[float] = ..., percentageSampled: _Optional[float] = ...) -> None: ...
 
 class BoObservation(_message.Message):
     __slots__ = ("x", "observation")

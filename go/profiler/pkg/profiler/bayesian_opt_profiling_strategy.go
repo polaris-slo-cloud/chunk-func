@@ -22,6 +22,7 @@ var (
 	defaultBoKappa = 2.576
 	DefaultBoXi    = 0.01
 
+	DefaultBoMinSamplesPercent = 0.0
 	DefaultBoMaxSamplesPercent = 0.4
 )
 
@@ -75,6 +76,9 @@ type BayesianOptProfilingStrategy struct {
 	// Locking protocol: no other lock must be held when acquiring this mutex.
 	profilingQueueMutex sync.Mutex
 
+	// The minimum number of samples that will be collected (regardless of the POI value), as a percentage of the total number of profiles.
+	minSamplesPercent float64
+
 	// The maximum number of samples that will be collected, as a percentage of the total number of profiles.
 	maxSamplesPercent float64
 
@@ -102,6 +106,7 @@ type BayesianOptProfilingStrategy struct {
 
 func NewBayesianOptProfilingStrategy(
 	boClient bayesianopt.BayesianOptimizerServiceClient,
+	minSamplesPercent float64,
 	maxSamplesPercent float64,
 	xi float64,
 	poiThreshold float64,
@@ -113,6 +118,7 @@ func NewBayesianOptProfilingStrategy(
 		completedInputsMutex:          sync.Mutex{},
 		boModelIdsMutex:               sync.Mutex{},
 		profilingQueueMutex:           sync.Mutex{},
+		minSamplesPercent:             minSamplesPercent,
 		maxSamplesPercent:             maxSamplesPercent,
 		xi:                            xi,
 		poiThreshold:                  poiThreshold,
@@ -264,7 +270,7 @@ func (bops *BayesianOptProfilingStrategy) getAndQueueNextProfile(
 		return
 	}
 
-	if suggestion.Suggestion.Poi < bops.poiThreshold {
+	if (suggestion.Suggestion.PercentageSampled >= bops.minSamplesPercent && suggestion.Suggestion.Poi < bops.poiThreshold) || suggestion.Suggestion.Poi == 0.0 {
 		bops.markInputAsComplete(input)
 		return
 	}
