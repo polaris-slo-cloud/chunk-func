@@ -1,4 +1,4 @@
-import { ResourceProfile } from '../model';
+import { ResourceProfile } from '../../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -8,8 +8,8 @@ import {
     WorkflowState,
     computeStepMeanExecTimeForInputSize,
     computeStepsAvgExecTimes,
-} from '../workflow';
-import { ProportionalCriticalPathSloConfigStrategyBase } from './proportional-critical-path-slo-config-strategy.base';
+} from '../../workflow';
+import { ProportionalCriticalPathSloConfigStrategyBase } from '../proportional-critical-path-slo-config-strategy.base';
 
 export const createInputHeuristicProportionalCPSloConfigStrategy: ChooseConfigurationStrategyFactory =
     (workflow: Workflow) => new InputHeuristicProportionalCPSloConfigStrategy(workflow.graph, workflow.availableResourceProfiles);

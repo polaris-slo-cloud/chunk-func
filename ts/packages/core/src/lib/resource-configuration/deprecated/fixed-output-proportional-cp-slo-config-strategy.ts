@@ -1,4 +1,4 @@
-import { ResourceProfile, WorkflowExecutionDescription } from '../model';
+import { ResourceProfile, WorkflowExecutionDescription } from '../../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -9,8 +9,8 @@ import {
     computeStepInputSize,
     computeStepMeanExecTimeForInputSize,
     computeStepsAvgExecTimes,
-} from '../workflow';
-import { ProportionalCriticalPathSloConfigStrategyBase } from './proportional-critical-path-slo-config-strategy.base';
+} from '../../workflow';
+import { ProportionalCriticalPathSloConfigStrategyBase } from '../proportional-critical-path-slo-config-strategy.base';
 
 export const createFixedOutputProportionalCPSloConfigStrategy: ChooseConfigurationStrategyFactory =
     (workflow: Workflow) => new FixedOutputProportionalCPSloConfigStrategy(workflow.graph, workflow.availableResourceProfiles);

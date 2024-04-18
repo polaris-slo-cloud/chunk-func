@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import { ResourceProfile } from '../model';
+import { ResourceProfile } from '../../model';
 import {
     SlamConfigFinder,
     createCostIncreaseMinHeapComparator,
@@ -7,7 +7,7 @@ import {
     createMeanProfilingResultAllInputsStrategy,
     slamFuncInfoCostsMinHeapComparator,
     slamFuncInfoExecTimeMaxHeapComparator,
-} from '../slam';
+} from '../../slam';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -18,9 +18,9 @@ import {
     WorkflowState,
     computeWorkflowStepsInputSizes,
     getResourceProfilesSortedByMemory,
-} from '../workflow';
-import { FastestConfigStrategy } from './fastest-config-strategy';
-import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
+} from '../../workflow';
+import { FastestConfigStrategy } from '../fastest-config-strategy';
+import { ResourceConfigurationStrategyBase } from '../resource-configuration-strategy.base';
 
 export const createOnlineSlamConfigStrategy: ChooseConfigurationStrategyFactory =
     (workflow: Workflow) => new OnlineSlamConfigStrategy(workflow);

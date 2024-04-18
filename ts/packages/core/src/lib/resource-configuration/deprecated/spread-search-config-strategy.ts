@@ -4,13 +4,13 @@ import {
     getProfilingResultForProfile,
     getResourceProfileId,
     getResultsForInputSizeSorted,
-} from '../model';
+} from '../../model';
 import {
     ConfiguredWorkflowPath,
     GetStepWeightWithProfileFn,
     WorkflowResourceConfigGraph,
     getAvgExecTimeAcrossAllInputs,
-} from '../spread-search';
+} from '../../spread-search';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -19,9 +19,9 @@ import {
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
-} from '../workflow';
-import { FastestConfigStrategy } from './fastest-config-strategy';
-import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
+} from '../../workflow';
+import { FastestConfigStrategy } from '../fastest-config-strategy';
+import { ResourceConfigurationStrategyBase } from '../resource-configuration-strategy.base';
 
 
 const DEFAULT_ESTIMATE_MULTIPLIER = 1.0;

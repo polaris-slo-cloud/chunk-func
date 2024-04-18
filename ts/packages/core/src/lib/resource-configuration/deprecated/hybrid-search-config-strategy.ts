@@ -1,7 +1,7 @@
-import { ResourceProfile, getProfilingResultForProfile } from '../model';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, Workflow, WorkflowFunctionStep, WorkflowGraph, WorkflowState } from '../workflow';
-import { ProportionalCriticalPathSloConfigStrategy } from './proportional-critical-path-slo-config-strategy';
-import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
+import { ResourceProfile, getProfilingResultForProfile } from '../../model';
+import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, Workflow, WorkflowFunctionStep, WorkflowGraph, WorkflowState } from '../../workflow';
+import { ProportionalCriticalPathSloConfigStrategy } from '../proportional-critical-path-slo-config-strategy';
+import { ResourceConfigurationStrategyBase } from '../resource-configuration-strategy.base';
 import { SpreadSearchConfigStrategy, SpreadSearchOptions } from './spread-search-config-strategy';
 
 export const createHybridSearchConfigStrategy: ChooseConfigurationStrategyFactory =

@@ -1,4 +1,4 @@
-import { ResourceProfile } from '../model';
+import { ResourceProfile } from '../../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -9,7 +9,7 @@ import {
     getLongestExecutionTimeForInput,
     getCheapestExecutionTimeForInput,
     Workflow,
-} from '../workflow';
+} from '../../workflow';
 import { SloCompliantConfigStrategyBase } from './slo-compliant-config-strategy.base';
 
 export const createInputHeuristicSloCompliantConfigStrategy: ChooseConfigurationStrategyFactory =

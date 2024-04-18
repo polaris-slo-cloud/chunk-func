@@ -1,7 +1,7 @@
-import { ResourceProfile, getResultsForInput } from '../model';
-import { AccumulatedStepInput, WorkflowState, WorkflowFunctionStep, GetStepWeightFn, ResourceConfigurationStrategy, WorkflowGraph } from '../workflow';
-import { FastestConfigStrategy } from './fastest-config-strategy';
-import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
+import { ResourceProfile, getResultsForInput } from '../../model';
+import { AccumulatedStepInput, WorkflowState, WorkflowFunctionStep, GetStepWeightFn, ResourceConfigurationStrategy, WorkflowGraph } from '../../workflow';
+import { FastestConfigStrategy } from '../fastest-config-strategy';
+import { ResourceConfigurationStrategyBase } from '../resource-configuration-strategy.base';
 
 /**
  * Base class for a ResourceConfigurationStrategy that always picks the cheapest profile that allows fulfilling the SLO.
