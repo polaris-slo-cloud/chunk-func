@@ -32,7 +32,6 @@ export class WorkflowExecution {
     run<I, O>(input: WorkflowInput<I>): WorkflowOutput<O> {
         this.executionDescription = input.executionDescription;
         this.state = new WorkflowStateImpl({
-            maxExecutionTimeMs: input.executionDescription.maxResponseTimeMs,
             executionDescription: input.executionDescription,
         });
 

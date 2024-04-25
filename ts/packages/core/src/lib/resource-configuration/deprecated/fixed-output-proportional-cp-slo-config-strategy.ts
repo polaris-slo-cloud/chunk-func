@@ -1,4 +1,4 @@
-import { ResourceProfile, WorkflowExecutionDescription } from '../../model';
+import { ExecutionMetrics, ResourceProfile, WorkflowExecutionDescription } from '../../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -7,8 +7,8 @@ import {
     WorkflowGraph,
     WorkflowState,
     computeStepInputSize,
-    computeStepMeanExecTimeForInputSize,
-    computeStepsAvgExecTimes,
+    computeStepMeanExecMetricsForInputSize,
+    computeStepsAvgExecMetrics,
 } from '../../workflow';
 import { ProportionalCriticalPathSloConfigStrategyBase } from '../proportional-critical-path-slo-config-strategy.base';
 
@@ -23,9 +23,9 @@ export class FixedOutputProportionalCPSloConfigStrategy extends ProportionalCrit
     static readonly strategyName = 'FixedOutputProportionalCPSloConfigStrategy';
 
     /**
-     * A map that maps each function step name to its average execution time.
+     * A map that maps each function step name to its average execution metrics.
      */
-    private avgStepExecTimes?: Record<string, number>;
+    private avgStepExecMetrics?: Record<string, ExecutionMetrics>;
 
     constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
         super(FixedOutputProportionalCPSloConfigStrategy.strategyName, graph, availableResProfiles);
@@ -38,25 +38,25 @@ export class FixedOutputProportionalCPSloConfigStrategy extends ProportionalCrit
      *
      * @returns A map that maps each function step name to its average execution time.
      */
-    protected override computeAvgExecTimesUntilEnd(workflowState: WorkflowState, currStep: WorkflowFunctionStep, currStepInput: AccumulatedStepInput): Record<string, number> {
-        if (!this.avgStepExecTimes) {
-            this.avgStepExecTimes = this.computeAvgExecTimes(workflowState.executionDescription);
+    protected override computeAvgExecMetricsUntilEnd(workflowState: WorkflowState, currStep: WorkflowFunctionStep, currStepInput: AccumulatedStepInput): Record<string, ExecutionMetrics> {
+        if (!this.avgStepExecMetrics) {
+            this.avgStepExecMetrics = this.computeAvgExecMetrics(workflowState.executionDescription);
         }
-        return this.avgStepExecTimes;
+        return this.avgStepExecMetrics;
     }
 
     /**
      * @returns A map that maps each function step name to its average execution time.
      */
-    private computeAvgExecTimes(executionDescription: WorkflowExecutionDescription): Record<string, number> {
-        const avgExecTimes = computeStepsAvgExecTimes(
+    private computeAvgExecMetrics(executionDescription: WorkflowExecutionDescription): Record<string, ExecutionMetrics> {
+        const avgExecMetrics = computeStepsAvgExecMetrics(
             this.workflowGraph.steps,
             (funcStep) => {
                 const stepInputSize = computeStepInputSize(funcStep, executionDescription);
-                return computeStepMeanExecTimeForInputSize(funcStep, stepInputSize);
+                return computeStepMeanExecMetricsForInputSize(funcStep, stepInputSize);
             },
         );
-        return avgExecTimes;
+        return avgExecMetrics;
     }
 
 }

@@ -21,9 +21,30 @@ export enum ProfilingResultType {
 }
 
 /**
+ * The execution metrics of a step under a given resource profile or of a workflow path.
+ */
+export interface ExecutionMetrics {
+
+    /**
+     * The time to execute the step or path in milliseconds.
+     *
+     * For a path the execution time of the source node is NOT included.
+     */
+    executionTimeMs: number;
+
+    /**
+     * The total cost incurred by a single execution of a step or path.
+     *
+     * For a path the cost of the source node is NOT included.
+     */
+    executionCost: number;
+
+}
+
+/**
  * Collects the result of a single profiling session.
  */
-export interface ProfilingResult {
+export interface ProfilingResult extends ExecutionMetrics {
 
     /**
      * The HTTP status code returned by the function execution.
@@ -41,19 +62,9 @@ export interface ProfilingResult {
     resultType?: ProfilingResultType;
 
     /**
-     * The execution time of the function in milliseconds.
-     */
-    executionTimeMs: number;
-
-    /**
      * The size of the used input in bytes.
      */
     inputSizeBytes: number;
-
-    /**
-     * The total cost incurred by a single execution of the function with the used resource profile.
-     */
-    executionCost: number;
 
 }
 

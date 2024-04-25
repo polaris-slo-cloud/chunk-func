@@ -1,4 +1,5 @@
 export * from './data';
+export * from './slo';
 export * from './state';
 export * from './step';
 export * from './step.util';

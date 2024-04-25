@@ -51,7 +51,7 @@ export class WorkflowGraphImpl implements WorkflowGraph {
 
         const workflowPath: WorkflowPath = {
             executionTimeMs: 0,
-            cost: 0,
+            executionCost: 0,
             steps: new Array(rawPath.length),
         };
 
@@ -61,7 +61,7 @@ export class WorkflowGraphImpl implements WorkflowGraph {
                 if (step.type === WorkflowStepType.Function) {
                     const weight = weightFn(step as WorkflowFunctionStep);
                     workflowPath.executionTimeMs += weight.profilingResult.executionTimeMs;
-                    workflowPath.cost += weight.profilingResult.executionCost;
+                    workflowPath.executionCost += weight.profilingResult.executionCost;
                 }
             }
             workflowPath.steps[i] = step;

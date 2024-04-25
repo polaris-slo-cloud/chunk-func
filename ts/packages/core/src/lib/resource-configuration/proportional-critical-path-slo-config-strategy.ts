@@ -1,4 +1,4 @@
-import { ResourceProfile } from '../model';
+import { ExecutionMetrics, ResourceProfile } from '../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -6,8 +6,8 @@ import {
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
-    computeStepMeanExecTimeAllProfiles,
-    computeStepsAvgExecTimes,
+    computeStepMeanExecMetricsAllProfiles,
+    computeStepsAvgExecMetrics,
 } from '../workflow';
 import { ProportionalCriticalPathSloConfigStrategyBase } from './proportional-critical-path-slo-config-strategy.base';
 
@@ -20,7 +20,7 @@ export const createProportionalCriticalPathSloConfigStrategy: ChooseConfiguratio
  *
  * The two big differences to StepConf are:
  *   1. We are input size aware for the current step.
- *   2. We use the average execution times for calculating the step execution time contributions and SLO
+ *   2. We use the average execution weights for calculating the step execution time contributions and SLO
  *      (StepConf uses the most cost eff resource config for the middle input sizes).
  */
 export class ProportionalCriticalPathSloConfigStrategy extends ProportionalCriticalPathSloConfigStrategyBase {
@@ -28,24 +28,28 @@ export class ProportionalCriticalPathSloConfigStrategy extends ProportionalCriti
     static readonly strategyName = 'ProportionalCriticalPathSloConfigStrategy';
 
     /**
-     * A map that maps each function step name to its average execution time.
+     * A map that maps each function step name to its average execution metrics.
      */
-    private avgStepExecTimes: Record<string, number>;
+    private avgStepExecMetrics: Record<string, ExecutionMetrics>;
 
     constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
         super(ProportionalCriticalPathSloConfigStrategy.strategyName, graph, availableResProfiles);
-        this.avgStepExecTimes = computeStepsAvgExecTimes(graph.steps, computeStepMeanExecTimeAllProfiles);
+        this.avgStepExecMetrics = computeStepsAvgExecMetrics(graph.steps, computeStepMeanExecMetricsAllProfiles);
     }
 
     /**
-     * Computes the average execution times for all steps starting from `currStep` until the end of the workflow.
+     * Computes the average execution metrics for all steps starting from `currStep` until the end of the workflow.
      *
      * The values may be precomputed for all steps, if they do not change as more information is available about the execution of the workflow.
      *
-     * @returns A map that maps each function step name to its average execution time.
+     * @returns A map that maps each function step name to its average execution metrics.
      */
-    protected override computeAvgExecTimesUntilEnd(workflowState: WorkflowState, currStep: WorkflowFunctionStep, currStepInput: AccumulatedStepInput): Record<string, number> {
-        return this.avgStepExecTimes;
+    protected override computeAvgExecMetricsUntilEnd(
+        workflowState: WorkflowState,
+        currStep: WorkflowFunctionStep,
+        currStepInput: AccumulatedStepInput,
+    ): Record<string, ExecutionMetrics> {
+        return this.avgStepExecMetrics;
     }
 
 }

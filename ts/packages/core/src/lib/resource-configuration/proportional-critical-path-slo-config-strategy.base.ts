@@ -1,7 +1,8 @@
-import { ResourceProfile, getResultsForInput } from '../model';
+import { ExecutionMetrics, ResourceProfile, getResultsForInput } from '../model';
 import {
     AccumulatedStepInput,
     ResourceConfigurationStrategy,
+    ServiceLevelObjective,
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
@@ -24,30 +25,36 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
     }
 
     /**
-     * Computes the average execution times for all steps starting from `currStep` until the end of the workflow.
+     * Computes the average execution metrics for all steps starting from `currStep` until the end of the workflow.
      *
      * The values may be precomputed for all steps, if they do not change as more information is available about the execution of the workflow.
      *
-     * @returns A map that maps each function step name to its average execution time.
+     * @returns A map that maps each function step name to its average execution metrics.
      */
-    protected abstract computeAvgExecTimesUntilEnd(workflowState: WorkflowState, currStep: WorkflowFunctionStep, currStepInput: AccumulatedStepInput): Record<string, number>;
+    protected abstract computeAvgExecMetricsUntilEnd(
+        workflowState: WorkflowState,
+        currStep: WorkflowFunctionStep,
+        currStepInput: AccumulatedStepInput,
+    ): Record<string, ExecutionMetrics>;
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        const remainingTime = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
-        const avgExecTimes = this.computeAvgExecTimesUntilEnd(workflowState, step, input);
-        const stepSloMs = this.computeStepSlo(step, remainingTime, avgExecTimes);
+        const workflowMetrics = workflowState.slo.getWorkflowWeights(input.thread);
+        const remainingSlo = workflowState.slo.sloLimit - workflowMetrics.sloWeight;
+        const avgExecMetrics = this.computeAvgExecMetricsUntilEnd(workflowState, step, input);
+        const stepSlo = this.computeStepSlo(step, remainingSlo, avgExecMetrics, workflowState.slo);
 
-        let selectedProfileCost = Number.POSITIVE_INFINITY;
-        let selectedProfileExecTime = Number.POSITIVE_INFINITY;
+        let selectedProfileOptWeight = Number.POSITIVE_INFINITY;
+        let selectedProfileSloWeight = Number.POSITIVE_INFINITY;
         let selectedProfileId: string | undefined;
 
         for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            const stepExecTime = resultForInput.result.executionTimeMs;
-            if (stepExecTime <= stepSloMs) {
-                const stepExecCost = resultForInput.result.executionCost;
-                if (stepExecCost < selectedProfileCost || (stepExecCost === selectedProfileCost && stepExecTime < selectedProfileExecTime)) {
-                    selectedProfileCost = stepExecCost;
-                    selectedProfileExecTime = stepExecTime;
+            const stepWeight = workflowState.slo.getExecutionWeights(resultForInput.result);
+            const stepSloWeight = stepWeight.sloWeight;
+            if (stepSloWeight <= stepSlo) {
+                const stepOptWeight = stepWeight.optimizationWeight;
+                if (stepOptWeight < selectedProfileOptWeight || (stepOptWeight === selectedProfileOptWeight && stepSloWeight < selectedProfileSloWeight)) {
+                    selectedProfileOptWeight = stepOptWeight;
+                    selectedProfileSloWeight = stepSloWeight;
                     selectedProfileId = resultForInput.resourceProfileId;
                 }
             }
@@ -61,33 +68,40 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
     }
 
     /**
-     * Computes the SLO for the current step, given the critical path starting from it and based on the remaining time, not the original workflow SLO.
+     * Computes the SLO for the current step, given the critical path starting from it and based on the remaining SLO, not the original workflow SLO.
      */
-    private computeStepSlo(step: WorkflowFunctionStep, remainingTimeMs: number, avgStepExecTimes: Record<string, number>): number {
-        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getAvgStepWeight(avgStepExecTimes, currStep));
-        const avgStepWeight = this.getAvgStepWeight(avgStepExecTimes, step);
-        const criticalPathExecTimeWithSrc = criticalPath.executionTimeMs + avgStepWeight.sloWeight;
+    private computeStepSlo(
+        step: WorkflowFunctionStep,
+        remainingSlo: number,
+        avgExecMetrics: Record<string, ExecutionMetrics>,
+        slo: ServiceLevelObjective,
+    ): number {
+        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getAvgStepWeight(avgExecMetrics, currStep, slo));
+        const criticalPathWeight = slo.getExecutionWeights(criticalPath);
+        const avgStepWeight = this.getAvgStepWeight(avgExecMetrics, step, slo);
+        const criticalPathWeightWithSrc = criticalPathWeight.sloWeight + avgStepWeight.sloWeight;
 
-        const percentage = avgStepWeight.sloWeight / criticalPathExecTimeWithSrc;
+        const percentage = avgStepWeight.sloWeight / criticalPathWeightWithSrc;
         if (percentage > 1) {
             throw new Error(`Current step percentage is ${percentage}`)
         }
-        return remainingTimeMs * percentage;
+        return remainingSlo * percentage;
     }
 
-    private getAvgStepWeight(avgStepExecTimes: Record<string, number>, step: WorkflowFunctionStep): WorkflowStepWeight {
-        const avgExecTime = avgStepExecTimes[step.name];
+    private getAvgStepWeight(avgExecMetrics: Record<string, ExecutionMetrics>, step: WorkflowFunctionStep, slo: ServiceLevelObjective): WorkflowStepWeight {
+        const avgStepExecMetrics = avgExecMetrics[step.name];
+        const avgStepWeight = slo.getExecutionWeights(avgStepExecMetrics);
         return {
             // Ugly hack, but we have no profiling result, since this is the average of all profiling results.
             profilingResult: {
-                executionCost: -1,
-                executionTimeMs: avgExecTime,
+                executionCost: avgStepExecMetrics.executionCost,
+                executionTimeMs: avgStepExecMetrics.executionTimeMs,
                 inputSizeBytes: -1,
                 statusCode: 200,
             },
             resourceProfileId: '',
-            sloWeight: avgExecTime,
-            optimizationWeight: -1,
+            sloWeight: avgStepWeight.sloWeight,
+            optimizationWeight: avgStepWeight.optimizationWeight,
         };
     }
 

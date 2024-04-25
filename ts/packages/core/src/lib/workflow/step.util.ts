@@ -1,14 +1,15 @@
-import { WorkflowExecutionDescription, WorkflowStepType, getResultsForInput, isSuccessStatusCode } from '../model';
+import { ExecutionMetrics, WorkflowExecutionDescription, WorkflowStepType, getResultsForInput, isSuccessStatusCode } from '../model';
 import { WorkflowFunctionStep, WorkflowStep, WorkflowStepsMap } from './step';
 
-/** Describes a function that estimates the execution time of a function. */
-export type StepExecTimeEstimationStrategy = (step: WorkflowFunctionStep) => number;
+/** Describes a function that estimates the execution metrics of a function. */
+export type StepMetricsEstimationStrategy = (step: WorkflowFunctionStep) => ExecutionMetrics;
 
 /**
- * Computes the average exec time of all profiles across all input sizes.
+ * Computes the average exec metrics of all profiles across all input sizes.
  */
-export function computeStepMeanExecTimeAllProfiles(step: WorkflowFunctionStep): number {
+export function computeStepMeanExecMetricsAllProfiles(step: WorkflowFunctionStep): ExecutionMetrics {
     let totalExecTime = 0;
+    let totalCost = 0;
     let measurementsCount = 0;
     for (const results of step.profilingResults.results) {
         if (!results.results) {
@@ -17,6 +18,7 @@ export function computeStepMeanExecTimeAllProfiles(step: WorkflowFunctionStep): 
         for (const profileResult of results.results) {
             if (isSuccessStatusCode(profileResult.statusCode)) {
                 totalExecTime += profileResult.executionTimeMs;
+                totalCost += profileResult.executionCost;
                 ++measurementsCount;
             }
         }
@@ -26,17 +28,22 @@ export function computeStepMeanExecTimeAllProfiles(step: WorkflowFunctionStep): 
         throw new Error(`No successful profiling runs for step ${step.name}`);
     }
 
-    return totalExecTime / measurementsCount;
+    return {
+        executionTimeMs: totalExecTime / measurementsCount,
+        executionCost: totalCost / measurementsCount,
+    };
 }
 
 /**
- * Computes the average exec time of all profiles for the specified input size.
+ * Computes the average exec metrics of all profiles for the specified input size.
  */
-export function computeStepMeanExecTimeForInputSize(step: WorkflowFunctionStep, inputSize: number): number {
+export function computeStepMeanExecMetricsForInputSize(step: WorkflowFunctionStep, inputSize: number): ExecutionMetrics {
     let totalExecTime = 0;
+    let totalCost = 0;
     let measurementsCount = 0;
     for (const resultForInput of getResultsForInput(step.profilingResults, inputSize)) {
         totalExecTime += resultForInput.result.executionTimeMs;
+        totalCost += resultForInput.result.executionCost;
         ++measurementsCount;
     }
 
@@ -44,28 +51,31 @@ export function computeStepMeanExecTimeForInputSize(step: WorkflowFunctionStep, 
         throw new Error(`No successful profiling runs for step ${step.name}`);
     }
 
-    return totalExecTime / measurementsCount;
+    return {
+        executionTimeMs: totalExecTime / measurementsCount,
+        executionCost: totalCost / measurementsCount,
+    };
 }
 
 /**
- * Computes the average execution times of the specified `WorkflowSteps`.
+ * Computes the average execution metrics of the specified `WorkflowSteps`.
  *
  * @param steps The `WorkflowSteps`, for which to compute the average execution times.
- * @param estimationStrategy The `StepExecTimeEstimationStrategy` to use for estimating the average execution time of a step.
- * @returns A map that maps each function step name to its average execution time.
+ * @param estimationStrategy The `StepWeightEstimationStrategy` to use for estimating the average execution metrics of a step.
+ * @returns A map that maps each function step name to its average execution metrics.
  */
-export function computeStepsAvgExecTimes(steps: WorkflowStepsMap, estimationStrategy: StepExecTimeEstimationStrategy): Record<string, number> {
-    const avgExecTimes: Record<string, number> = {};
+export function computeStepsAvgExecMetrics(steps: WorkflowStepsMap, estimationStrategy: StepMetricsEstimationStrategy): Record<string, ExecutionMetrics> {
+    const avgExecMetrics: Record<string, ExecutionMetrics> = {};
 
     for (const stepName in steps) {
         const step = steps[stepName];
         if (step.type === WorkflowStepType.Function) {
-            const stepExecTime = estimationStrategy(step as WorkflowFunctionStep);
-            avgExecTimes[stepName] = stepExecTime;
+            const stepExecMetrics = estimationStrategy(step as WorkflowFunctionStep);
+            avgExecMetrics[stepName] = stepExecMetrics;
         }
     }
 
-    return avgExecTimes;
+    return avgExecMetrics;
 }
 
 /**

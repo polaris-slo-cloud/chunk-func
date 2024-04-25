@@ -117,9 +117,22 @@ export interface WorkflowExecutionDescription {
     inputSizeBytes: number;
 
     /**
-     * The max response time SLO of the workflow.
+     * The type of SLO.
      */
-    maxResponseTimeMs: number;
+    sloType: string;
+
+    /**
+     * The limit value of the SLO.
+     */
+    sloLimit: number;
+
+    /**
+     * The max response time SLO of the workflow.
+     *
+     * @deprecated Use `sloType` and `sloLimit` instead. We only keep this for now,
+     * so that we don't need to modify the many existing scenarios that we have.
+     */
+    maxResponseTimeMs?: number;
 
     /**
      * The execution descriptions of the steps of the workflow.

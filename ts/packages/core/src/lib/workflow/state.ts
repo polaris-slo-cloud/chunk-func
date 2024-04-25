@@ -1,5 +1,6 @@
 import { Queue } from '../collections/queue';
 import { ResourceProfile, WorkflowExecutionDescription } from '../model';
+import { ServiceLevelObjective } from './slo';
 import { StepInput, WorkflowStep } from './step';
 import { WorkflowThread } from './thread';
 
@@ -24,9 +25,9 @@ export interface WorkflowState {
     steps: Record<string, StepState>;
 
     /**
-     * The maximum execution time SLO of the workflow in milliseconds.
+     * The SLO for this execution of the workflow.
      */
-    maxExecutionTimeMs: number;
+    slo: ServiceLevelObjective;
 
     /**
      * The accumulated cost of the workflow steps up to this point.

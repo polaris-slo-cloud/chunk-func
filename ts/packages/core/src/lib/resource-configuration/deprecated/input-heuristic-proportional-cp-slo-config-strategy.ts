@@ -1,4 +1,4 @@
-import { ResourceProfile } from '../../model';
+import { ExecutionMetrics, ResourceProfile } from '../../model';
 import {
     AccumulatedStepInput,
     ChooseConfigurationStrategyFactory,
@@ -6,8 +6,8 @@ import {
     WorkflowFunctionStep,
     WorkflowGraph,
     WorkflowState,
-    computeStepMeanExecTimeForInputSize,
-    computeStepsAvgExecTimes,
+    computeStepMeanExecMetricsForInputSize,
+    computeStepsAvgExecMetrics,
 } from '../../workflow';
 import { ProportionalCriticalPathSloConfigStrategyBase } from '../proportional-critical-path-slo-config-strategy.base';
 
@@ -33,10 +33,10 @@ export class InputHeuristicProportionalCPSloConfigStrategy extends ProportionalC
      *
      * @returns A map that maps each function step name to its average execution time.
      */
-    protected override computeAvgExecTimesUntilEnd(workflowState: WorkflowState, currStep: WorkflowFunctionStep, currStepInput: AccumulatedStepInput): Record<string, number> {
-        const avgExecTimes = computeStepsAvgExecTimes(
+    protected override computeAvgExecMetricsUntilEnd(workflowState: WorkflowState, currStep: WorkflowFunctionStep, currStepInput: AccumulatedStepInput): Record<string, ExecutionMetrics> {
+        const avgExecTimes = computeStepsAvgExecMetrics(
             this.workflowGraph.steps,
-            (stepToEstimate) => computeStepMeanExecTimeForInputSize(stepToEstimate, currStepInput.totalDataSizeBytes),
+            (stepToEstimate) => computeStepMeanExecMetricsForInputSize(stepToEstimate, currStepInput.totalDataSizeBytes),
         );
         return avgExecTimes;
     }

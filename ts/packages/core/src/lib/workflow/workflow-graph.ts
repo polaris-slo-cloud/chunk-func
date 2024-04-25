@@ -1,6 +1,6 @@
 import { DirectedGraph } from 'graphology';
 import { WorkflowFunctionStep, WorkflowStep, WorkflowStepsMap } from './step';
-import { ProfilingResult } from '../model';
+import { ExecutionMetrics, ProfilingResult } from '../model';
 
 /**
  * A DAG of a workflow in two forms: using WorkflowSteps and using a graphology graph.
@@ -60,9 +60,10 @@ export interface WorkflowNodeAttributes {
 }
 
 /**
- * The weight of a WorkflowStep as returned by GetStepWeightFn.
+ * Contains the SLO weight metric and the optimization weight metric
+ * for a single WorkflowStep, a path, or the executed portion of the workflow.
  */
-export interface WorkflowStepWeight {
+export interface WeightMetrics {
 
     /**
      * The sum of these weights along a path are constrained by the SLO.
@@ -72,13 +73,20 @@ export interface WorkflowStepWeight {
     sloWeight: number;
 
     /**
-     * The sum of these weights should be optimized (typically minimized).
+     * The sum of these weights along a path should be optimized (typically minimized).
      *
      * This weight needs to be optimized, while the sum of the sloWeights meet the SLO constraint.
      *
      * Example: the `sloWeight` could be the execution time and the `optimizationWeight` could be the cost.
      */
     optimizationWeight: number;
+
+}
+
+/**
+ * The weight of a WorkflowStep as returned by GetStepWeightFn.
+ */
+export interface WorkflowStepWeight extends WeightMetrics {
 
     /**
      * The ID of the resource profile that was used to compute the weight.
@@ -105,7 +113,7 @@ export type StepWeightKey = keyof Pick<WorkflowStepWeight, 'sloWeight' | 'optimi
 /**
  * Describes a path between two workflow steps.
  */
-export interface WorkflowPath {
+export interface WorkflowPath extends ExecutionMetrics {
 
     /**
      * The steps of the path, from the source to the target.
@@ -113,19 +121,5 @@ export interface WorkflowPath {
      * This includes both, the source and the target.
      */
     steps: WorkflowStep[];
-
-    /**
-     * The expected execution time of the path.
-     *
-     * The execution time of the source node is NOT included.
-     */
-    executionTimeMs: number;
-
-    /**
-     * The expected cost of the path.
-     *
-     * The cost of the source node is NOT included.
-     */
-    cost: number;
 
 }
