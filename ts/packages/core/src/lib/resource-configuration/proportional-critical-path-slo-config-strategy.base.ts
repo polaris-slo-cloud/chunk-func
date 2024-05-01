@@ -10,6 +10,7 @@ import {
 } from '../workflow';
 import { FastestConfigStrategy } from './fastest-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
+import { computeStepSlo, findBestProfileForStepSlo } from './util';
 
 /**
  * Base class for a ResourceConfigurationStrategy that divides the SLO into parts according to the distribution of the execution times of the profiled functions.
@@ -41,51 +42,25 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
         const workflowMetrics = workflowState.slo.getWorkflowWeights(input.thread);
         const remainingSlo = workflowState.slo.sloLimit - workflowMetrics.sloWeight;
         const avgExecMetrics = this.computeAvgExecMetricsUntilEnd(workflowState, step, input);
-        const stepSlo = this.computeStepSlo(step, remainingSlo, avgExecMetrics, workflowState.slo);
+        const stepSlo = computeStepSlo(
+            this.workflowGraph,
+            step,
+            remainingSlo,
+            workflowState.slo,
+            currStep => this.getAvgStepWeight(avgExecMetrics, currStep, workflowState.slo),
+        );
 
-        let selectedProfileOptWeight = Number.POSITIVE_INFINITY;
-        let selectedProfileSloWeight = Number.POSITIVE_INFINITY;
-        let selectedProfileId: string | undefined;
-
-        for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            const stepWeight = workflowState.slo.getExecutionWeights(resultForInput.result);
-            const stepSloWeight = stepWeight.sloWeight;
-            if (stepSloWeight <= stepSlo) {
-                const stepOptWeight = stepWeight.optimizationWeight;
-                if (stepOptWeight < selectedProfileOptWeight || (stepOptWeight === selectedProfileOptWeight && stepSloWeight < selectedProfileSloWeight)) {
-                    selectedProfileOptWeight = stepOptWeight;
-                    selectedProfileSloWeight = stepSloWeight;
-                    selectedProfileId = resultForInput.resourceProfileId;
-                }
-            }
-        }
+        const selectedProfileId = findBestProfileForStepSlo(
+            workflowState.slo,
+            stepSlo,
+            getResultsForInput(step.profilingResults, input.totalDataSizeBytes),
+        );
 
         if (!selectedProfileId) {
             return this.fallbackStrategy.chooseConfiguration(workflowState, step, input);
         }
         const profile = this.availableResourceProfiles[selectedProfileId];
         return profile;
-    }
-
-    /**
-     * Computes the SLO for the current step, given the critical path starting from it and based on the remaining SLO, not the original workflow SLO.
-     */
-    private computeStepSlo(
-        step: WorkflowFunctionStep,
-        remainingSlo: number,
-        avgExecMetrics: Record<string, ExecutionMetrics>,
-        slo: ServiceLevelObjective,
-    ): number {
-        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getAvgStepWeight(avgExecMetrics, currStep, slo));
-        const criticalPathWeight = slo.getExecutionWeights(criticalPath);
-        const avgStepWeight = this.getAvgStepWeight(avgExecMetrics, step, slo);
-        const criticalPathWeightWithSrc = criticalPathWeight.sloWeight + avgStepWeight.sloWeight;
-
-        const percentage = avgStepWeight.sloWeight / criticalPathWeightWithSrc;
-        if (percentage > 1) {
-            throw new Error(`Current step percentage is ${percentage}`)
-        }
-        return remainingSlo * percentage;
     }
 
     private getAvgStepWeight(avgExecMetrics: Record<string, ExecutionMetrics>, step: WorkflowFunctionStep, slo: ServiceLevelObjective): WorkflowStepWeight {

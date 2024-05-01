@@ -1,6 +1,7 @@
 import { ProfilingResultWithProfileId, ProfilingSessionResults, ResourceProfile, WorkflowStepType, isSuccessStatusCode } from '../model';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, WorkflowStepWeight, WorkflowPath, Workflow } from '../workflow';
+import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, WorkflowStepWeight, Workflow, ServiceLevelObjective } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
+import { computeStepSlo, findBestProfileForStepSlo } from './util';
 
 export const createStepConfConfigStrategy: ChooseConfigurationStrategyFactory =
     (workflow: Workflow) => new StepConfConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
@@ -11,37 +12,36 @@ export const createStepConfConfigStrategy: ChooseConfigurationStrategyFactory =
  * in IEEE INFOCOM 2022 - IEEE Conference on Computer Communications, 2022, pp. 1868–1877.
  *
  * Since StepConf is not aware of the function input sizes, we always use the middle input size.
+ *
+ * This is an adapted version of StepConf, which allows arbitrary SLOs by abstracting the response time and cost into an SLO weight and an optimization weight.
+ * The most cost-effective profile (lowest value for `cost / responseTimeMs`) becomes the most effective profile (lowest value for `optWeight / sloWeight`).
  */
 export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
 
     static readonly strategyName = 'StepConfConfigStrategy';
 
-    private mostCostEffConfigs: Record<string, ProfilingResultWithProfileId>;
+    private mostEffectiveConfigs: Record<string, ProfilingResultWithProfileId> | undefined;
 
     constructor(graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) {
         super(StepConfConfigStrategy.strategyName, graph, availableResProfiles);
-        this.mostCostEffConfigs = this.findMostCostEffConfigs(graph);
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        const remainingTimeMs = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
-        const stepSloMs = this.computeStepSlo(step, remainingTimeMs);
+        const workflowMetrics = workflowState.slo.getWorkflowWeights(input.thread);
+        const remainingSlo = workflowState.slo.sloLimit - workflowMetrics.sloWeight;
+        const stepSlo = computeStepSlo(
+            this.workflowGraph,
+            step,
+            remainingSlo,
+            workflowState.slo,
+            currStep => this.getMostEffectiveStepWeight(currStep, workflowState.slo),
+        );
 
-        let selectedProfileCost = Number.POSITIVE_INFINITY;
-        let selectedProfileExecTime = Number.POSITIVE_INFINITY;
-        let selectedProfileId: string | undefined;
-
-        for (const profilingResult of getResultsForMiddleInput(step.profilingResults)) {
-            const stepExecTime = profilingResult.result.executionTimeMs;
-            if (stepExecTime <= stepSloMs) {
-                const stepExecCost = profilingResult.result.executionCost;
-                if (stepExecCost < selectedProfileCost || (stepExecCost === selectedProfileCost && stepExecTime < selectedProfileExecTime)) {
-                    selectedProfileCost = stepExecCost;
-                    selectedProfileExecTime = stepExecTime;
-                    selectedProfileId = profilingResult.resourceProfileId;
-                }
-            }
-        }
+        let selectedProfileId = findBestProfileForStepSlo(
+            workflowState.slo,
+            stepSlo,
+            getResultsForMiddleInput(step.profilingResults),
+        );
 
         if (!selectedProfileId) {
             selectedProfileId = this.pickFastestProfile(step);
@@ -50,29 +50,19 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
         return profile;
     }
 
-    private getMostCostEffStepWeight(step: WorkflowFunctionStep): WorkflowStepWeight {
-        const costEffConfig = this.mostCostEffConfigs[step.name];
+    private getMostEffectiveStepWeight(step: WorkflowFunctionStep, slo: ServiceLevelObjective): WorkflowStepWeight {
+        if (!this.mostEffectiveConfigs) {
+            this.mostEffectiveConfigs = this.findMostEffectiveConfigs(this.workflowGraph, slo);
+        }
+
+        const costEffConfig = this.mostEffectiveConfigs[step.name];
+        const stepWeights = slo.getExecutionWeights(costEffConfig.result);
         return {
             profilingResult: costEffConfig.result,
             resourceProfileId: costEffConfig.resourceProfileId,
-            sloWeight: costEffConfig.result.executionTimeMs,
-            optimizationWeight: costEffConfig.result.executionCost,
+            sloWeight: stepWeights.sloWeight,
+            optimizationWeight: stepWeights.optimizationWeight,
         };
-    }
-
-    /**
-     * Computes the SLO for the current step, given the critical path starting from it and based on the remaining time, not the original workflow SLO.
-     */
-    private computeStepSlo(step: WorkflowFunctionStep, remainingTimeMs: number): number {
-        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, currStep => this.getMostCostEffStepWeight(currStep));
-        const costEffStepWeight = this.getMostCostEffStepWeight(step);
-        const criticalPathExecTimeWithSrc = criticalPath.executionTimeMs + costEffStepWeight.sloWeight;
-
-        const percentage = costEffStepWeight.sloWeight / criticalPathExecTimeWithSrc;
-        if (percentage > 1) {
-            throw new Error(`Current step percentage is ${percentage}`)
-        }
-        return remainingTimeMs * percentage;
     }
 
     private pickFastestProfile(step: WorkflowFunctionStep): string {
@@ -97,34 +87,35 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
         return selectedProfileId;
     }
 
-    private findMostCostEffConfigs(graph: WorkflowGraph): Record<string, ProfilingResultWithProfileId> {
-        const mostCostEffConfigs: Record<string, ProfilingResultWithProfileId> = {};
+    private findMostEffectiveConfigs(graph: WorkflowGraph, slo: ServiceLevelObjective): Record<string, ProfilingResultWithProfileId> {
+        const mostEffConfigs: Record<string, ProfilingResultWithProfileId> = {};
         for (const stepName in graph.steps) {
             const step = graph.steps[stepName];
             if (step.type === WorkflowStepType.Function) {
-                const costEffConfig = this.findMostCostEffConfig(step as WorkflowFunctionStep);
-                mostCostEffConfigs[stepName] = costEffConfig;
+                const effectiveConfig = this.findMostEffectiveConfig(step as WorkflowFunctionStep, slo);
+                mostEffConfigs[stepName] = effectiveConfig;
             }
         }
-        return mostCostEffConfigs;
+        return mostEffConfigs;
     }
 
-    private findMostCostEffConfig(step: WorkflowFunctionStep): ProfilingResultWithProfileId {
-        let mostCostEffProfile: ProfilingResultWithProfileId | undefined;
-        let bestCostEff = Number.POSITIVE_INFINITY;
+    private findMostEffectiveConfig(step: WorkflowFunctionStep, slo: ServiceLevelObjective): ProfilingResultWithProfileId {
+        let mostEffProfile: ProfilingResultWithProfileId | undefined;
+        let bestEffectiveness = Number.POSITIVE_INFINITY;
 
         for (const profilingResult of getResultsForMiddleInput(step.profilingResults)) {
-            const costEff = profilingResult.result.executionCost / profilingResult.result.executionTimeMs;
-            if (costEff < bestCostEff) {
-                bestCostEff = costEff;
-                mostCostEffProfile = profilingResult;
+            const profileWeights = slo.getExecutionWeights(profilingResult.result)
+            const profileEff = profileWeights.optimizationWeight / profileWeights.sloWeight;
+            if (profileEff < bestEffectiveness) {
+                bestEffectiveness = profileEff;
+                mostEffProfile = profilingResult;
             }
         }
 
-        if (!mostCostEffProfile) {
+        if (!mostEffProfile) {
             throw new Error(`Could not find the most cost efficient profile for ${step.name}`);
         }
-        return mostCostEffProfile;
+        return mostEffProfile;
     }
 
 }
