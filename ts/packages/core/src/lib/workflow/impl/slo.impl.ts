@@ -27,6 +27,8 @@ export abstract class SloBase implements ServiceLevelObjective {
 
     abstract getExecutionWeights(expectedMetrics: ExecutionMetrics): WeightMetrics;
 
+    abstract cloneWithNewLimit(newSloLimit: number): ServiceLevelObjective;
+
 }
 
 export class MaxExecutionTimeSlo extends SloBase {
@@ -49,6 +51,10 @@ export class MaxExecutionTimeSlo extends SloBase {
         };
     }
 
+    cloneWithNewLimit(newSloLimit: number): ServiceLevelObjective {
+        return new MaxExecutionTimeSlo(newSloLimit, this.workflowState);
+    }
+
 }
 
 export class MaxCostSlo extends SloBase {
@@ -69,6 +75,10 @@ export class MaxCostSlo extends SloBase {
             sloWeight: expectedMetrics.executionCost,
             optimizationWeight: expectedMetrics.executionTimeMs,
         };
+    }
+
+    cloneWithNewLimit(newSloLimit: number): ServiceLevelObjective {
+        return new MaxCostSlo(newSloLimit, this.workflowState);
     }
 
 }

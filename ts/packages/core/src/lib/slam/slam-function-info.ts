@@ -1,6 +1,6 @@
 import { Comparator } from 'heap-js';
 import { ProfilingResult, ResourceProfile, getProfilingResultForProfile } from '../model';
-import { WorkflowFunctionStep } from '../workflow';
+import { WeightMetrics, WorkflowFunctionStep } from '../workflow';
 
 /**
  * Collects all SLAM-related information about a `WorkflowFunctionStep`.
@@ -21,6 +21,9 @@ export interface SlamFunctionInfo {
     /** The profiling result with the selected profile. */
     profilingResult: ProfilingResult;
 
+    /** The weights of the step according to the current SLO. */
+    stepWeight: WeightMetrics;
+
 }
 
 /**
@@ -34,16 +37,16 @@ export interface SlamFunctionInfo {
 export type SlamFunctionInfoComparator = Comparator<SlamFunctionInfo>;
 
 /**
- * Comparator for establishing a max-heap using the profiling results' `executionTimeMs`.
+ * Comparator for establishing a max-heap using the functions' `sloWeight`.
  */
-export const slamFuncInfoExecTimeMaxHeapComparator: SlamFunctionInfoComparator =
-    (a: SlamFunctionInfo, b: SlamFunctionInfo) => b.profilingResult.executionTimeMs - a.profilingResult.executionTimeMs;
+export const slamFuncInfoSloWeightMaxHeapComparator: SlamFunctionInfoComparator =
+    (a: SlamFunctionInfo, b: SlamFunctionInfo) => b.stepWeight.sloWeight - a.stepWeight.sloWeight;
 
 /**
- * Comparator for establishing a min-heap using the costs.
+ * Comparator for establishing a min-heap using the `optimizationWeight`.
  */
-export const slamFuncInfoCostsMinHeapComparator: SlamFunctionInfoComparator =
-    (a: SlamFunctionInfo, b: SlamFunctionInfo) => a.profilingResult.executionCost - b.profilingResult.executionCost;
+export const slamFuncInfoOptWeightMinHeapComparator: SlamFunctionInfoComparator =
+    (a: SlamFunctionInfo, b: SlamFunctionInfo) => a.stepWeight.optimizationWeight - b.stepWeight.optimizationWeight;
 
 /**
  * Creates a comparator for establishing a max-heap using the potential execution time improvements when switching

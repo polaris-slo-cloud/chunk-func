@@ -8,6 +8,7 @@ import {
     getResultsForInput,
 } from '../model';
 import {
+    ServiceLevelObjective,
     Workflow,
     WorkflowFunctionStep,
     WorkflowInput,
@@ -16,7 +17,7 @@ import {
     getResourceProfilesSortedByMemory,
 } from '../workflow';
 import { PreconfiguredConfigStrategy } from '../resource-configuration/preconfigured-config-strategy';
-import { SlamFunctionInfo, SlamFunctionInfoComparator, slamFuncInfoExecTimeMaxHeapComparator } from './slam-function-info';
+import { SlamFunctionInfo, SlamFunctionInfoComparator, slamFuncInfoSloWeightMaxHeapComparator } from './slam-function-info';
 import { SlamProfilingResultComputationStrategy, getExactInputSizeProfilingResult } from './slam-profile-computation-strategy';
 
 /**
@@ -69,9 +70,9 @@ interface SlamState {
     stepInputSizes: Record<string, number>;
 
     /**
-     * The SLO in milliseconds.
+     * The SLO that needs to be fulfilled.
      */
-    maxExecutionTimeMs: number;
+    slo: ServiceLevelObjective;
 }
 
 export interface SlamOutput {
@@ -112,15 +113,15 @@ export class SlamConfigFinder {
      * Finds a config optimized for the specified SLO using the input sizes defined in the workflowInput (these input sizes
      * should be the medians of the possible inputs, as normally used by SLAM).
      *
-     * @param maxExecutionTimeMs The SLO in milliseconds.
+     * @param slo The SLO that needs to be fulfilled.
      * @param workflowInput The input to the workflow. The input to the first step is `workflowInput.data`.
      * @returns The resource profile configurations determined for each step and the output of the workflow simulation using the specified input
      * or `undefined` if no configuration can be found that fulfills the SLO.
      */
-    optimizeForSlo(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamOutput | undefined {
+    optimizeForSlo(slo: ServiceLevelObjective, workflowInput: WorkflowInput<any>): SlamOutput | undefined {
         // In the base version of the algorithm we always return a function to the heap if it hasn't exhausted all available profiles.
         const alwaysReturnToHeap: CheckReturnToHeapFn = () => true;
-        return this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, alwaysReturnToHeap);
+        return this.optimizeForSloInternal(slo, workflowInput, alwaysReturnToHeap);
     }
 
     /**
@@ -129,22 +130,22 @@ export class SlamConfigFinder {
      *
      * If no cheaper config than `optimizeForSlo()` can be found, that config is returned.
      *
-     * @param maxExecutionTimeMs The SLO in milliseconds.
+     * @param slo The SLO that needs to be fulfilled.
      * @param workflowInput The input to the workflow. The input to the first step is `workflowInput.data`.
      * @returns The resource profile configurations determined for each step and the output of the workflow simulation using the specified input
      * or `undefined` if no configuration can be found that fulfills the SLO.
      */
-    optimizeForSloAndCost(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamOutput | undefined {
-        const baseResult = this.optimizeForSlo(maxExecutionTimeMs, workflowInput);
+    optimizeForSloAndCost(slo: ServiceLevelObjective, workflowInput: WorkflowInput<any>): SlamOutput | undefined {
+        const baseResult = this.optimizeForSlo(slo, workflowInput);
 
         const returnToHeapIfCostEfficient: CheckReturnToHeapFn = (oldResult: ProfilingResult, newResult: ProfilingResult) => {
             const costIncrease = (newResult.executionCost - oldResult.executionCost) / oldResult.executionCost;
             const speedIncrease = (oldResult.executionTimeMs - newResult.executionTimeMs) / oldResult.executionTimeMs;
             return costIncrease <= speedIncrease;
         };
-        const costOptimizedResult = this.optimizeForSloInternal(maxExecutionTimeMs, workflowInput, returnToHeapIfCostEfficient);
+        const costOptimizedResult = this.optimizeForSloInternal(slo, workflowInput, returnToHeapIfCostEfficient);
 
-        if (costOptimizedResult && (!baseResult || costOptimizedResult.workflowOutput.totalCost < baseResult.workflowOutput.totalCost)) {
+        if (costOptimizedResult && (!baseResult || costOptimizedResult.workflowOutput.executionCost < baseResult.workflowOutput.executionCost)) {
             // Cost optimized result is cheaper than baseResult or baseResult does not exist (i.e., could not fulfill the SLO).
             return costOptimizedResult;
         } else {
@@ -159,8 +160,8 @@ export class SlamConfigFinder {
      *
      * @returns the workflowOutput and the stepConfigs on success or `undefined` if no configuration to satisfy the SLO can be found.
      */
-    private optimizeForSloInternal(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>, checkReturnToHeap: CheckReturnToHeapFn): SlamOutput | undefined {
-        const state = this.initSlamState(maxExecutionTimeMs, workflowInput);
+    private optimizeForSloInternal(slo: ServiceLevelObjective, workflowInput: WorkflowInput<any>, checkReturnToHeap: CheckReturnToHeapFn): SlamOutput | undefined {
+        const state = this.initSlamState(slo, workflowInput);
         const maxProfileIndex = this.availableProfiles.length - 1;
 
         do {
@@ -181,6 +182,7 @@ export class SlamConfigFinder {
                 state.stepInputSizes[longestFunc.step.name],
                 this.availableProfiles[longestFunc.selectedProfileIndex],
             );
+            longestFunc.stepWeight = slo.getExecutionWeights(longestFunc.profilingResult);
 
             if (longestFunc.selectedProfileIndex < maxProfileIndex && checkReturnToHeap(oldProfileResult, longestFunc.profilingResult)) {
                 state.funcHeap.add(longestFunc);
@@ -191,12 +193,12 @@ export class SlamConfigFinder {
         return undefined;
     }
 
-    private initSlamState(maxExecutionTimeMs: number, workflowInput: WorkflowInput<any>): SlamState {
+    private initSlamState(slo: ServiceLevelObjective, workflowInput: WorkflowInput<any>): SlamState {
         const state: SlamState = {
             stepInputSizes: computeWorkflowStepsInputSizes(this.workflow.graph, workflowInput),
             funcSteps: [],
             funcHeap: new Heap(this.settings.funcInfoComparator),
-            maxExecutionTimeMs,
+            slo,
             workflowInput,
         };
         this.fillHeap(state);
@@ -217,6 +219,7 @@ export class SlamConfigFinder {
                     step: functionStep,
                     selectedProfileIndex: this.getProfileIndex(baseProfilingResult.resourceProfileId),
                     profilingResult: baseProfilingResult.result,
+                    stepWeight: state.slo.getExecutionWeights(baseProfilingResult.result),
                 };
                 if (slamInfo.selectedProfileIndex < maxProfileIndex) {
                     state.funcHeap.add(slamInfo);
@@ -256,11 +259,12 @@ export class SlamConfigFinder {
         const stepConfigs = this.buildWorkflowConfig(state.funcSteps);
         const configStrat = new PreconfiguredConfigStrategy(this.workflow.graph, this.workflow.availableResourceProfiles, stepConfigs);
         const output = this.workflow.execute(state.workflowInput, configStrat);
+        const workflowWeight = state.slo.getExecutionWeights(output);
 
         return {
             workflowOutput: output,
             stepConfigs,
-            sloFulfilled: output.executionTimeMs <= state.maxExecutionTimeMs,
+            sloFulfilled: workflowWeight.sloWeight <= state.slo.sloLimit,
         }
     }
 
@@ -277,7 +281,7 @@ export class SlamConfigFinder {
             settings = {};
         }
         if (!settings.funcInfoComparator) {
-            settings.funcInfoComparator = slamFuncInfoExecTimeMaxHeapComparator;
+            settings.funcInfoComparator = slamFuncInfoSloWeightMaxHeapComparator;
         }
         if (!settings.profileComputationStrategy) {
             settings.profileComputationStrategy = getExactInputSizeProfilingResult;

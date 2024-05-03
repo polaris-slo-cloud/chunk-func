@@ -36,6 +36,8 @@ export interface ExecutionMetrics {
      * The total cost incurred by a single execution of a step or path.
      *
      * For a path the cost of the source node is NOT included.
+     *
+     * For an entire workflow, all the steps are included.
      */
     executionCost: number;
 

@@ -1,6 +1,6 @@
 import { ResourceProfile } from '../model';
 import { SlamConfigFinder } from '../slam';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, Workflow, WorkflowFunctionStep, WorkflowInput, WorkflowState } from '../workflow';
+import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, ServiceLevelObjective, Workflow, WorkflowFunctionStep, WorkflowInput, WorkflowState } from '../workflow';
 import { PreconfiguredConfigStrategy } from './preconfigured-config-strategy';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
@@ -27,13 +27,13 @@ export class SlamConfigStrategy extends ResourceConfigurationStrategyBase {
         this.workflow = workflow;
     }
 
-    train(slo: number, trainingInput: WorkflowInput<unknown>): any {
+    train(slo: ServiceLevelObjective, trainingInput: WorkflowInput<unknown>): any {
         const configFinder = new SlamConfigFinder(this.workflow);
 
         // To realistically compare to the other approaches we need to use the eval SLO with the SLAM profiling data.
         const slamResult = configFinder.optimizeForSloAndCost(slo, trainingInput);
         if (!slamResult) {
-            throw new Error(`There is no configuration that satisfies the SLO of ${slo}`);
+            throw new Error(`There is no configuration that satisfies the SLO of ${slo.sloLimit}`);
         }
 
         this.preconfiguredStrategy = new PreconfiguredConfigStrategy(this.workflowGraph, this.availableResourceProfiles, slamResult.stepConfigs);

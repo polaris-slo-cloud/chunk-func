@@ -1,5 +1,6 @@
-import { ResourceProfile, WorkflowExecutionDescription } from '../model';
+import { ExecutionMetrics, ResourceProfile, WorkflowExecutionDescription } from '../model';
 import { InputOutputData } from './data';
+import { ServiceLevelObjective } from './slo';
 import { WorkflowState } from './state';
 import { AccumulatedStepInput, WorkflowFunctionStep, WorkflowStep, WorkflowStepExecutionLog } from './step';
 import { WorkflowGraph } from './workflow-graph';
@@ -30,7 +31,7 @@ export interface ResourceConfigurationStrategy {
      * @param trainingInput The WorkflowInput to be used for training. This may be different
      * from the input to the actual workflow.
      */
-    train?(slo: number, trainingInput: WorkflowInput<unknown>): any;
+    train?(slo: ServiceLevelObjective, trainingInput: WorkflowInput<unknown>): any;
 
     /**
      * Chooses the resource profile configuration for the specified function step, given the current state and input.
@@ -67,7 +68,7 @@ export interface WorkflowInput<T> {
 /**
  * Describes the output of a Workflow.
  */
-export interface WorkflowOutput<T> {
+export interface WorkflowOutput<T> extends ExecutionMetrics {
 
     /**
      * The execution logs of the individual workflow steps.
@@ -82,7 +83,7 @@ export interface WorkflowOutput<T> {
     /**
      * The total cost of the execution of the workflow.
      */
-    totalCost: number;
+    executionCost: number;
 
     /**
      * The average number of milliseconds that the resource configuration strategy took to execute.

@@ -53,7 +53,7 @@ export class WorkflowExecution {
         const stepStats = this.collectStepLogs();
         const workflowOutput: WorkflowOutput<O> = {
             executionTimeMs: mainThread.executionTimeMs,
-            totalCost: this.state.totalCost,
+            executionCost: this.state.totalCost,
             data: stepOutput.data,
             stepLogs: stepStats.stepLogs,
             avgResourceConfigStrategyExecutionTimeMs: stepStats.avgResConfigStratExecTimeMs,

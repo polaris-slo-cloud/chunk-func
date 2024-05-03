@@ -72,6 +72,11 @@ export interface ServiceLevelObjective {
      */
     getExecutionWeights(execMetrics: ExecutionMetrics): WeightMetrics;
 
+    /**]
+     * @returns A clone of this SLO with the new SLO limit.
+     */
+    cloneWithNewLimit(newSloLimit: number): ServiceLevelObjective;
+
     // ToDo
     // Idea: Adding comparator methods for the SLO weight and the optimization weight could allow a fully
     // generic implementation that covers all possible OptimizationWeightActions.
