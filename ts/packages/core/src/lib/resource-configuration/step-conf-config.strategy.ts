@@ -27,8 +27,9 @@ export class StepConfConfigStrategy extends ResourceConfigurationStrategyBase {
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        const workflowMetrics = workflowState.slo.getWorkflowWeights(input.thread);
-        const remainingSlo = workflowState.slo.sloLimit - workflowMetrics.sloWeight;
+        const workflowMetrics = workflowState.getExecutionMetrics(input.thread);
+        const workflowWeights = workflowState.slo.getExecutionWeights(workflowMetrics);
+        const remainingSlo = workflowState.slo.sloLimit - workflowWeights.sloWeight;
         const stepSlo = computeStepSlo(
             this.workflowGraph,
             step,

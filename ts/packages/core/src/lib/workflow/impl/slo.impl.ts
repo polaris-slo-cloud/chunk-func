@@ -1,8 +1,24 @@
-import { ExecutionMetrics } from '../../model';
+import { ExecutionMetrics, WorkflowExecutionDescription } from '../../model';
 import { MAX_COST_SLO, MAX_EXECUTION_TIME_SLO, OptimizationWeightAction, ServiceLevelObjective, SloLimitType } from '../slo';
-import { WorkflowState } from '../state';
-import { WorkflowThread } from '../thread';
 import { WeightMetrics } from '../workflow-graph';
+
+export function initSlo(executionDescription: WorkflowExecutionDescription): ServiceLevelObjective {
+    // Ugly hack to maintain compatibility with existing scenario YAML files.
+    if (!executionDescription.sloType && typeof executionDescription.maxResponseTimeMs === 'number') {
+        executionDescription.sloType = MAX_EXECUTION_TIME_SLO;
+        executionDescription.sloLimit = executionDescription.maxResponseTimeMs;
+    }
+
+    // The proper way to configure an SLO is through sloType and sloLimit.
+    switch (executionDescription.sloType) {
+        case MAX_EXECUTION_TIME_SLO:
+            return new MaxExecutionTimeSlo(executionDescription.sloLimit);
+        case MAX_COST_SLO:
+            return new MaxCostSlo(executionDescription.sloLimit);
+        default:
+            throw new Error(`Unknown SLO type: ${executionDescription.sloType}`);
+    }
+}
 
 export abstract class SloBase implements ServiceLevelObjective {
 
@@ -23,8 +39,6 @@ export abstract class SloBase implements ServiceLevelObjective {
         this.optimizationWeightAction = optWeightAction;
     }
 
-    abstract getWorkflowWeights(activeThread: WorkflowThread): WeightMetrics;
-
     abstract getExecutionWeights(expectedMetrics: ExecutionMetrics): WeightMetrics;
 
     abstract cloneWithNewLimit(newSloLimit: number): ServiceLevelObjective;
@@ -33,15 +47,8 @@ export abstract class SloBase implements ServiceLevelObjective {
 
 export class MaxExecutionTimeSlo extends SloBase {
 
-    constructor(sloLimit: number, private workflowState: WorkflowState) {
+    constructor(sloLimit: number) {
         super(MAX_EXECUTION_TIME_SLO, SloLimitType.UpperBound, sloLimit, OptimizationWeightAction.Minimize);
-    }
-
-    override getWorkflowWeights(activeThread: WorkflowThread): WeightMetrics {
-        return {
-            sloWeight: activeThread.executionTimeMs,
-            optimizationWeight: this.workflowState.totalCost,
-        };
     }
 
     override getExecutionWeights(expectedMetrics: ExecutionMetrics): WeightMetrics {
@@ -52,22 +59,15 @@ export class MaxExecutionTimeSlo extends SloBase {
     }
 
     cloneWithNewLimit(newSloLimit: number): ServiceLevelObjective {
-        return new MaxExecutionTimeSlo(newSloLimit, this.workflowState);
+        return new MaxExecutionTimeSlo(newSloLimit);
     }
 
 }
 
 export class MaxCostSlo extends SloBase {
 
-    constructor(sloLimit: number, private workflowState: WorkflowState) {
+    constructor(sloLimit: number) {
         super(MAX_COST_SLO, SloLimitType.UpperBound, sloLimit, OptimizationWeightAction.Minimize);
-    }
-
-    override getWorkflowWeights(activeThread: WorkflowThread): WeightMetrics {
-        return {
-            sloWeight: this.workflowState.totalCost,
-            optimizationWeight: activeThread.executionTimeMs,
-        };
     }
 
     override getExecutionWeights(expectedMetrics: ExecutionMetrics): WeightMetrics {
@@ -78,7 +78,7 @@ export class MaxCostSlo extends SloBase {
     }
 
     cloneWithNewLimit(newSloLimit: number): ServiceLevelObjective {
-        return new MaxCostSlo(newSloLimit, this.workflowState);
+        return new MaxCostSlo(newSloLimit);
     }
 
 }

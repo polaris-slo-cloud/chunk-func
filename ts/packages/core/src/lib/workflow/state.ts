@@ -1,5 +1,5 @@
 import { Queue } from '../collections/queue';
-import { ResourceProfile, WorkflowExecutionDescription } from '../model';
+import { ExecutionMetrics, ResourceProfile, WorkflowExecutionDescription } from '../model';
 import { ServiceLevelObjective } from './slo';
 import { StepInput, WorkflowStep } from './step';
 import { WorkflowThread } from './thread';
@@ -38,6 +38,11 @@ export interface WorkflowState {
      * Description of the scenario that the workflow is executing.
      */
     executionDescription: WorkflowExecutionDescription;
+
+    /**
+     * Gets the execution metrics for the specified thread and the total cost of the entire workflow thus far.
+     */
+    getExecutionMetrics(thread: WorkflowThread): ExecutionMetrics;
 
 }
 

@@ -61,14 +61,7 @@ export interface ServiceLevelObjective {
     readonly optimizationWeightAction: OptimizationWeightAction;
 
     /**
-     * @returns The SLO weight and the optimization weight for the already executed part
-     * of the workflow, based on the active thread.
-     */
-    getWorkflowWeights(activeThread: WorkflowThread): WeightMetrics;
-
-    /**
-     * @returns The SLO weight and the optimization weight for the expected
-     * execution of a `WorkflowStep` or `WorkflowPath`.
+     * @returns The SLO weight and the optimization weight extracted from the specified `ExecutionMetrics`.
      */
     getExecutionWeights(execMetrics: ExecutionMetrics): WeightMetrics;
 

@@ -64,8 +64,9 @@ export class OnlineSlamConfigStrategy extends ResourceConfigurationStrategyBase 
         }
         slamInput.executionDescription.inputSizeBytes = input.totalDataSizeBytes;
 
-        const workflowMetrics = workflowState.slo.getWorkflowWeights(input.thread);
-        const remainingSlo = workflowState.slo.sloLimit - workflowMetrics.sloWeight;
+        const workflowMetrics = workflowState.getExecutionMetrics(input.thread);
+        const workflowWeights = workflowState.slo.getExecutionWeights(workflowMetrics);
+        const remainingSlo = workflowState.slo.sloLimit - workflowWeights.sloWeight;
         slamInput.executionDescription.sloLimit = remainingSlo;
 
         const subWorkflow = this.workflow.createSubWorkflow(step);

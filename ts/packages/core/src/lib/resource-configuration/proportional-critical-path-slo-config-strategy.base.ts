@@ -39,8 +39,9 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
     ): Record<string, ExecutionMetrics>;
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        const workflowMetrics = workflowState.slo.getWorkflowWeights(input.thread);
-        const remainingSlo = workflowState.slo.sloLimit - workflowMetrics.sloWeight;
+        const workflowMetrics = workflowState.getExecutionMetrics(input.thread);
+        const workflowWeights = workflowState.slo.getExecutionWeights(workflowMetrics);
+        const remainingSlo = workflowState.slo.sloLimit - workflowWeights.sloWeight;
         const avgExecMetrics = this.computeAvgExecMetricsUntilEnd(workflowState, step, input);
         const stepSlo = computeStepSlo(
             this.workflowGraph,

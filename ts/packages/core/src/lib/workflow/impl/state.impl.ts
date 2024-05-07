@@ -1,10 +1,10 @@
 import { LinkedListQueue } from '../../collections';
-import { WorkflowExecutionDescription } from '../../model';
-import { MAX_COST_SLO, MAX_EXECUTION_TIME_SLO, ServiceLevelObjective } from '../slo';
+import { ExecutionMetrics, WorkflowExecutionDescription } from '../../model';
+import { ServiceLevelObjective } from '../slo';
 import { StepState, WorkflowState } from '../state';
 import { WorkflowStep } from '../step';
 import { WorkflowThread } from '../thread';
-import { MaxCostSlo, MaxExecutionTimeSlo } from './slo.impl';
+import { initSlo } from './slo.impl';
 
 export type WorkflowStateInitData = Pick<WorkflowState, 'executionDescription'>;
 
@@ -20,25 +20,14 @@ export class WorkflowStateImpl implements WorkflowState {
 
     constructor(initData: WorkflowStateInitData) {
         this.executionDescription = initData.executionDescription;
-        this.slo = this.initSlo(initData.executionDescription);
+        this.slo = initSlo(initData.executionDescription);
     }
 
-    private initSlo(executionDescription: WorkflowExecutionDescription): ServiceLevelObjective {
-        // Ugly hack to maintain compatibility with existing scenario YAML files.
-        if (!executionDescription.sloType && typeof executionDescription.maxResponseTimeMs === 'number') {
-            executionDescription.sloType = MAX_EXECUTION_TIME_SLO;
-            executionDescription.sloLimit = executionDescription.maxResponseTimeMs;
-        }
-
-        // The proper way to configure an SLO is through sloType and sloLimit.
-        switch (executionDescription.sloType) {
-            case MAX_EXECUTION_TIME_SLO:
-                return new MaxExecutionTimeSlo(executionDescription.sloLimit, this);
-            case MAX_COST_SLO:
-                return new MaxCostSlo(executionDescription.sloLimit, this);
-            default:
-                throw new Error(`Unknown SLO type: ${executionDescription.sloType}`);
-        }
+    getExecutionMetrics(thread: WorkflowThread): ExecutionMetrics {
+        return {
+            executionTimeMs: thread.executionTimeMs,
+            executionCost: this.totalCost,
+        };
     }
 
 }
