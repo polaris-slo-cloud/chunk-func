@@ -65,6 +65,11 @@ export interface ServiceLevelObjective {
      */
     getExecutionWeights(execMetrics: ExecutionMetrics): WeightMetrics;
 
+    /**
+     * @returns `true` if the specified metrics fulfill the SLO, otherwise `false`.
+     */
+    isFulfilled(execMetrics: ExecutionMetrics): boolean;
+
     /**]
      * @returns A clone of this SLO with the new SLO limit.
      */

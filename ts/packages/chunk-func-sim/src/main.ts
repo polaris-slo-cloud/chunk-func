@@ -36,6 +36,7 @@ import {
     createSpreadSearchConfigStrategy,
     HybridSearchConfigStrategy,
     createHybridSearchConfigStrategy,
+    initSlo,
 } from '@chunk-func/core';
 import { convertArgsToOptions } from './util';
 
@@ -91,7 +92,6 @@ const resConfigOptions = convertArgsToOptions(process.argv.slice(optionsStartInd
 
 const workflowBuilder = new WorkflowBuilder();
 const workflow = workflowBuilder.buildWorkflow(workflowDesc);
-const slo = execDesc.maxResponseTimeMs;
 
 let strategyTrainingOutput: any;
 let output: WorkflowOutput<unknown>;
@@ -105,7 +105,11 @@ try {
             throw new Error(`${resConfigStrat.name} requires a training-scenario.yaml to be specified as the last argument.`);
         }
         const trainingInput = buildWorkflowInput(trainingScenarioDesc);
-        strategyTrainingOutput = resConfigStrat.train(slo, trainingInput);
+        trainingInput.executionDescription.sloLimit = execDesc.sloLimit;
+        trainingInput.executionDescription.sloType = execDesc.sloType;
+        trainingInput.executionDescription.maxResponseTimeMs = execDesc.maxResponseTimeMs;
+        const trainingSlo = initSlo(trainingInput.executionDescription);
+        strategyTrainingOutput = resConfigStrat.train(trainingSlo, trainingInput);
     }
 
     const input = buildWorkflowInput(execDesc);
@@ -113,7 +117,7 @@ try {
 } catch (err) {
     output = {
         executionTimeMs: -1,
-        totalCost: -1,
+        executionCost: -1,
     } as WorkflowOutput<unknown>;
     error = err;
 }
@@ -122,10 +126,10 @@ const simOutput: SimulatorOutput = {
     scenarioName: execDesc.scenarioName,
     resourceConfigStrategy: resourceConfigStratName,
     inputDataSizeMib: execDesc.inputSizeBytes / 1024 / 1024,
-    sloMs: slo,
+    sloMs: execDesc.sloLimit || execDesc.maxResponseTimeMs,
     strategyTrainingOutput,
     workflowOutput: output,
-    sloFulfilled: output.executionTimeMs <= slo,
+    sloFulfilled: output.sloFulfilled,
 };
 
 if (error) {

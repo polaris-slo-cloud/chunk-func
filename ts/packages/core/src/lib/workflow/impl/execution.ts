@@ -51,12 +51,14 @@ export class WorkflowExecution {
         }
 
         const stepStats = this.collectStepLogs();
+        const finalExecMetrics = this.state.getExecutionMetrics(mainThread);
         const workflowOutput: WorkflowOutput<O> = {
-            executionTimeMs: mainThread.executionTimeMs,
-            executionCost: this.state.totalCost,
+            executionTimeMs: finalExecMetrics.executionTimeMs,
+            executionCost: finalExecMetrics.executionCost,
             data: stepOutput.data,
             stepLogs: stepStats.stepLogs,
             avgResourceConfigStrategyExecutionTimeMs: stepStats.avgResConfigStratExecTimeMs,
+            sloFulfilled: this.state.slo.isFulfilled(finalExecMetrics),
         }
         return workflowOutput;
     }

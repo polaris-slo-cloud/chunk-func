@@ -95,6 +95,11 @@ export interface WorkflowOutput<T> extends ExecutionMetrics {
      */
     data: InputOutputData<T>;
 
+    /**
+     * `true` if the SLO is fulfilled, otherwise `false`.
+     */
+    sloFulfilled: boolean;
+
 }
 
 /**
