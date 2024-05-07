@@ -27,6 +27,8 @@ export class SloCompliantConfigStrategy extends SloCompliantConfigStrategyBase {
     }
 
     protected override getCriticalPathWeightFn(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): GetStepWeightFn {
+        throw new Error('This strategy has not been adapted for arbitrary SLOs.');
+
         // Using the longest time yields a critical path exec time that is much too long for any reasonable SLO.
         // But using the cheapest exec time, works quite well.
         return getCheapestExecutionTimeForInput(Number.POSITIVE_INFINITY);

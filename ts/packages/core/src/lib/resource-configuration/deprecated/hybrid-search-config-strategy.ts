@@ -24,29 +24,31 @@ export class HybridSearchConfigStrategy extends ResourceConfigurationStrategyBas
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        const spreadSearchResProfile = this.spreadSearch.chooseConfiguration(workflowState, step, input);
-        const propCpResProfile = this.proportionalCP.chooseConfiguration(workflowState, step, input);
+        throw new Error('This strategy has not been adapted for arbitrary SLOs.');
 
-        if (spreadSearchResProfile === propCpResProfile) {
-            return spreadSearchResProfile;
-        }
+        // const spreadSearchResProfile = this.spreadSearch.chooseConfiguration(workflowState, step, input);
+        // const propCpResProfile = this.proportionalCP.chooseConfiguration(workflowState, step, input);
 
-        const spreadSearchResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, spreadSearchResProfile);
-        const propCpResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, propCpResProfile);
+        // if (spreadSearchResProfile === propCpResProfile) {
+        //     return spreadSearchResProfile;
+        // }
 
-        // Return the profile that yields the cheaper result.
-        if (spreadSearchResult.executionCost < propCpResult.executionCost) {
-            return spreadSearchResProfile;
-        }
-        if (propCpResult.executionCost < spreadSearchResult.executionCost) {
-            return propCpResProfile;
-        }
+        // const spreadSearchResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, spreadSearchResProfile);
+        // const propCpResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, propCpResProfile);
 
-        // If both profiles have the same cost, return the faster one.
-        if (spreadSearchResult.executionTimeMs <= propCpResult.executionTimeMs) {
-            return spreadSearchResProfile;
-        }
-        return propCpResProfile;
+        // // Return the profile that yields the cheaper result.
+        // if (spreadSearchResult.executionCost < propCpResult.executionCost) {
+        //     return spreadSearchResProfile;
+        // }
+        // if (propCpResult.executionCost < spreadSearchResult.executionCost) {
+        //     return propCpResProfile;
+        // }
+
+        // // If both profiles have the same cost, return the faster one.
+        // if (spreadSearchResult.executionTimeMs <= propCpResult.executionTimeMs) {
+        //     return spreadSearchResProfile;
+        // }
+        // return propCpResProfile;
     }
 
 }

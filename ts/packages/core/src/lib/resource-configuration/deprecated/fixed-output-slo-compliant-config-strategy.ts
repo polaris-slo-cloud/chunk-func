@@ -28,11 +28,12 @@ export class FixedOutputSloCompliantConfigStrategy extends SloCompliantConfigStr
     }
 
     protected override getCriticalPathWeightFn(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): GetStepWeightFn {
-        return (currStep: WorkflowFunctionStep) => {
-            const inputSize = computeStepInputSize(currStep, workflowState.executionDescription);
-            const currStepWeightFn = getCheapestExecutionTimeForInput(inputSize);
-            return currStepWeightFn(currStep);
-        };
+        throw new Error('This strategy has not been adapted for arbitrary SLOs.');
+        // return (currStep: WorkflowFunctionStep) => {
+        //     const inputSize = computeStepInputSize(currStep, workflowState.executionDescription);
+        //     const currStepWeightFn = getCheapestExecutionTimeForInput(inputSize);
+        //     return currStepWeightFn(currStep);
+        // };
     }
 
 }

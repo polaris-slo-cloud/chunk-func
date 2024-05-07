@@ -18,33 +18,35 @@ export abstract class SloCompliantConfigStrategyBase extends ResourceConfigurati
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        // Get the critical path from this step to the end.
-        const weightFn = this.getCriticalPathWeightFn(workflowState, step, input);
-        const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, weightFn);
+        throw new Error('This strategy has not been adapted for arbitrary SLOs.');
 
-        let selectedProfileCost = Number.POSITIVE_INFINITY;
-        let selectedProfileExecTime = Number.POSITIVE_INFINITY;
-        let selectedProfileId: string | undefined;
+        // // Get the critical path from this step to the end.
+        // const weightFn = this.getCriticalPathWeightFn(workflowState, step, input);
+        // const criticalPath = this.workflowGraph.findCriticalPath(step, this.workflowGraph.end, weightFn);
 
-        for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
-            const stepExecTime = resultForInput.result.executionTimeMs;
-            const expectedTotalExecTime = input.thread.executionTimeMs + stepExecTime + criticalPath.executionTimeMs;
+        // let selectedProfileCost = Number.POSITIVE_INFINITY;
+        // let selectedProfileExecTime = Number.POSITIVE_INFINITY;
+        // let selectedProfileId: string | undefined;
 
-            if (expectedTotalExecTime <= workflowState.maxExecutionTimeMs) {
-                const stepExecCost = resultForInput.result.executionCost;
-                if (stepExecCost < selectedProfileCost || (stepExecCost === selectedProfileCost && stepExecTime < selectedProfileExecTime)) {
-                    selectedProfileCost = stepExecCost;
-                    selectedProfileExecTime = stepExecTime;
-                    selectedProfileId = resultForInput.resourceProfileId;
-                }
-            }
-        }
+        // for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
+        //     const stepExecTime = resultForInput.result.executionTimeMs;
+        //     const expectedTotalExecTime = input.thread.executionTimeMs + stepExecTime + criticalPath.executionTimeMs;
 
-        if (!selectedProfileId) {
-            return this.fallbackStrategy.chooseConfiguration(workflowState, step, input);
-        }
-        const profile = this.availableResourceProfiles[selectedProfileId];
-        return profile;
+        //     if (expectedTotalExecTime <= workflowState.maxExecutionTimeMs) {
+        //         const stepExecCost = resultForInput.result.executionCost;
+        //         if (stepExecCost < selectedProfileCost || (stepExecCost === selectedProfileCost && stepExecTime < selectedProfileExecTime)) {
+        //             selectedProfileCost = stepExecCost;
+        //             selectedProfileExecTime = stepExecTime;
+        //             selectedProfileId = resultForInput.resourceProfileId;
+        //         }
+        //     }
+        // }
+
+        // if (!selectedProfileId) {
+        //     return this.fallbackStrategy.chooseConfiguration(workflowState, step, input);
+        // }
+        // const profile = this.availableResourceProfiles[selectedProfileId];
+        // return profile;
     }
 
     /**

@@ -82,36 +82,38 @@ export class SpreadSearchConfigStrategy extends ResourceConfigurationStrategyBas
     }
 
     chooseConfiguration(workflowState: WorkflowState, step: WorkflowFunctionStep, input: AccumulatedStepInput): ResourceProfile {
-        if (!this.resConfigGraph) {
-            this.resConfigGraph = new WorkflowResourceConfigGraph(this.workflowGraph, this.availableResourceProfiles);
-        }
+        throw new Error('This strategy has not been adapted for arbitrary SLOs.');
 
-        const getStepNodeExecTime: GetStepWeightWithProfileFn = (stepNode) => {
-            if (stepNode.step.name !== step.name) {
-                // return getExecTimeForMaxInput(stepNode);
-                const stepWeight = getAvgExecTimeAcrossAllInputs(stepNode);
-                stepWeight.sloWeight *= this.options.estimateMultiplier;
-                stepWeight.optimizationWeight *= this.options.estimateMultiplier;
-                return stepWeight;
-            } else {
-                const profilingResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, stepNode.resourceProfile);
-                return {
-                    profilingResult,
-                    resourceProfileId: getResourceProfileId(stepNode.resourceProfile),
-                    sloWeight: profilingResult.executionTimeMs,
-                    optimizationWeight: profilingResult.executionCost,
-                };
-            }
-        };
+        // if (!this.resConfigGraph) {
+        //     this.resConfigGraph = new WorkflowResourceConfigGraph(this.workflowGraph, this.availableResourceProfiles);
+        // }
 
-        const remainingSlo = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
-        const path = this.resConfigGraph.findSloCompliantPathToEnd(step, remainingSlo, stepNode => getStepNodeExecTime(stepNode));
+        // const getStepNodeExecTime: GetStepWeightWithProfileFn = (stepNode) => {
+        //     if (stepNode.step.name !== step.name) {
+        //         // return getExecTimeForMaxInput(stepNode);
+        //         const stepWeight = getAvgExecTimeAcrossAllInputs(stepNode);
+        //         stepWeight.sloWeight *= this.options.estimateMultiplier;
+        //         stepWeight.optimizationWeight *= this.options.estimateMultiplier;
+        //         return stepWeight;
+        //     } else {
+        //         const profilingResult = getProfilingResultForProfile(step.profilingResults, input.totalDataSizeBytes, stepNode.resourceProfile);
+        //         return {
+        //             profilingResult,
+        //             resourceProfileId: getResourceProfileId(stepNode.resourceProfile),
+        //             sloWeight: profilingResult.executionTimeMs,
+        //             optimizationWeight: profilingResult.executionCost,
+        //         };
+        //     }
+        // };
 
-        if (path) {
-            return this.pickSafeResourceProfile(step, path, input, remainingSlo);
-        }
-        // throw new Error(`There is no path from ${step.name} to the end of the workflow.`);
-        return this.fallbackStrategy.chooseConfiguration(workflowState, step, input);
+        // const remainingSlo = workflowState.maxExecutionTimeMs - input.thread.executionTimeMs;
+        // const path = this.resConfigGraph.findSloCompliantPathToEnd(step, remainingSlo, stepNode => getStepNodeExecTime(stepNode));
+
+        // if (path) {
+        //     return this.pickSafeResourceProfile(step, path, input, remainingSlo);
+        // }
+        // // throw new Error(`There is no path from ${step.name} to the end of the workflow.`);
+        // return this.fallbackStrategy.chooseConfiguration(workflowState, step, input);
     }
 
     /**
