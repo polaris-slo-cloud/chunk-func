@@ -36,13 +36,13 @@ declare -A SCENARIOS=(
 declare -A CONFIG_STRATEGIES=(
     ["proportional-critical-path-slo"]="ProportionalCriticalPathSloConfigStrategy"
     ["step-conf"]="StepConfConfigStrategy"
-    ["spread-search"]="SpreadSearchConfigStrategy"
-    ["hybrid-search"]="HybridSearchConfigStrategy"
+    # ["spread-search"]="SpreadSearchConfigStrategy"
+    # ["hybrid-search"]="HybridSearchConfigStrategy"
 )
 
 declare -A CONFIG_STRATEGIES_WITH_TRAINING=(
     ["slam"]="SlamConfigStrategy"
-    ["online-slam"]="OnlineSlamConfigStrategy"
+    # ["online-slam"]="OnlineSlamConfigStrategy"
 )
 
 declare -A CMD_LINE_ARGUMENTS=(
