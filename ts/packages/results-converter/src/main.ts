@@ -45,7 +45,7 @@ function processResultFile(filePath: string): ProcessedSimulationResult {
         scenario: `${inputSize}MB`,
         sloMs: simResult.sloMs,
         executionTimeMs: simResult.workflowOutput.executionTimeMs,
-        cost: simResult.workflowOutput.totalCost,
+        cost: simResult.workflowOutput.executionCost,
         avgResConfigStratExecTimeMs: simResult.workflowOutput.avgResourceConfigStrategyExecutionTimeMs,
     };
 }

@@ -1,9 +1,9 @@
 #!/bin/bash
 # set -x
 
-BASE_SLO_MS=0 # fastest(scenario-01) + (cheapest(scenario-01) - fastest(scenario(01)) / 2
-SLO_RANGE_PERCENT=0 # Determined by PROFILES_TYPE
+# baseSlo = fastest(scenario-01) + (cheapest(scenario-01) - fastest(scenario(01)) / 2
 SLO_STEP_PERCENT=1
+RET=""
 
 WORKFLOW_PATH="workflow"
 OUTPUT_DIR="./simulation-logs"
@@ -15,16 +15,29 @@ PROFILES_TYPE="" # Set by first command line argument. Can be "gcf", "aws", or "
 CHUNK_FUNC_SIM_JS="../../dist/packages/chunk-func-sim/main.js"
 RESULTS_CONVERTER_JS="../../dist/packages/results-converter/main.js"
 
+SLO_TYPES=(
+    "MaxExecutionTime"
+    "MaxCost"
+)
+
 declare -A BASE_SLOS=(
-    ["gcf"]=79000
-    ["aws"]=54274
-    ["aws-bo"]=54274
+    ["gcf-MaxExecutionTime"]=79000
+    ["aws-MaxExecutionTime"]=54274
+    ["aws-bo-MaxExecutionTime"]=54274
+
+    ["gcf-MaxCost"]=""
+    ["aws-MaxCost"]="0.00245075"
+    ["aws-bo-MaxCost"]="0.00245075"
 )
 
 declare -A SLO_RANGES_PERCENT=(
-    ["gcf"]=40
-    ["aws"]=40
-    ["aws-bo"]=40
+    ["gcf-MaxExecutionTime"]=40
+    ["aws-MaxExecutionTime"]=40
+    ["aws-bo-MaxExecutionTime"]=40
+
+    ["gcf-MaxCost"]=40
+    ["aws-MaxCost"]=40
+    ["aws-bo-MaxCost"]=40
 )
 
 declare -A SCENARIOS=(
@@ -50,13 +63,26 @@ declare -A CMD_LINE_ARGUMENTS=(
     ["hybrid-search"]="--estimateMultiplier 1.0 --safetyMargin 0.01 --profileIncrements 1"
 )
 
+# Writes the scenario YAML with the specified sloType and sloLimit to a temp file.
+function writeScenarioYaml() {
+    local scenarioTemplateFile=$1
+    local sloType=$2
+    local sloLimit=$3
+
+    local scenarioFinalYamlFile="$(mktemp)"
+    local scenarioYaml=$(sed -e "s/{{ \.sloType }}/${sloType}/" "$scenarioTemplateFile")
+    sed -e "s/{{ \.sloLimit }}/${sloLimit}/" <<< "$scenarioYaml" > "$scenarioFinalYamlFile"
+
+    RET=$scenarioFinalYamlFile
+}
+
 # Executes simulations for the SLO-independent strategies, i.e., fastest and cheapest.
 function runSloIndependentStrategies() {
     local scenarioName=$1
     local scenarioTemplateFile=$2
 
-    local scenarioFinalYamlFile="$(mktemp)"
-    sed -e "s/{{ \.sloMs }}/100/" "$scenarioTemplateFile" > "$scenarioFinalYamlFile"
+    writeScenarioYaml "$scenarioTemplateFile" "MaxExecutionTime" 100
+    local scenarioFinalYamlFile=$RET
 
     node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "FastestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-${PROFILES_TYPE}-fastest.json"
     node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "CheapestConfigStrategy" > "${OUTPUT_DIR}/${scenarioName}-${PROFILES_TYPE}-cheapest.json"
@@ -68,52 +94,101 @@ function runSloIndependentStrategies() {
 function runSloStrategies() {
     local scenarioName=$1
     local scenarioTemplateFile=$2
-    local sloMs=$3
+    local sloType=$3
+    local sloLimit=$4
 
-    local scenarioFinalYamlFile="$(mktemp)"
-    sed -e "s/{{ \.sloMs }}/${sloMs}/" "$scenarioTemplateFile" > "$scenarioFinalYamlFile"
+    writeScenarioYaml "$scenarioTemplateFile" "$sloType" "$sloLimit"
+    local scenarioFinalYamlFile=$RET
 
     for configStratKey in "${!CONFIG_STRATEGIES[@]}"; do
         local configStrat=${CONFIG_STRATEGIES[$configStratKey]}
         local cmdLineArgs=${CMD_LINE_ARGUMENTS[$configStratKey]}
-        echo "Running $configStrat $cmdLineArgs with SLO: $sloMs"
-        node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" $cmdLineArgs > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloMs}.json"
+        echo "Running $configStrat $cmdLineArgs with SLO: $sloLimit"
+        node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" $cmdLineArgs > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloLimit}.json"
     done
 
     for configStratKey in "${!CONFIG_STRATEGIES_WITH_TRAINING[@]}"; do
         local configStrat=${CONFIG_STRATEGIES_WITH_TRAINING[$configStratKey]}
         local cmdLineArgs=${CMD_LINE_ARGUMENTS[$configStratKey]}
-        echo "Running $configStrat $cmdLineArgs with SLO: $sloMs"
-        node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" "$TRAINING_SCENARIO_PATH" $cmdLineArgs > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloMs}.json"
+        echo "Running $configStrat $cmdLineArgs with SLO: $sloLimit"
+        node "$CHUNK_FUNC_SIM_JS" "$WORKFLOW_PATH" "$scenarioFinalYamlFile" "$configStrat" "$TRAINING_SCENARIO_PATH" $cmdLineArgs > "${OUTPUT_DIR}/${scenarioName}-${configStratKey}-${sloLimit}.json"
     done
 
     rm "$scenarioFinalYamlFile"
 }
 
-# Simulates the SLO range (BASE_SLO_MS, BASE_SLO_MS +/- SLO_RANGE_PERCENT]
+# Simulates the SLO range (baseSlo, baseSlo +/- sloRangePercent]
 # The + or - is determined by the $multiplier parameter.
 function simulateSloRange() {
     local scenarioName=$1
-    local scenarioTemplateFile=${SCENARIOS[$scenarioName]}
-    local multiplier=$3
+    local scenarioTemplateFile=$2
+    local sloType=$3
+    local baseSlo=$4
+    local sloRangePercent=$5
+    local multiplier=$6
 
-    local onePercent=$((BASE_SLO_MS/100))
-    for ((i=$SLO_STEP_PERCENT; i<=$SLO_RANGE_PERCENT; i=i+SLO_STEP_PERCENT)); do
-        local sloMs=$((BASE_SLO_MS+onePercent*i*multiplier))
-        runSloStrategies "$scenarioName" "$scenarioTemplateFile" "$sloMs"
+    local onePercent=""
+    # We use floating point division only if the baseSlo is already a floating point number.
+    if [[ "$baseSlo" == *"."* ]]; then
+        onePercent=$(echo "$baseSlo/100" | bc -l)
+    else
+        onePercent=$((baseSlo/100))
+    fi
+
+    for ((i=$SLO_STEP_PERCENT; i<=$sloRangePercent; i=i+SLO_STEP_PERCENT)); do
+        local sloLimit=$(echo "$baseSlo+$onePercent*$i*$multiplier" | bc -l)
+        runSloStrategies "$scenarioName" "$scenarioTemplateFile" "$sloType" "$sloLimit"
     done
 }
 
 # Simulates a scenario with all strategies.
 function simulateScenario() {
     local scenarioName=$1
+    local sloType=$2
+    local baseSlo=$3
+    local sloRangePercent=$4
     local scenarioTemplateFile=${SCENARIOS[$scenarioName]}
 
     runSloIndependentStrategies "$scenarioName" "$scenarioTemplateFile"
 
-    runSloStrategies "$scenarioName" "$scenarioTemplateFile" "$BASE_SLO_MS"
-    simulateSloRange "$scenarioName" "$scenarioTemplateFile" "-1"
-    simulateSloRange "$scenarioName" "$scenarioTemplateFile" "1"
+    runSloStrategies "$scenarioName" "$scenarioTemplateFile" "$sloType" "$baseSlo"
+    simulateSloRange "$scenarioName" "$scenarioTemplateFile" "$sloType" "$baseSlo" "$sloRangePercent" "-1"
+    simulateSloRange "$scenarioName" "$scenarioTemplateFile" "$sloType" "$baseSlo" "$sloRangePercent" "1"
+}
+
+function convertResultsToCsv() {
+    local outputDir=$1
+    local resultsCsv=$2
+
+    echo "Converting results and storing them in $resultsCsv"
+    node "$RESULTS_CONVERTER_JS" "$outputDir" "$resultsCsv"
+
+    # Sort the CSV by strategy, scenario, and SLO
+    sortedCsv=$(head -n 1 "$resultsCsv" && tail -n +2 "$resultsCsv" | sort -t "," -k 1,1d -k 2,2h -k 3,3n)
+    echo "$sortedCsv" > "$resultsCsv"
+
+    echo "Removing all JSON files from output directory"
+    rm "$outputDir/"*.json
+}
+
+function simulateScenarios() {
+    local sloConfigKey=""
+    local baseSlo=""
+    local sloRangePercent=""
+
+    echo "Simulating scenarios ..."
+    for currSloType in "${SLO_TYPES[@]}"; do
+        sloConfigKey="$PROFILES_TYPE-$currSloType"
+        baseSlo=${BASE_SLOS[${sloConfigKey}]}
+        sloRangePercent=${SLO_RANGES_PERCENT[${sloConfigKey}]}
+
+        for scenarioKey in "${!SCENARIOS[@]}"; do
+            simulateScenario "$scenarioKey" "$currSloType" "$baseSlo" "$sloRangePercent"
+        done
+
+        local resultsCsv="${RESULTS_CSV}-${PROFILES_TYPE}-${currSloType}.csv"
+        convertResultsToCsv "$OUTPUT_DIR" "$resultsCsv"
+    done
 }
 
 
@@ -126,24 +201,11 @@ fi
 
 PROFILES_TYPE=$1
 WORKFLOW_PATH="${WORKFLOW_PATH}-${PROFILES_TYPE}.yaml"
-RESULTS_CSV="${RESULTS_CSV}-${PROFILES_TYPE}.csv"
-BASE_SLO_MS=${BASE_SLOS[${PROFILES_TYPE}]}
-SLO_RANGE_PERCENT=${SLO_RANGES_PERCENT[${PROFILES_TYPE}]}
 
 mkdir -p "$OUTPUT_DIR"
 
 echo "Removing all JSON files from output directory"
 rm "$OUTPUT_DIR/"*.json
 
-echo "Simulating scenarios ..."
-for scenarioKey in "${!SCENARIOS[@]}"; do
-    simulateScenario "$scenarioKey"
-done
+simulateScenarios
 
-# Convert the results to CSV
-echo "Converting results and storing them in $RESULTS_CSV"
-node "$RESULTS_CONVERTER_JS" "$OUTPUT_DIR" "$RESULTS_CSV"
-
-# Sort the CSV by strategy, scenario, and SLO
-sortedCsv=$(head -n 1 "$RESULTS_CSV" && tail -n +2 "$RESULTS_CSV" | sort -t "," -k 1,1d -k 2,2h -k 3,3n)
-echo "$sortedCsv" > "$RESULTS_CSV"
