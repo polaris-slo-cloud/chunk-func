@@ -9,7 +9,8 @@ inputSizeBytes: 238915345
 
 # 29287 is the fastest possible time.
 # 185283 is the time for the cheapest possible config.
-maxResponseTimeMs: {{ .sloMs }}
+sloType: {{ .sloType }}
+sloLimit: {{ .sloLimit }}
 stepExecutions:
   validate-video:
     outputSizeBytes: 95566138

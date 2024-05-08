@@ -1,6 +1,7 @@
 scenarioName: scenario-03
 inputSizeBytes: 518400
-maxResponseTimeMs: {{ .sloMs }}
+sloType: {{ .sloType }}
+sloLimit: {{ .sloLimit }}
 stepExecutions:
   step-0:
     outputSizeBytes: 345600

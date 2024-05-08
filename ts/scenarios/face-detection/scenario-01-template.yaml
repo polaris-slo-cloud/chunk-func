@@ -4,7 +4,8 @@ inputSizeBytes: 1620000 #  60s * 1080p * 25fps
 
 # Cheapest possible execution time is: 699189 ms
 # Fastest possible execution time is: 171561 ms
-maxResponseTimeMs: {{ .sloMs }}
+sloType: {{ .sloType }}
+sloLimit: {{ .sloLimit }}
 stepExecutions:
   validate-video-face-recog:
     outputSizeBytes: 1620000

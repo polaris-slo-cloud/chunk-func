@@ -2,7 +2,8 @@
 scenarioName: homogeneous-workflow-test
 inputSizeBytes: 1296000
 
-maxResponseTimeMs: {{ .sloMs }}
+sloType: {{ .sloType }}
+sloLimit: {{ .sloLimit }}
 stepExecutions:
 
   step-0:
