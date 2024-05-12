@@ -1,5 +1,12 @@
 import * as fs from 'node:fs';
+import * as seedrandom from 'seedrandom';
 import { FunctionAndInput, InputRangeSlicerFn } from './model';
+
+// Reproducible random numbers.
+const random = seedrandom('chunk-func');
+
+// Non-reproducible random numbers;
+// const random = seedrandom();
 
 export const getAllInputs: InputRangeSlicerFn = (inputs: number[]) => inputs;
 
@@ -43,7 +50,7 @@ export function getMedianInputSize(inputs: number[]): number {
 }
 
 export function pickRandomItem<T>(items: T[]): T {
-    const r = Math.random();
+    const r = random();
     const index = Math.floor(r * items.length);
     return items[index];
 }
