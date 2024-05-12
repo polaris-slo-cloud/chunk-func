@@ -27,7 +27,7 @@ declare -A BASE_SLOS=(
 
     ["gcf-MaxCost"]=""
     ["aws-MaxCost"]="0.081736999999999998"
-    ["aws-bo-MaxCost"]="0.081736999999999998
+    ["aws-bo-MaxCost"]="0.081736999999999998"
 )
 
 declare -A SLO_RANGES_PERCENT=(
