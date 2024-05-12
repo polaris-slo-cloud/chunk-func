@@ -5,7 +5,7 @@
   "sloMs": 56000,
   "workflowOutput": {
     "executionTimeMs": 44788,
-    "totalCost": 0.164635,
+    "executionCost": 0.164635,
     "data": {
       "sizeBytes": 37873978
     },
@@ -41,7 +41,7 @@
         },
         "executionTimeMs": 43095,
         "executionCost": 0.082062,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "merge-videos": {
         "resourceProfile": {
@@ -55,7 +55,8 @@
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0
+    "avgResourceConfigStrategyExecutionTimeMs": 0.25,
+    "sloFulfilled": true
   },
   "sloFulfilled": true
 }

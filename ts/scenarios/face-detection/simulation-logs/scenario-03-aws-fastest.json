@@ -5,7 +5,7 @@
   "sloMs": 80000,
   "workflowOutput": {
     "executionTimeMs": 29342,
-    "totalCost": 0.004417000000000001,
+    "executionCost": 0.004417000000000001,
     "data": {
       "sizeBytes": 345600
     },
@@ -30,7 +30,7 @@
         },
         "executionTimeMs": 2528,
         "executionCost": 0.000366,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "detect-faces": {
         "resourceProfile": {
@@ -55,7 +55,8 @@
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0
+    "avgResourceConfigStrategyExecutionTimeMs": 0.25,
+    "sloFulfilled": true
   },
   "sloFulfilled": true
 }

@@ -5,7 +5,7 @@
   "sloMs": 37000,
   "workflowOutput": {
     "executionTimeMs": 29287,
-    "totalCost": 0.10562200000000001,
+    "executionCost": 0.10562200000000001,
     "data": {
       "sizeBytes": 37873978
     },
@@ -19,7 +19,7 @@
         },
         "executionTimeMs": 79,
         "executionCost": 0.00001,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "cut-video-segment-a": {
         "resourceProfile": {
@@ -55,7 +55,8 @@
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0
+    "avgResourceConfigStrategyExecutionTimeMs": 0.25,
+    "sloFulfilled": true
   },
   "sloFulfilled": true
 }

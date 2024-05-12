@@ -5,7 +5,7 @@
   "sloMs": 7000,
   "workflowOutput": {
     "executionTimeMs": 1343,
-    "totalCost": 0.000114,
+    "executionCost": 0.000114,
     "data": {
       "sizeBytes": 21569326
     },
@@ -19,7 +19,7 @@
         },
         "executionTimeMs": 724,
         "executionCost": 0.000072,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "extract-basic-stats": {
         "resourceProfile": {
@@ -52,10 +52,11 @@
         },
         "executionTimeMs": 449,
         "executionCost": 0.000042,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0
+    "avgResourceConfigStrategyExecutionTimeMs": 0.5,
+    "sloFulfilled": true
   },
   "sloFulfilled": true
 }

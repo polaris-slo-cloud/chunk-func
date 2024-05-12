@@ -5,7 +5,7 @@
   "sloMs": 150000,
   "workflowOutput": {
     "executionTimeMs": 178505,
-    "totalCost": 0.0006,
+    "executionCost": 0.0006,
     "data": {
       "sizeBytes": 864000
     },
@@ -55,7 +55,8 @@
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0.25
+    "avgResourceConfigStrategyExecutionTimeMs": 0.25,
+    "sloFulfilled": false
   },
   "sloFulfilled": false
 }

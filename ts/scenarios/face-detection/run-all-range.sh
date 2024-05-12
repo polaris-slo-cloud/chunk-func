@@ -26,8 +26,8 @@ declare -A BASE_SLOS=(
     ["aws-bo-MaxExecutionTime"]=129823
 
     ["gcf-MaxCost"]=""
-    ["aws-MaxCost"]=""
-    ["aws-bo-MaxCost"]=""
+    ["aws-MaxCost"]="0.0066605"
+    ["aws-bo-MaxCost"]="0.0066605"
 )
 
 declare -A SLO_RANGES_PERCENT=(

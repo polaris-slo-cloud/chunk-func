@@ -5,7 +5,7 @@
   "sloMs": 11500,
   "workflowOutput": {
     "executionTimeMs": 4988,
-    "totalCost": 0.001343,
+    "executionCost": 0.001343,
     "data": {
       "sizeBytes": 18936989
     },
@@ -30,7 +30,7 @@
         },
         "executionTimeMs": 4491,
         "executionCost": 0.00066,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "cut-video-segment-b": {
         "resourceProfile": {
@@ -41,7 +41,7 @@
         },
         "executionTimeMs": 4491,
         "executionCost": 0.00066,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "merge-videos": {
         "resourceProfile": {
@@ -55,7 +55,8 @@
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0.25
+    "avgResourceConfigStrategyExecutionTimeMs": 0.25,
+    "sloFulfilled": true
   },
   "sloFulfilled": true
 }

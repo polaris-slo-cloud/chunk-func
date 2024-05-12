@@ -5,7 +5,7 @@
   "sloMs": 200000,
   "workflowOutput": {
     "executionTimeMs": 81091,
-    "totalCost": 0.012721,
+    "executionCost": 0.012721,
     "data": {
       "sizeBytes": 1620000
     },
@@ -19,7 +19,7 @@
         },
         "executionTimeMs": 91,
         "executionCost": 0.000007,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "transform-video": {
         "resourceProfile": {
@@ -30,7 +30,7 @@
         },
         "executionTimeMs": 13099,
         "executionCost": 0.002184,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "detect-faces": {
         "resourceProfile": {
@@ -55,7 +55,8 @@
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0.25
+    "avgResourceConfigStrategyExecutionTimeMs": 0.25,
+    "sloFulfilled": true
   },
   "sloFulfilled": true
 }

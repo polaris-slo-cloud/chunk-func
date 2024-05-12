@@ -5,7 +5,7 @@
   "sloMs": 80000,
   "workflowOutput": {
     "executionTimeMs": 159064,
-    "totalCost": 0.000519,
+    "executionCost": 0.000519,
     "data": {
       "sizeBytes": 345600
     },
@@ -19,7 +19,7 @@
         },
         "executionTimeMs": 22,
         "executionCost": 0,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "transform-video": {
         "resourceProfile": {
@@ -55,7 +55,8 @@
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0.25
+    "avgResourceConfigStrategyExecutionTimeMs": 0,
+    "sloFulfilled": false
   },
   "sloFulfilled": false
 }
