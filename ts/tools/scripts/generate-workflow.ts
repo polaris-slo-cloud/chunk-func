@@ -2,12 +2,16 @@ import * as Yaml from 'js-yaml';
 import * as fs from 'node:fs';
 import { exit } from 'node:process';
 import {
+    FunctionAndInput,
     InputRangeSlicerFn,
     LONG_STEP_INDEX,
     MEDIUM_STEP_INDEX,
     SHORT_STEP_INDEX,
     WorkflowGenerationPlan,
     extractOutDirFromArgs,
+    extractProfilesTypeFromArgs,
+    functionsAndInputsAws,
+    functionsAndInputsAwsBo,
     functionsAndInputsGcf,
     generateScenarios,
     generateSlamTrainingScenario,
@@ -21,31 +25,37 @@ import {
     getStaircaseWorkflowPlan,
 } from './lib';
 
-const functionsAndInputs = functionsAndInputsGcf;
+const functionsAndInputsByProfiles: Record<string, FunctionAndInput[]> = {
+    'gcf': functionsAndInputsGcf,
+    'aws': functionsAndInputsAws,
+    'aws-bo': functionsAndInputsAwsBo,
+};
 
-// Homogeneous workflow.
-const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHomogeneousWorkflowPlan(40, functionsAndInputs[MEDIUM_STEP_INDEX]);
+function getWorkflowGenerationPlan(functionsAndInputs: FunctionAndInput[]): WorkflowGenerationPlan {
+    // Homogeneous workflow.
+    return getHomogeneousWorkflowPlan(40, functionsAndInputs[MEDIUM_STEP_INDEX]);
 
-// Long-short workflow.
-// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHalfHalfWorkflowPlan(20, functionsAndInputs[MEDIUM_STEP_INDEX], functionsAndInputs[SHORT_STEP_INDEX]);
+    // Long-short workflow.
+    // return getHalfHalfWorkflowPlan(20, functionsAndInputs[MEDIUM_STEP_INDEX], functionsAndInputs[SHORT_STEP_INDEX]);
 
-// High resources - low resources workflow.
-// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHalfHalfWorkflowPlan(20, functionsAndInputs[LONG_STEP_INDEX], functionsAndInputs[SHORT_STEP_INDEX]);
+    // High resources - low resources workflow.
+    // return getHalfHalfWorkflowPlan(20, functionsAndInputs[LONG_STEP_INDEX], functionsAndInputs[SHORT_STEP_INDEX]);
 
-// Short-long workflow.
-// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHalfHalfWorkflowPlan(20, functionsAndInputs[SHORT_STEP_INDEX], functionsAndInputs[MEDIUM_STEP_INDEX]);
+    // Short-long workflow.
+    // return getHalfHalfWorkflowPlan(20, functionsAndInputs[SHORT_STEP_INDEX], functionsAndInputs[MEDIUM_STEP_INDEX]);
 
-// Low resources - high resources workflow.
-// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHalfHalfWorkflowPlan(20, functionsAndInputs[SHORT_STEP_INDEX], functionsAndInputs[LONG_STEP_INDEX]);
+    // Low resources - high resources workflow.
+    // return getHalfHalfWorkflowPlan(20, functionsAndInputs[SHORT_STEP_INDEX], functionsAndInputs[LONG_STEP_INDEX]);
 
-// Cyclic workflow.
-// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getCyclicWorkflowPlan(14, functionsAndInputs);
+    // Cyclic workflow.
+    // return getCyclicWorkflowPlan(14, functionsAndInputs);
 
-// Staircase workflow.
-// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getStaircaseWorkflowPlan(14, functionsAndInputs);
+    // Staircase workflow.
+    // return getStaircaseWorkflowPlan(14, functionsAndInputs);
 
-// Random workflow.
-// const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = [ { functionsAndInputs: functionsAndInputs, stepsCount: 40 } ];
+    // Random workflow.
+    // return [ { functionsAndInputs: functionsAndInputs, stepsCount: 40 } ];
+}
 
 const SCENARIO_INPUT_RANGES: InputRangeSlicerFn[] = [
     getLargeInputsOnly,
@@ -53,16 +63,16 @@ const SCENARIO_INPUT_RANGES: InputRangeSlicerFn[] = [
     getSmallInputsOnly,
 ];
 
-function generateWorkflowAndScenario(plan: WorkflowGenerationPlan, scenarioPlans: InputRangeSlicerFn[], outDir: string): void {
+function generateWorkflowAndScenario(plan: WorkflowGenerationPlan, scenarioPlans: InputRangeSlicerFn[], outDir: string, resProfilesType: string): void {
     console.log('Generating workflow');
-    const workflow = generateWorkflow(plan);
+    const workflow = generateWorkflow(plan, resProfilesType);
     const scenarios = generateScenarios(workflow, scenarioPlans);
     const slamScenario = generateSlamTrainingScenario(workflow);
 
-
-    console.log(`Writing workflow to ${outDir}/workflow.yaml`);
+    const workflowFilePath = `${outDir}/workflow-${resProfilesType}.yaml`;
+    console.log(`Writing workflow to ${workflowFilePath}`);
     const workflowYaml = Yaml.dump(workflow.workflow);
-    fs.writeFileSync(`${outDir}/workflow.yaml`, workflowYaml, { encoding: 'utf-8' });
+    fs.writeFileSync(workflowFilePath, workflowYaml, { encoding: 'utf-8' });
 
     for (const scenario of scenarios) {
         const scenarioYaml = Yaml.dump(scenario);
@@ -83,8 +93,15 @@ function generateWorkflowAndScenario(plan: WorkflowGenerationPlan, scenarioPlans
 }
 
 const outDir = extractOutDirFromArgs(2);
-if (!outDir) {
-    console.log('Usage: npx ts-node generate-workflow.ts <output-dir>');
+const resProfilesType = extractProfilesTypeFromArgs(3);
+if (!outDir || !resProfilesType) {
+    console.log('Usage: npx ts-node generate-workflow.ts <output-dir> <gcf|aws|aws-bo>');
     exit(1);
 }
-generateWorkflowAndScenario(WORKFLOW_GENERATION_PLAN, SCENARIO_INPUT_RANGES, outDir);
+const functionsAndInputs = functionsAndInputsByProfiles[resProfilesType];
+if (!functionsAndInputs) {
+    console.log(`Incorrect resource profiles type ${resProfilesType}. Allowed types are 'gcf', 'aws', and 'aws-bo'.`)
+    exit(1);
+}
+const wfGenerationPlan = getWorkflowGenerationPlan(functionsAndInputs);
+generateWorkflowAndScenario(wfGenerationPlan, SCENARIO_INPUT_RANGES, outDir, resProfilesType);

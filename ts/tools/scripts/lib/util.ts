@@ -75,3 +75,11 @@ export function extractOutDirFromArgs(expectedIndex: number): string | undefined
 
     return undefined;
 }
+
+export function extractProfilesTypeFromArgs(expectedIndex: number): string | undefined {
+    if (process.argv.length > expectedIndex) {
+        return process.argv[expectedIndex];
+    }
+
+    return undefined;
+}

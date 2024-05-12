@@ -1,4 +1,6 @@
 import { FunctionAndInput } from './model';
+import { shortFunctionStepAws, mediumFunctionStepAws, longFunctionStepAws } from './step-definitions-aws';
+import { longFunctionStepAwsBo, mediumFunctionStepAwsBo, shortFunctionStepAwsBo } from './step-definitions-aws-bo';
 import { shortFunctionStepGcf, mediumFunctionStepGcf, longFunctionStepGcf } from './step-definitions-gcf';
 
 export const shortFunctionInputs = [
@@ -32,6 +34,18 @@ export const functionsAndInputsGcf: FunctionAndInput[] = [
     { functionStep: shortFunctionStepGcf, inputs: shortFunctionInputs },
     { functionStep: mediumFunctionStepGcf, inputs: mediumFunctionInputs },
     { functionStep: longFunctionStepGcf, inputs: longFunctionInputs },
+];
+
+export const functionsAndInputsAws: FunctionAndInput[] = [
+    { functionStep: shortFunctionStepAws, inputs: shortFunctionInputs },
+    { functionStep: mediumFunctionStepAws, inputs: mediumFunctionInputs },
+    { functionStep: longFunctionStepAws, inputs: longFunctionInputs },
+];
+
+export const functionsAndInputsAwsBo: FunctionAndInput[] = [
+    { functionStep: shortFunctionStepAwsBo, inputs: shortFunctionInputs },
+    { functionStep: mediumFunctionStepAwsBo, inputs: mediumFunctionInputs },
+    { functionStep: longFunctionStepAwsBo, inputs: longFunctionInputs },
 ];
 
 export const SHORT_STEP_INDEX = 0;

@@ -608,7 +608,7 @@ export const mediumFunctionStepGcf: WorkflowStepDescription = {
     }
 };
 
-/** The detect-faces function from the face-detection workflow. */
+/** The detect-faces function from the face-detection workflow with GCF profiles. */
 export const longFunctionStepGcf: WorkflowStepDescription = {
     name: 'detect-faces',
     type: WorkflowStepType.Function,

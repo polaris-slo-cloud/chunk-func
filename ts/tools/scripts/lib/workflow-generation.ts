@@ -2,13 +2,13 @@ import { WorkflowDescription, WorkflowExecutionDescription } from '@chunk-func/c
 import { cloneDeep } from 'lodash';
 import { InputRangeSlicerFn, WorkflowAndPossibleInputs, WorkflowGenerationPlan } from './model';
 import { getMedianInputSize, getScenarioName, getStepName, pickRandomItem } from './util';
-import { workflowHeader } from './workflow-generation-plans';
+import { workflowHeaders } from './workflow-generation-plans';
 
 type PickOutputSizeFn = (inputs: number[]) => number;
 
-export function generateWorkflow(plan: WorkflowGenerationPlan): WorkflowAndPossibleInputs {
+export function generateWorkflow(plan: WorkflowGenerationPlan, resProfilesType: string): WorkflowAndPossibleInputs {
     const possibleStepInputs: Record<string, number[]> = {};
-    const workflow: WorkflowDescription = cloneDeep(workflowHeader);
+    const workflow: WorkflowDescription = cloneDeep(workflowHeaders[resProfilesType]);
 
     let currStepIndex = 0;
     for (const sequence of plan) {
