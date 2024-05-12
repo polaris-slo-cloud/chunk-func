@@ -38,7 +38,8 @@ function generateScenarioInternal(scenarioName: string, workflow: WorkflowAndPos
     const scenario: WorkflowExecutionDescription = {
         scenarioName: scenarioName,
         inputSizeBytes: pickOutputSizeFn(possibleInputs[workflow.workflow.steps[0].name]),
-        maxResponseTimeMs: sloMs,
+        sloType: 'MaxExecutionTime',
+        sloLimit: sloMs,
         stepExecutions: {},
     };
 

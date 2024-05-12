@@ -70,7 +70,8 @@ function generateWorkflowAndScenario(plan: WorkflowGenerationPlan, scenarioPlans
         fs.writeFileSync(filenameBase + '.yaml', scenarioYaml, { encoding: 'utf-8' });
 
         console.log(`Writing scenario template to ${filenameBase}-template.yaml`);
-        const scenarioTemplateYaml = scenarioYaml.replace('maxResponseTimeMs: 1000', 'maxResponseTimeMs: {{ .sloMs }}');
+        let scenarioTemplateYaml = scenarioYaml.replace('sloType: "MaxExecutionTime"', 'sloType: {{ .sloType }}');
+        scenarioTemplateYaml = scenarioTemplateYaml.replace('sloLimit: 1000', 'sloLimit: {{ .sloLimit }}');
         fs.writeFileSync(filenameBase + '-template.yaml', scenarioTemplateYaml, { encoding: 'utf-8' });
     }
 
