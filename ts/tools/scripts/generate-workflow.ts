@@ -8,7 +8,7 @@ import {
     SHORT_STEP_INDEX,
     WorkflowGenerationPlan,
     extractOutDirFromArgs,
-    functionsAndInputs,
+    functionsAndInputsGcf,
     generateScenarios,
     generateSlamTrainingScenario,
     generateWorkflow,
@@ -20,6 +20,8 @@ import {
     getSmallInputsOnly,
     getStaircaseWorkflowPlan,
 } from './lib';
+
+const functionsAndInputs = functionsAndInputsGcf;
 
 // Homogeneous workflow.
 const WORKFLOW_GENERATION_PLAN: WorkflowGenerationPlan = getHomogeneousWorkflowPlan(40, functionsAndInputs[MEDIUM_STEP_INDEX]);
