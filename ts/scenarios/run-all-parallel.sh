@@ -1,6 +1,8 @@
 #!/bin/bash
 # set -x
 
+MAX_PARALLEL=5
+
 SCENARIOS=(
     "./cyclic-workflow"
     "./face-detection"
@@ -21,16 +23,26 @@ PROFILE_TYPES=(
     "aws-bo"
 )
 
+PIDS=()
+
 function runScenario() {
     local scenario=$1
     cd "$1"
     for profileType in "${PROFILE_TYPES[@]}"; do
+        echo "$scenario $profileType"
         ./run-all-range.sh "$profileType"
     done
 }
 
+function waitForSubshells() {
+    # Wait for all subshells to finish
+    for pid in "${PIDS[@]}"; do
+        wait $pid
+    done
+    PIDS=()
+}
+
 function runSimulations() {
-    local pids=()
     local scenario=""
 
     local length=${#SCENARIOS[@]}
@@ -38,13 +50,15 @@ function runSimulations() {
     do
         scenario=${SCENARIOS[${i}]}
         ( runScenario "$scenario" ) &
-        pids[${i}]=$!
+        PIDS[${i}]=$!
+
+        echo "PIDS count ${#PIDS[@]}"
+        if [[ ${#PIDS[@]} -eq $MAX_PARALLEL ]]; then
+            waitForSubshells
+        fi
     done
 
-    # Wait for all subshells to finish
-    for pid in "${pids[@]}"; do
-        wait $pid
-    done
+    waitForSubshells
 }
 
 runSimulations
