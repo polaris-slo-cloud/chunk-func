@@ -66,7 +66,7 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
 
     private getAvgStepWeight(avgExecMetrics: Record<string, ExecutionMetrics>, step: WorkflowFunctionStep, slo: ServiceLevelObjective): WorkflowStepWeight {
         // If any profiling results have been inferred, we multiply the SLO weight with 1.1 to introduce a safety margin.
-        const multiplier = step.profilingResults.configurationsInferred ? 1.1 : 1.0;
+        const multiplier = step.profilingResults.configurationsInferred ? 1.2 : 1.1;
 
         const avgStepExecMetrics = avgExecMetrics[step.name];
         const avgStepWeight = slo.getExecutionWeights(avgStepExecMetrics);
