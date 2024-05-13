@@ -43,13 +43,18 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
         const workflowWeights = workflowState.slo.getExecutionWeights(workflowMetrics);
         const remainingSlo = workflowState.slo.sloLimit - workflowWeights.sloWeight;
         const avgExecMetrics = this.computeAvgExecMetricsUntilEnd(workflowState, step, input);
-        const stepSlo = computeStepSlo(
+        let stepSlo = computeStepSlo(
             this.workflowGraph,
             step,
             remainingSlo,
             workflowState.slo,
             currStep => this.getAvgStepWeight(avgExecMetrics, currStep, workflowState.slo),
         );
+
+        // If the profiling results contain inferences, we decrease the stepSlo to introduce an additional safety margin.
+        if (step.profilingResults.configurationsInferred) {
+            stepSlo *= 0.8;
+        }
 
         const selectedProfileId = findBestProfileForStepSlo(
             workflowState.slo,
@@ -65,9 +70,6 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
     }
 
     private getAvgStepWeight(avgExecMetrics: Record<string, ExecutionMetrics>, step: WorkflowFunctionStep, slo: ServiceLevelObjective): WorkflowStepWeight {
-        // If any profiling results have been inferred, we multiply the SLO weight with 1.1 to introduce a safety margin.
-        const multiplier = step.profilingResults.configurationsInferred ? 1.2 : 1.1;
-
         const avgStepExecMetrics = avgExecMetrics[step.name];
         const avgStepWeight = slo.getExecutionWeights(avgStepExecMetrics);
         return {
@@ -79,7 +81,7 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
                 statusCode: 200,
             },
             resourceProfileId: '',
-            sloWeight: avgStepWeight.sloWeight * multiplier,
+            sloWeight: avgStepWeight.sloWeight,
             optimizationWeight: avgStepWeight.optimizationWeight,
         };
     }
