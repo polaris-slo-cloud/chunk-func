@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import { ProfilingSessionResults, ResourceProfile, WorkflowExecutionDescription, WorkflowStepDescription, WorkflowStepType, findResourceProfileResults, findResultForInput, getResourceProfileId } from '../../model';
+import { ProfilingResult, ProfilingSessionResults, ResourceProfile, WorkflowExecutionDescription, WorkflowStepDescription, WorkflowStepType, findResourceProfileResults, findResultForInput, getResourceProfileId } from '../../model';
 import { AccumulatedStepInput, StepOutput, WorkflowFunctionStep, WorkflowStep } from '../step';
 
 /**
@@ -89,7 +89,11 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
             throw new Error(`No Profiling results for ${getResourceProfileId(resourceProfile)}`);
         }
 
-        const result = findResultForInput(input.totalDataSizeBytes, profileResults.results);
+        let result = findResultForInput(input.totalDataSizeBytes, profileResults.results);
+        if (!result && this.profilingResults.configurationsInferred) {
+            // For partially inferred profiling results we allow switching to the next higher successful profile.
+            result = this.findNextHigherProfilingResult(input, resourceProfile);
+        }
         if (!result) {
             throw new Error(`ResourceProfile ${getResourceProfileId(resourceProfile)}MiB does not contain a successful profiling result for input ${input.totalDataSizeBytes}.`);
         }
@@ -100,6 +104,28 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
 
     override clone(): WorkflowStep {
         return new WorkflowFunctionStepImpl(this);
+    }
+
+    protected findNextHigherProfilingResult(input: AccumulatedStepInput, minResourceProfile: ResourceProfile): ProfilingResult | undefined {
+        const minProfileId = getResourceProfileId(minResourceProfile);
+        let foundMin = false;
+        for (const currResults of this.exhaustiveProfilingResults.results) {
+            if (!foundMin) {
+                foundMin = currResults.resourceProfileId === minProfileId;
+                if (!foundMin) {
+                    continue;
+                }
+            }
+
+            if (currResults.results) {
+                const result = findResultForInput(input.totalDataSizeBytes, currResults.results);
+                if (result) {
+                    return result;
+                }
+            }
+        }
+
+        return undefined;
     }
 
 }
