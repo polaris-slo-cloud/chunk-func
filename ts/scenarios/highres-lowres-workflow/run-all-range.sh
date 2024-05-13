@@ -36,8 +36,8 @@ declare -A SLO_RANGES_PERCENT=(
     ["aws-bo-MaxExecutionTime"]=35
 
     ["gcf-MaxCost"]=40
-    ["aws-MaxCost"]=40
-    ["aws-bo-MaxCost"]=40
+    ["aws-MaxCost"]=35
+    ["aws-bo-MaxCost"]=35
 )
 
 declare -A SCENARIOS=(
