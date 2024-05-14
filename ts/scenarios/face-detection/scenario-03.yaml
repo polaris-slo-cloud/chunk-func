@@ -2,8 +2,6 @@
 scenarioName: scenario-03-input-20s-720p
 inputSizeBytes: 345600 # 20s * 720p * 24fps
 
-# Cheapest possible execution time is: 129142 ms
-# Fastest possible execution time is: 55342 ms
 maxResponseTimeMs: 80000
 stepExecutions:
   validate-video-face-recog:

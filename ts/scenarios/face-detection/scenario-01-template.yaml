@@ -2,8 +2,6 @@
 scenarioName: scenario-01-input-60s-1080p
 inputSizeBytes: 1620000 #  60s * 1080p * 25fps
 
-# Cheapest possible execution time is: 699189 ms
-# Fastest possible execution time is: 171561 ms
 sloType: {{ .sloType }}
 sloLimit: {{ .sloLimit }}
 stepExecutions:
