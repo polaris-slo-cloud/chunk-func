@@ -42,7 +42,7 @@ var (
 // Gets a list of resource profiles that are available on the underlying platform.
 //
 // Returns a list of profiles based on AWS Lambda, which (as of Feb 10, 2024) supports memory sizes
-// from 128 MB to 10240 MB in 1 MB increments (https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html#configuration-memory-console)
+// from 128 MB to 10240 MB in 1 MB increments (https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html)
 // and uses 1ms billing units (https://aws.amazon.com/lambda/pricing/)
 // We increase memory granularity and go with 64 MB increments.
 // We interpolate prices linearly between the steps listed in the above link.
