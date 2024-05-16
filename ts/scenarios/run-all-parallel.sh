@@ -8,7 +8,7 @@ SCENARIOS=(
     "./face-detection"
     "./highres-lowres-workflow"
     "./homogeneous-workflow"
-    "./log-processing"
+    # "./log-processing"
     "./lowres-highres-workflow"
     "./random-workflow"
     "./staircase-workflow"

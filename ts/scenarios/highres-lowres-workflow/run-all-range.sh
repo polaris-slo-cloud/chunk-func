@@ -25,7 +25,7 @@ declare -A BASE_SLOS=(
     ["aws-MaxExecutionTime"]=2019767
     ["aws-bo-MaxExecutionTime"]=2019767
 
-    ["gcf-MaxCost"]=""
+    ["gcf-MaxCost"]="2.68820099999999975"
     ["aws-MaxCost"]="0.109119000000000028"
     ["aws-bo-MaxCost"]="0.109119000000000028"
 )
