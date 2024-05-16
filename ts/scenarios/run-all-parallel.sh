@@ -8,7 +8,7 @@ SCENARIOS=(
     "./face-detection"
     "./highres-lowres-workflow"
     "./homogeneous-workflow"
-    # "./log-processing"
+    "./log-processing"
     "./long-short-workflow"
     "./lowres-highres-workflow"
     "./random-workflow"
@@ -18,7 +18,7 @@ SCENARIOS=(
 )
 
 PROFILE_TYPES=(
-    # "gcf"
+    "gcf"
     "aws"
     "aws-bo"
 )
