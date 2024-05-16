@@ -9,10 +9,8 @@ SCENARIOS=(
     "./highres-lowres-workflow"
     "./homogeneous-workflow"
     "./log-processing"
-    "./long-short-workflow"
     "./lowres-highres-workflow"
     "./random-workflow"
-    "./short-long-workflow"
     "./staircase-workflow"
     "./video-processing"
 )
