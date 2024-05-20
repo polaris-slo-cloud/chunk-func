@@ -23,7 +23,7 @@ SLO_TYPES=(
 declare -A BASE_SLOS=(
     ["gcf-MaxExecutionTime"]=12000
 
-    # All AWS profiles have at least 1 vCPU, and Node.JS is single threaded, so there is not much difference between cheapest and fastest.
+    # All AWS profiles have at least 1 vCPU and Node.JS is single threaded, so there is not much difference between cheapest and fastest.
     # Actually this scenario does not make sense for AWS, because the fastest possible exec time is ~99.3% of the BASE_SLO.
     ["aws-MaxExecutionTime"]=1557
     ["aws-bo-MaxExecutionTime"]=1557
@@ -34,9 +34,12 @@ declare -A BASE_SLOS=(
 )
 
 declare -A SLO_RANGES_PERCENT=(
-    ["gcf-MaxExecutionTime"]=35
-    ["aws-MaxExecutionTime"]=35
-    ["aws-bo-MaxExecutionTime"]=35
+    ["gcf-MaxExecutionTime"]=15
+
+    # All AWS profiles have at least 1 vCPU and Node.JS is single threaded, so there is not much difference between cheapest and fastest.
+    # Actually this scenario does not make sense for AWS, because the fastest possible exec time is ~99.3% of the BASE_SLO.
+    ["aws-MaxExecutionTime"]=1
+    ["aws-bo-MaxExecutionTime"]=1
 
     ["gcf-MaxCost"]=35
     ["aws-MaxCost"]=35
