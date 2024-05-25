@@ -1,17 +1,23 @@
 import { DirectedGraph } from 'graphology';
+import { subgraph } from 'graphology-operators';
 import { dijkstra } from 'graphology-shortest-path';
-import { WorkflowFunctionStep, WorkflowStep } from '../step';
-import { GetStepWeightFn, WorkflowGraph, WorkflowNodeAttributes, WorkflowPath } from '../workflow-graph';
+import { bfsFromNode } from 'graphology-traversal';
 import { WorkflowDescription, WorkflowStepType } from '../../model';
+import { WorkflowFunctionStep, WorkflowStep, WorkflowStepsMap } from '../step';
+import { GetStepWeightFn, StepWeightKey, WorkflowGraph, WorkflowNodeAttributes, WorkflowPath } from '../workflow-graph';
 
 export class WorkflowGraphImpl implements WorkflowGraph {
 
     start: WorkflowStep;
     end: WorkflowStep;
-    steps: Record<string, WorkflowStep>;
+    steps: WorkflowStepsMap;
     graph: DirectedGraph<WorkflowNodeAttributes>;
 
-    constructor(steps: Record<string, WorkflowStep>, graph: DirectedGraph<WorkflowNodeAttributes>, workflowDescription: WorkflowDescription) {
+    constructor(
+        steps: WorkflowStepsMap,
+        graph: DirectedGraph<WorkflowNodeAttributes>,
+        workflowDescription: Pick<WorkflowDescription, 'startStep' | 'endStep'>,
+    ) {
         this.steps = steps;
         this.graph = graph;
 
@@ -24,7 +30,7 @@ export class WorkflowGraphImpl implements WorkflowGraph {
         this.end = end;
     }
 
-    findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn): WorkflowPath {
+    findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn, pathWeightKey: StepWeightKey = 'sloWeight'): WorkflowPath {
         const rawPath = dijkstra.bidirectional(
             this.graph,
             source.name,
@@ -33,7 +39,7 @@ export class WorkflowGraphImpl implements WorkflowGraph {
                 const targetNode = this.graph.getTargetAttributes(edge);
                 if (targetNode.step.type === WorkflowStepType.Function) {
                     const weight = weightFn(targetNode.step as WorkflowFunctionStep);
-                    return -weight.weight;
+                    return -weight[pathWeightKey];
                 }
                 return 0;
             },
@@ -45,6 +51,7 @@ export class WorkflowGraphImpl implements WorkflowGraph {
 
         const workflowPath: WorkflowPath = {
             executionTimeMs: 0,
+            executionCost: 0,
             steps: new Array(rawPath.length),
         };
 
@@ -54,12 +61,44 @@ export class WorkflowGraphImpl implements WorkflowGraph {
                 if (step.type === WorkflowStepType.Function) {
                     const weight = weightFn(step as WorkflowFunctionStep);
                     workflowPath.executionTimeMs += weight.profilingResult.executionTimeMs;
+                    workflowPath.executionCost += weight.profilingResult.executionCost;
                 }
             }
             workflowPath.steps[i] = step;
         }
 
         return workflowPath;
+    }
+
+    createSubgraph(startStep: WorkflowStep): WorkflowGraph {
+        const subgraphSteps = this.getSubgraphSteps(startStep);
+        const workflowSubgraph = subgraph(
+            this.graph,
+            (key) => !!subgraphSteps[key],
+        ) as DirectedGraph<WorkflowNodeAttributes>;
+
+        for (const key in subgraphSteps) {
+            const step = subgraphSteps[key];
+            step.requiredInputs = workflowSubgraph.mapInNeighbors(key, (neighborKey) => neighborKey);
+            if (step.requiredInputs.length === 0) {
+                step.requiredInputs = undefined;
+            }
+            workflowSubgraph.setNodeAttribute(key, 'step', step);
+        }
+
+        return new WorkflowGraphImpl(subgraphSteps, workflowSubgraph, { startStep: startStep.name, endStep: this.end.name });
+    }
+
+    private getSubgraphSteps(startStep: WorkflowStep): WorkflowStepsMap {
+        const subgraphSteps: WorkflowStepsMap = {};
+        bfsFromNode(
+            this.graph,
+            startStep.name,
+            (key, attributes) => {
+                subgraphSteps[key] = attributes.step.clone();
+            },
+        );
+        return subgraphSteps;
     }
 
 }

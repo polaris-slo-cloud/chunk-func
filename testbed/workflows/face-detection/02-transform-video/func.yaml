@@ -1,0 +1,16 @@
+specVersion: 0.36.0
+name: transform-video
+runtime: typescript
+registry: polarissloc
+image: polarissloc/chunk-func-transform-video:latest
+imageDigest: sha256:69f85454afc45f57c32f445894ca8874f538bab0ab0aaeb1e6b7b69cd3b6e992
+created: 2023-10-18T12:03:34.789666879+02:00
+build:
+  builder: pack
+  buildEnvs:
+  - name: BP_NODE_RUN_SCRIPTS
+    value: build
+  - name: BP_NODE_VERSION
+    value: 18.*
+deploy:
+  namespace: func-test

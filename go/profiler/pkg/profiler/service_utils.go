@@ -28,19 +28,29 @@ func CreateKnativeServiceWithProfile(
 	fn *function.FunctionWithDescription,
 	targetNamespace string,
 	resourceProfile *function.ResourceProfile,
+	deploymentMgr FunctionDeploymentManager,
 ) (*knServing.Service, error) {
 	ret := &knServing.Service{
 		ObjectMeta: *kubeutil.DeepCopyObjectMetaForNewObject(&fn.Function.ObjectMeta),
 		Spec:       *fn.Function.Spec.DeepCopy(),
 	}
 	ret.ObjectMeta.Namespace = targetNamespace
-	ret.ObjectMeta.Name = fn.Function.Name + "-" + resourceProfile.StringifyForK8sObj()
+	ret.ObjectMeta.Name = deploymentMgr.GetUniqueFunctionName(fn.Function.Name + "-" + resourceProfile.StringifyForK8sObj())
+
+	if ret.ObjectMeta.Labels == nil {
+		ret.ObjectMeta.Labels = make(map[string]string)
+	}
+	kubeutil.SetAnnotation(ret, kubeutil.ResourceProfileAnnotation, resourceProfile.ID())
+	kubeutil.SetAnnotation(ret, kubeutil.ProfiledServiceAnnotation, fn.Function.Namespace+"."+fn.Function.Name)
 
 	container := kubeutil.FindContainer(ret.Spec.Template.Spec.Containers, fn.Description.FunctionContainer)
 	if container == nil {
 		return nil, fmt.Errorf("the Knative Service %s does not contain a container %s", fn.Function.Name, fn.Description.FunctionContainer)
 	}
 	SetResourceLimits(container, &resourceProfile.ResourceConfiguration)
+
+	timeoutSec := int64(fn.Description.MaxResponseTimeMs / 1000)
+	ret.Spec.ConfigurationSpec.Template.Spec.TimeoutSeconds = &timeoutSec
 
 	return ret, nil
 }
@@ -66,7 +76,7 @@ func CreateAndWaitForService(
 	deploymentMgr FunctionDeploymentManager,
 	timeout time.Duration,
 ) (*knServing.Service, error) {
-	svc, err := CreateKnativeServiceWithProfile(fn, targetNamespace, resourceProfile)
+	svc, err := CreateKnativeServiceWithProfile(fn, targetNamespace, resourceProfile, deploymentMgr)
 	if err != nil {
 		return nil, err
 	}

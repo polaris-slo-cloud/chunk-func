@@ -1,0 +1,131 @@
+# This FunctionDescription example refers to the mark-faces function located in the repository folder
+# testbed/workflows/face-detection/04-mark-faces
+
+apiVersion: chunk-func.polaris-slo-cloud.github.io/v1
+kind: FunctionDescription
+metadata:
+  namespace: func-test
+  name: mark-faces
+  labels:
+    app.kubernetes.io/name: functiondescription
+    app.kubernetes.io/instance: mark-faces
+    app.kubernetes.io/part-of: chunk-func-controller
+spec:
+  functionDescription:
+    functionName: mark-faces
+    functionContainer: user-container
+    maxResponseTimeMs: 120000
+    typicalInputs:
+      - sizeBytes: 345600 # 20s * 720p * 24fps
+        message:
+          input:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: people-walking-20s-720p.mp4
+            objectSizeBytes: 345600
+          faces:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: people-walking-20s-720p-transcoded-to-360p.mp4-faces.json
+            objectSizeBytes: 72701
+
+      - sizeBytes: 518400 # 20s * 1080p * 24fps
+        message:
+          input:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: people-walking-20s-1080p.mp4
+            objectSizeBytes: 518400
+          faces:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: people-walking-20s-1080p-transcoded-to-360p.mp4-faces.json
+            objectSizeBytes: 71413
+
+      - sizeBytes: 864000 # 40s * 720p * 30fps
+        message:
+          input:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: workout-40s-720p.mp4
+            objectSizeBytes: 864000
+          faces:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: workout-40s-720p-transcoded-to-360p.mp4-faces.json
+            objectSizeBytes: 95911
+
+      - sizeBytes: 1080000 # 60s * 720p * 25fps
+        message:
+          input:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: society-1m-720p.mp4
+            objectSizeBytes: 1080000
+          faces:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: society-1m-720p-transcoded-to-360p.mp4-faces.json
+            objectSizeBytes: 117518
+
+      - sizeBytes: 1296000 # 40s * 1080p * 30fps
+        message:
+          input:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: workout-40s-1080p.mp4
+            objectSizeBytes: 1296000
+          faces:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: workout-40s-1080p-transcoded-to-360p.mp4-faces.json
+            objectSizeBytes: 95714
+
+      - sizeBytes: 1620000 #  60s * 1080p * 25fps
+        message:
+          input:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: society-1m-1080p.mp4
+            objectSizeBytes: 1620000
+          faces:
+            url: http://10.152.183.26
+            # This is a demo deployment, we don't care about the password here.
+            user: 3IbgCHdvv7Yo82F4
+            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            bucket: face-detection
+            objectKey: society-1m-1080p-transcoded-to-360p.mp4-faces.json
+            objectSizeBytes: 119860

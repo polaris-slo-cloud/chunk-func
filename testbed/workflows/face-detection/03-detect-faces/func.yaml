@@ -1,0 +1,25 @@
+specVersion: 0.35.0
+name: detect-faces
+runtime: python
+registry: polarissloc
+image: polarissloc/chunk-func-detect-faces:latest
+created: 2024-01-19T17:05:13.540623154+01:00
+build:
+  builder: pack
+  buildpacks:
+    ## We need to install the libgl1, libgl1-mesa-glx, and libglib2.0-0 packages with apt,
+    ## that's why we need an additional build pack (see https://github.com/knative/func/issues/2128 ).
+    ## Alternatively, we use have a Dockerfile for building this function, which results in a much smaller container image (690MB instead of 1.3GB).
+    - ghcr.io/dmikusa/buildpacks/dmikusa_apt:0.0.2
+    - gcr.io/paketo-buildpacks/ca-certificates:3.6.3
+    # - gcr.io/paketo-buildpacks/watchexec:2.8.3 # This is not needed and would break the build process.
+    - gcr.io/paketo-buildpacks/cpython:1.9.0
+    - gcr.io/paketo-buildpacks/pip:0.18.0
+    - gcr.io/paketo-buildpacks/pip-install:0.6.0
+    - gcr.io/paketo-buildpacks/python-start:0.14.14
+    - gcr.io/paketo-buildpacks/procfile:5.6.4
+  buildEnvs:
+  - name: BP_CPYTHON_VERSION
+    value: 3.11.*
+deploy:
+  namespace: func-test

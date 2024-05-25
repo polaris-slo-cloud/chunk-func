@@ -1,5 +1,6 @@
 import { Queue } from '../collections/queue';
-import { ResourceProfile, WorkflowExecutionDescription } from '../model';
+import { ExecutionMetrics, ResourceProfile, WorkflowExecutionDescription } from '../model';
+import { ServiceLevelObjective } from './slo';
 import { StepInput, WorkflowStep } from './step';
 import { WorkflowThread } from './thread';
 
@@ -24,9 +25,9 @@ export interface WorkflowState {
     steps: Record<string, StepState>;
 
     /**
-     * The maximum execution time SLO of the workflow in milliseconds.
+     * The SLO for this execution of the workflow.
      */
-    maxExecutionTimeMs: number;
+    slo: ServiceLevelObjective;
 
     /**
      * The accumulated cost of the workflow steps up to this point.
@@ -37,6 +38,11 @@ export interface WorkflowState {
      * Description of the scenario that the workflow is executing.
      */
     executionDescription: WorkflowExecutionDescription;
+
+    /**
+     * Gets the execution metrics for the specified thread and the total cost of the entire workflow thus far.
+     */
+    getExecutionMetrics(thread: WorkflowThread): ExecutionMetrics;
 
 }
 
@@ -56,6 +62,11 @@ export interface StepState {
      * The ResourceProfile that was selected for this step's execution, if it comprises a serverless function.
      */
     selectedConfig?: ResourceProfile;
+
+    /**
+     * The number of milliseconds that the resource configuration strategy took to execute.
+     */
+    resourceConfigStrategyExecutionTimeMs: number;
 
     /**
      * The time the execution of this step took.

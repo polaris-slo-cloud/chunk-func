@@ -16,7 +16,8 @@ import (
 )
 
 var (
-	_ TimedFunctionTrigger[any] = (*RestTrigger)(nil)
+	_ TimedFunctionTrigger[any]          = (*RestTrigger)(nil)
+	_ TimedFunctionTriggerFactoryFn[any] = RestTriggerFactory
 )
 
 type RestTrigger struct {
@@ -28,6 +29,10 @@ func NewRestTrigger() *RestTrigger {
 		httpClient: &http.Client{},
 	}
 	return rt
+}
+
+func RestTriggerFactory() TimedFunctionTrigger[any] {
+	return NewRestTrigger()
 }
 
 func (rt *RestTrigger) TriggerFunction(ctx context.Context, fn *knServing.Service, input *function.FunctionInput) (*FunctionExecutionResult[any], error) {

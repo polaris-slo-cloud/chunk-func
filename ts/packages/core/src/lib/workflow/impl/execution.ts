@@ -1,4 +1,4 @@
-import { ResourceProfile, WorkflowExecutionDescription, WorkflowStepType } from '../../model';
+import { WorkflowExecutionDescription, WorkflowStepType } from '../../model';
 import { InputOutputData } from '../data';
 import { StepState, WorkflowState } from '../state';
 import { AccumulatedStepInput, StepInput, StepOutput, WorkflowFunctionStep, WorkflowStep, WorkflowStepExecutionLog } from '../step';
@@ -23,10 +23,15 @@ export class WorkflowExecution {
         this.resourceConfigStrat = resourceConfigStrat;
     }
 
+    /**
+     * Executes the workflow using the specified input.
+     *
+     * @param input The input for the workflow execution.
+     * `input.data` is used as the input to the first step.
+     */
     run<I, O>(input: WorkflowInput<I>): WorkflowOutput<O> {
         this.executionDescription = input.executionDescription;
         this.state = new WorkflowStateImpl({
-            maxExecutionTimeMs: this.workflow.maxExecutionTimeMs,
             executionDescription: input.executionDescription,
         });
 
@@ -45,11 +50,15 @@ export class WorkflowExecution {
             throw new Error('Workflow did not produce any output.');
         }
 
+        const stepStats = this.collectStepLogs();
+        const finalExecMetrics = this.state.getExecutionMetrics(mainThread);
         const workflowOutput: WorkflowOutput<O> = {
-            executionTimeMs: mainThread.executionTimeMs,
-            totalCost: this.state.totalCost,
+            executionTimeMs: finalExecMetrics.executionTimeMs,
+            executionCost: finalExecMetrics.executionCost,
             data: stepOutput.data,
-            stepLogs: this.collectStepLogs(),
+            stepLogs: stepStats.stepLogs,
+            avgResourceConfigStrategyExecutionTimeMs: stepStats.avgResConfigStratExecTimeMs,
+            sloFulfilled: this.state.slo.isFulfilled(finalExecMetrics),
         }
         return workflowOutput;
     }
@@ -67,6 +76,7 @@ export class WorkflowExecution {
                 receivedInputs: [ input ],
                 executionTimeMs: 0,
                 executionCost: 0,
+                resourceConfigStrategyExecutionTimeMs: -1,
             };
             this.state.steps[step.name] = stepState;
         }
@@ -99,7 +109,9 @@ export class WorkflowExecution {
         stepState.selectedConfig = undefined;
 
         if (step.type === WorkflowStepType.Function) {
+            const start = Date.now();
             stepState.selectedConfig = this.resourceConfigStrat.chooseConfiguration(this.state, step as WorkflowFunctionStep, accumulatedInput);
+            stepState.resourceConfigStrategyExecutionTimeMs = Date.now() - start;
         }
 
         const stepOutput = step.execute(accumulatedInput, stepState.selectedConfig, this.executionDescription!);
@@ -171,21 +183,34 @@ export class WorkflowExecution {
         return accumulated;
     }
 
-    protected collectStepLogs(): Record<string, WorkflowStepExecutionLog> {
+    protected collectStepLogs(): { stepLogs: Record<string, WorkflowStepExecutionLog>, avgResConfigStratExecTimeMs: number } {
+        let totalResConfigExecTimeMs = 0;
+        let totalFunctionSteps = 0;
         const keys = Object.keys(this.state.steps);
-        const allConfigs: Record<string, WorkflowStepExecutionLog> = {};
+        const stepLogs: Record<string, WorkflowStepExecutionLog> = {};
+
         keys.forEach(stepName => {
             const step = this.workflow.graph.steps[stepName];
             if (step.type === WorkflowStepType.Function) {
                 const stepState = this.state.steps[stepName];
-                allConfigs[stepName] = {
+                stepLogs[stepName] = {
                     resourceProfile: stepState.selectedConfig!,
                     executionTimeMs: stepState.executionTimeMs,
                     executionCost: stepState.executionCost,
+                    resourceConfigStrategyExecutionTimeMs: stepState.resourceConfigStrategyExecutionTimeMs,
                 };
+
+                if (stepState.resourceConfigStrategyExecutionTimeMs !== -1) {
+                    totalResConfigExecTimeMs += stepState.resourceConfigStrategyExecutionTimeMs;
+                    ++ totalFunctionSteps;
+                }
             }
         });
-        return allConfigs;
+
+        return {
+            stepLogs,
+            avgResConfigStratExecTimeMs: totalFunctionSteps > 0 ? totalResConfigExecTimeMs / totalFunctionSteps : 0,
+        };
     }
 
 }

@@ -1,0 +1,62 @@
+{
+  "scenarioName": "scenario-02-input-40s-720p",
+  "resourceConfigStrategy": "FastestConfigStrategy",
+  "inputDataSizeMib": 0.823974609375,
+  "sloMs": 150000,
+  "workflowOutput": {
+    "executionTimeMs": 127460,
+    "executionCost": 0.24276799999999998,
+    "data": {
+      "sizeBytes": 864000
+    },
+    "stepLogs": {
+      "validate-video-face-recog": {
+        "resourceProfile": {
+          "memoryMiB": 4096,
+          "milliCpu": 2000,
+          "pricePerUnit": 0.00000812,
+          "billingUnitMs": 100
+        },
+        "executionTimeMs": 83,
+        "executionCost": 0.000008,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "transform-video": {
+        "resourceProfile": {
+          "memoryMiB": 16384,
+          "milliCpu": 4000,
+          "pricePerUnit": 0.0001904,
+          "billingUnitMs": 100
+        },
+        "executionTimeMs": 9731,
+        "executionCost": 0.018659,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "detect-faces": {
+        "resourceProfile": {
+          "memoryMiB": 16384,
+          "milliCpu": 4000,
+          "pricePerUnit": 0.0001904,
+          "billingUnitMs": 100
+        },
+        "executionTimeMs": 109198,
+        "executionCost": 0.207917,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "mark-faces": {
+        "resourceProfile": {
+          "memoryMiB": 16384,
+          "milliCpu": 4000,
+          "pricePerUnit": 0.0001904,
+          "billingUnitMs": 100
+        },
+        "executionTimeMs": 8448,
+        "executionCost": 0.016184,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      }
+    },
+    "avgResourceConfigStrategyExecutionTimeMs": 0,
+    "sloFulfilled": true
+  },
+  "sloFulfilled": true
+}

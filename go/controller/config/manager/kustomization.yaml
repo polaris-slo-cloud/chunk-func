@@ -3,6 +3,9 @@ resources:
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 images:
+- name: bayesian-optimizer
+  newName: polarissloc/chunk-func-bayesian-optimizer
+  newTag: 0.0.11
 - name: controller
   newName: polarissloc/chunk-func-controller
-  newTag: 0.0.25
+  newTag: 0.0.53

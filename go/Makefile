@@ -73,3 +73,24 @@ scheduler-debug-config:
 .PHONY: scheduler-release-image
 scheduler-release-image:
 	docker build -f ./scheduler/Dockerfile --build-arg RELEASE_VERSION="$(RELEASE_VERSION)" -t $(RELEASE_REGISTRY)/$(SCHEDULER_RELEASE_IMAGE) .
+
+
+###########################################
+# chunk-func controller
+###########################################
+
+.PHONY: build-controller
+build-controller:
+	cd controller && make build
+
+.PHONY: docker-build-controller
+docker-build-controller:
+	cd controller && make docker-build
+
+.PHONY: docker-push-controller
+docker-push-controller:
+	cd controller && make docker-push
+
+.PHONY: deploy-controller
+deploy-controller:
+	cd controller && make deploy

@@ -32,6 +32,11 @@ export interface SimulatorOutput {
      */
     sloFulfilled: boolean;
 
+    /**
+     * The output of the `ResourceConfigurationStrategy.train()` method, if the strategy supports it.
+     */
+    strategyTrainingOutput?: any;
+
     /** Contains the error info if an error occurred. */
     error?: any;
 

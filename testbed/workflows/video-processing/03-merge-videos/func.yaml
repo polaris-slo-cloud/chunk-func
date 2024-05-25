@@ -1,9 +1,9 @@
-specVersion: 0.35.0
+specVersion: 0.36.0
 name: merge-videos
 runtime: typescript
 registry: polarissloc
 image: polarissloc/chunk-func-merge-videos:latest
-imageDigest: sha256:eb37fbef4acef7d85b3ee98762e71e45fa0b2974cad2623c5015b666ddf19bb2
+imageDigest: sha256:a43be1d0f9b7502a86406ab51b3831632e71c0ffd0106fd48fdc079d0ebf7a0d
 created: 2023-10-18T12:03:34.789666879+02:00
 build:
   builder: pack
@@ -11,6 +11,6 @@ build:
   - name: BP_NODE_RUN_SCRIPTS
     value: build
   - name: BP_NODE_VERSION
-    value: 18.16.1
+    value: 18.*
 deploy:
   namespace: func-test

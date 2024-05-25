@@ -5,6 +5,8 @@ import { createS3ObjectStoreClient } from './object-store/impl/factories';
 import { LineByLineTransformer } from './object-store/transformer';
 import { createErrorResponse, reportInvalidS3ObjRef } from './util';
 
+const OUTPUT_BUCKET = 'output';
+
 const liveness: HealthCheck = () => {
     return {
         status: 200,
@@ -60,6 +62,7 @@ async function transformFile(objRef: ObjectStoreReference): Promise<ObjectStoreR
     const targetFileName = randomUUID();
     const targetObjRef: ObjectStoreReference = {
         ...objRef,
+        bucket: OUTPUT_BUCKET,
         objectKey: `${targetFileName}.log`,
     };
     const s3Client = createS3ObjectStoreClient(objRef);

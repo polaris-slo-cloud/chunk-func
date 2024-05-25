@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.tools.json",
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}

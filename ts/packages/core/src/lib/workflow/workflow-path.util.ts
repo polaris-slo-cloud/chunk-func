@@ -1,6 +1,6 @@
 import { ProfilingResultWithProfileId, getAllResults, getResultsForInput } from '../model';
 import { WorkflowFunctionStep } from './step';
-import { GetStepWeightFn } from './workflow-graph';
+import { GetStepWeightFn, WorkflowStepWeight } from './workflow-graph';
 
 /**
  * Returns the longest possible execution time of the WorkflowStep.
@@ -21,7 +21,8 @@ export const getLongestExecutionTime: GetStepWeightFn = (step: WorkflowFunctionS
     }
 
     return {
-        weight: longestExecTime,
+        sloWeight: longestExecTime,
+        optimizationWeight: selectedResult.result.executionCost,
         resourceProfileId: selectedResult.resourceProfileId,
         profilingResult: selectedResult.result,
     };
@@ -51,7 +52,8 @@ export function getLongestExecutionTimeForInput(inputSizeBytes: number): GetStep
         }
 
         return {
-            weight: longestExecTime,
+            sloWeight: longestExecTime,
+            optimizationWeight: longestExecTimeCost,
             resourceProfileId: selectedResult.resourceProfileId,
             profilingResult: selectedResult.result,
         };
@@ -82,7 +84,8 @@ export function getFastestExecutionTimeForInput(inputSizeBytes: number): GetStep
         }
 
         return {
-            weight: fastestExecTime,
+            sloWeight: fastestExecTime,
+            optimizationWeight: fastestExecTimeCost,
             resourceProfileId: selectedResult.resourceProfileId,
             profilingResult: selectedResult.result,
         };
@@ -113,9 +116,23 @@ export function getCheapestExecutionTimeForInput(inputSizeBytes: number): GetSte
         }
 
         return {
-            weight: selectedResult.result.executionTimeMs,
+            sloWeight: selectedResult.result.executionTimeMs,
+            optimizationWeight: selectedResult.result.executionCost,
             resourceProfileId: selectedResult.resourceProfileId,
             profilingResult: selectedResult.result,
         };
+    }
+}
+
+/**
+ * Creates weight function that swaps `sloWeight` and `optimizationWeight` of the `origWeightFn`.
+ */
+export function createSwappedWeightFn<T>(origWeightFn: (step: T) => WorkflowStepWeight): (step: T) => WorkflowStepWeight {
+    return (stepNode: T) => {
+        const result = origWeightFn(stepNode);
+        const temp = result.sloWeight;
+        result.sloWeight = result.optimizationWeight;
+        result.optimizationWeight = temp;
+        return result;
     }
 }

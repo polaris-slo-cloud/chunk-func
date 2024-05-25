@@ -1,4 +1,4 @@
-import { ResourceProfile, getResourceProfileId } from "./resource-profile";
+import { ResourceProfile, getResourceProfileId } from './resource-profile';
 
 /** Pseudo StatusCode to indicate that the function did not respond before the timeout. */
 export const timeoutStatusCode = -1;
@@ -13,9 +13,40 @@ export enum FunctionDeploymentStatus {
 }
 
 /**
+ * Describes whether a profiling result is the result of a profiling run or of model inference.
+ */
+export enum ProfilingResultType {
+    ProfilingResultProfiled = 'Profiled',
+    ProfilingResultInferred = 'Inferred',
+}
+
+/**
+ * The execution metrics of a step under a given resource profile or of a workflow path.
+ */
+export interface ExecutionMetrics {
+
+    /**
+     * The time to execute the step or path in milliseconds.
+     *
+     * For a path the execution time of the source node is NOT included.
+     */
+    executionTimeMs: number;
+
+    /**
+     * The total cost incurred by a single execution of a step or path.
+     *
+     * For a path the cost of the source node is NOT included.
+     *
+     * For an entire workflow, all the steps are included.
+     */
+    executionCost: number;
+
+}
+
+/**
  * Collects the result of a single profiling session.
  */
-export interface ProfilingResult {
+export interface ProfilingResult extends ExecutionMetrics {
 
     /**
      * The HTTP status code returned by the function execution.
@@ -26,19 +57,16 @@ export interface ProfilingResult {
     statusCode: number;
 
     /**
-     * The execution time of the function in milliseconds.
+     * Describes whether the profiling result is the result of
+     * a profiling run or of model inference.
+     * If this is not set, the result comes from profiling.
      */
-    executionTimeMs: number;
+    resultType?: ProfilingResultType;
 
     /**
      * The size of the used input in bytes.
      */
     inputSizeBytes: number;
-
-    /**
-     * The total cost incurred by a single execution of the function with the used resource profile.
-     */
-    executionCost: number;
 
 }
 
@@ -97,6 +125,21 @@ export interface ProfilingSessionResults {
     profilingDurationSeconds: number;
 
     /**
+     * The number of ResourceProfile-InputSize combinations (= configurations) that were profiled.
+     */
+    configurationsProfiled?: number;
+
+    /**
+     * The number of ResourceProfile-InputSize combinations (= configurations) that were inferred instead of profiled.
+     */
+    configurationsInferred?: number;
+
+    /**
+     * The number of profiling iterations for each ResourceProfile-InputSize combination.
+     */
+    iterationsPerInputAndProfile: number;
+
+    /**
      * The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (per 100ms).
      */
     results: ResourceProfileResults[];
@@ -120,6 +163,17 @@ export interface ProfilingResultWithProfileId {
 }
 
 /**
+ * @returns A negative number if `a < b`, a positive number if `a > b`, or zero if they are equal.
+ */
+export type ProfilingResultsComparator = (a: ProfilingResultWithProfileId, b: ProfilingResultWithProfileId) => number;
+
+/**
+ * Sorts according to `executionTimeMs` in descending order (from slowest to fastest).
+ */
+export const ProfilingResultsDescExecTimeComparator: ProfilingResultsComparator =
+    (a: ProfilingResultWithProfileId, b: ProfilingResultWithProfileId) => b.result.executionTimeMs - a.result.executionTimeMs;
+
+/**
  * Finds the profiling results for the specified resource profile.
  */
 export function findResourceProfileResults(profile: ResourceProfile, profilingSessionResults: ProfilingSessionResults): ResourceProfileResults | undefined {
@@ -132,6 +186,10 @@ export function findResourceProfileResults(profile: ResourceProfile, profilingSe
  * If no profile with a success status code can be found, `undefined` is returned.
  */
 export function findResultForInput(inputSizeBytes: number, profileResults: ProfilingResult[]): ProfilingResult | undefined {
+    if (profileResults.length === 0) {
+        return undefined;
+    }
+
     let profilingResult = profileResults.find(result => inputSizeBytes <= result.inputSizeBytes && isSuccessStatusCode(result.statusCode));
     if (!profilingResult) {
         const largestInputResult = profileResults[profileResults.length - 1];
@@ -184,4 +242,28 @@ export function* getAllResults(profilingSessionResults: ProfilingSessionResults)
             }
         }
     }
+}
+
+/**
+ * Gets the `ProfilingResult` for a specific profile and input size.
+ */
+export function getProfilingResultForProfile(profilingSessionResults: ProfilingSessionResults, inputSize:number, profile: ResourceProfile): ProfilingResult {
+    const profileId = getResourceProfileId(profile);
+    for (const result of getResultsForInput(profilingSessionResults, inputSize)) {
+        if (result.resourceProfileId === profileId) {
+            return result.result;
+        }
+    }
+    throw new Error(`Could not find a successful ProfilingResult for ${profileId}.`);
+}
+
+/**
+ * Gets the profiling results for a specific input size, sorted according to the specified criteria.
+ */
+export function getResultsForInputSizeSorted(profilingSessionResults: ProfilingSessionResults, inputSize: number, sortBy: ProfilingResultsComparator): ProfilingResultWithProfileId[] {
+    const results: ProfilingResultWithProfileId[] = [];
+    for (const profilingResult of getResultsForInput(profilingSessionResults, inputSize)) {
+        results.push(profilingResult);
+    }
+    return results.sort(sortBy);
 }

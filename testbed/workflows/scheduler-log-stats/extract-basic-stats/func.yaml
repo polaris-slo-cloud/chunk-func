@@ -1,9 +1,9 @@
-specVersion: 0.35.0
+specVersion: 0.36.0
 name: extract-basic-stats
 runtime: typescript
 registry: polarissloc
 image: polarissloc/chunk-func-extract-basic-stats:latest
-imageDigest: sha256:989bdf6ba4bf03eb480fc118f699ea8db3f2ac89df13b300ec10c5880584e753
+imageDigest: sha256:644bba8d1c91ae42c3bf084687dada81a864f222effa554b334916880d83f741
 created: 2023-08-16T13:51:12.634285619+02:00
 build:
   builder: pack
@@ -11,6 +11,6 @@ build:
   - name: BP_NODE_RUN_SCRIPTS
     value: build
   - name: BP_NODE_VERSION
-    value: 18.16.0
+    value: 18.*
 deploy:
   namespace: func-test

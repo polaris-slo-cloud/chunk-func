@@ -24,8 +24,11 @@ type ResourceProfile struct {
 	// The resource configuration parameters.
 	ResourceConfiguration `json:",inline" yaml:",inline"`
 
-	// The price for this configuration for 100ms of uptime.
-	Price100Ms float64 `json:"price100Ms" yaml:"price100Ms"`
+	// The price for this configuration for 1 billing unit of execution time.
+	PricePerUnit float64 `json:"pricePerUnit" yaml:"pricePerUnit"`
+
+	// The number of milliseconds in one billing unit.
+	BillingUnitMs int32 `json:"billingUnitMs" yaml:"billingUnitMs"`
 }
 
 // Returns the MilliCpu field as a resource.Quantity object.
@@ -49,13 +52,14 @@ func (rp *ResourceProfile) StringifyForK8sObj() string {
 	return fmt.Sprintf("%dmib-%dm", rp.MemoryMiB, rp.MilliCpu)
 }
 
-// Calculates the cost for the specified execution time, rounded up to the nearest 100ms mark.
+// Calculates the cost for the specified execution time, rounded up to the nearest billing unit mark.
 func (rp *ResourceProfile) CalculateCost(executionTimeMs int64) float64 {
-	execTimeUnits := executionTimeMs / 100
-	rest := executionTimeMs % 100
+	billingUnitMs := int64(rp.BillingUnitMs)
+	execTimeUnits := executionTimeMs / billingUnitMs
+	rest := executionTimeMs % billingUnitMs
 	if rest > 0 {
 		execTimeUnits++
 	}
-	cost := float64(execTimeUnits) * rp.Price100Ms
+	cost := float64(execTimeUnits) * rp.PricePerUnit
 	return cost
 }

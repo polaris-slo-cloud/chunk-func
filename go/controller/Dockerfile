@@ -1,6 +1,6 @@
 # This Dockerfile assumes that the root directory of the build is the ./go directory of the repository, not the ./go/controller directory.
 # Build the manager binary
-FROM golang:1.21 as builder
+FROM golang:1.22 as builder
 ARG TARGETOS
 ARG TARGETARCH
 
@@ -25,7 +25,7 @@ COPY common/pkg/ common/pkg/
 COPY profiler/pkg/ profiler/pkg/
 COPY controller/cmd/main.go controller/cmd/main.go
 COPY controller/api/ controller/api/
-COPY controller/internal/controller/ controller/internal/controller/
+COPY controller/internal/ controller/internal/
 
 # Build
 # the GOARCH has not a default value to allow the binary be built according to the host where the command
@@ -38,6 +38,7 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o ma
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
+COPY controller/config/mockedresults config/mockedresults
 COPY --from=builder /workspace/manager .
 USER 65532:65532
 

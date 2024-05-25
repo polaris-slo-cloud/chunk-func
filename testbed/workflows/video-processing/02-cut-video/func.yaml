@@ -1,9 +1,9 @@
-specVersion: 0.35.0
+specVersion: 0.36.0
 name: cut-video
 runtime: typescript
 registry: polarissloc
 image: polarissloc/chunk-func-cut-video:latest
-imageDigest: sha256:820b148864536e1ac17e52dd4ca37f046453a7a9ee88f68e10e5277ab4549469
+imageDigest: sha256:da51594adde8a1e0e5c1d60792c3d65a858b9c2270559d5f0bf4f72805c425f9
 created: 2023-10-18T12:03:34.789666879+02:00
 build:
   builder: pack
@@ -11,6 +11,6 @@ build:
   - name: BP_NODE_RUN_SCRIPTS
     value: build
   - name: BP_NODE_VERSION
-    value: 18.16.1
+    value: 18.*
 deploy:
   namespace: func-test

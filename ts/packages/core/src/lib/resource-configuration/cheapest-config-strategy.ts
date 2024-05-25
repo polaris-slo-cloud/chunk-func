@@ -1,12 +1,15 @@
 import { ResourceProfile, getResultsForInput } from '../model';
-import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep } from '../workflow';
+import { AccumulatedStepInput, ChooseConfigurationStrategyFactory, WorkflowGraph, WorkflowState, WorkflowFunctionStep, Workflow } from '../workflow';
 import { ResourceConfigurationStrategyBase } from './resource-configuration-strategy.base';
 
 export const createCheapestConfigStrategy: ChooseConfigurationStrategyFactory =
-    (graph: WorkflowGraph, availableResProfiles: Record<string, ResourceProfile>) => new CheapestConfigStrategy(graph, availableResProfiles);
+    (workflow: Workflow) => new CheapestConfigStrategy(workflow.graph, workflow.availableResourceProfiles);
 
 /**
  * ResourceConfigurationStrategy that always picks the cheapest resource configuration, irrespective of the SLO.
+ *
+ * This strategy relies on the `exhaustiveProfilingResults`, because its output are used as reference points.
+ * Thus, they should not be biased by any inferred profiling results.
  */
 export class CheapestConfigStrategy extends ResourceConfigurationStrategyBase {
 
@@ -21,7 +24,7 @@ export class CheapestConfigStrategy extends ResourceConfigurationStrategyBase {
         let selectedProfileExecTime = Number.POSITIVE_INFINITY;
         let selectedProfileId: string | undefined;
 
-        for (const resultForInput of getResultsForInput(step.profilingResults, input.totalDataSizeBytes)) {
+        for (const resultForInput of getResultsForInput(step.exhaustiveProfilingResults, input.totalDataSizeBytes)) {
             const execCost = resultForInput.result.executionCost;
             const execTime = resultForInput.result.executionTimeMs;
             if (execCost < lowestCost || (execCost === lowestCost && execTime < selectedProfileExecTime)) {
@@ -32,7 +35,7 @@ export class CheapestConfigStrategy extends ResourceConfigurationStrategyBase {
         }
 
         if (!selectedProfileId) {
-            throw new Error('ProfilingResults did not contain any results.');
+            throw new Error('ExhaustiveProfilingResults did not contain any results.');
         }
         const profile = this.availableResourceProfiles[selectedProfileId];
         return profile;

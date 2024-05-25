@@ -1,0 +1,62 @@
+{
+  "scenarioName": "scenario-02-input-54-Mib",
+  "resourceConfigStrategy": "FastestConfigStrategy",
+  "inputDataSizeMib": 54.2734375,
+  "sloMs": 7000,
+  "workflowOutput": {
+    "executionTimeMs": 6051,
+    "executionCost": 0.003718,
+    "data": {
+      "sizeBytes": 21569326
+    },
+    "stepLogs": {
+      "validate-log": {
+        "resourceProfile": {
+          "memoryMiB": 4096,
+          "milliCpu": 2000,
+          "pricePerUnit": 0.00000812,
+          "billingUnitMs": 100
+        },
+        "executionTimeMs": 1652,
+        "executionCost": 0.000138,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "extract-basic-stats": {
+        "resourceProfile": {
+          "memoryMiB": 16384,
+          "milliCpu": 4000,
+          "pricePerUnit": 0.0001904,
+          "billingUnitMs": 100
+        },
+        "executionTimeMs": 1793,
+        "executionCost": 0.003427,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "extract-successes": {
+        "resourceProfile": {
+          "memoryMiB": 2048,
+          "milliCpu": 1000,
+          "pricePerUnit": 0.00000406,
+          "billingUnitMs": 100
+        },
+        "executionTimeMs": 1846,
+        "executionCost": 0.000077,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      },
+      "extract-success-stats": {
+        "resourceProfile": {
+          "memoryMiB": 8192,
+          "milliCpu": 2000,
+          "pricePerUnit": 0.00000952,
+          "billingUnitMs": 100
+        },
+        "executionTimeMs": 760,
+        "executionCost": 0.000076,
+        "resourceConfigStrategyExecutionTimeMs": 0
+      }
+    },
+    "avgResourceConfigStrategyExecutionTimeMs": 0,
+    "sloFulfilled": true
+  },
+  "sloFulfilled": true
+}

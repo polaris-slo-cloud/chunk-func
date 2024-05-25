@@ -42,10 +42,11 @@ function processResultFile(filePath: string): ProcessedSimulationResult {
 
     return {
         strategy: simResult.resourceConfigStrategy.replace('ConfigStrategy', ''),
-        scenario: `${inputSize}MB ${sloSec}s`,
+        scenario: `${inputSize}MB`,
         sloMs: simResult.sloMs,
         executionTimeMs: simResult.workflowOutput.executionTimeMs,
-        cost: simResult.workflowOutput.totalCost,
+        cost: simResult.workflowOutput.executionCost,
+        avgResConfigStratExecTimeMs: simResult.workflowOutput.avgResourceConfigStrategyExecutionTimeMs,
     };
 }
 

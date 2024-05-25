@@ -17,9 +17,14 @@ export interface ResourceProfile {
     milliCpu: number;
 
     /**
-     * The price for this configuration for 100ms of uptime.
+     * The price for this configuration for 1 billing unit of execution time.
      */
-    price100Ms: number;
+    pricePerUnit: number;
+
+    /**
+     * The number of milliseconds in one billing unit.
+     */
+    billingUnitMs: number;
 
 }
 

@@ -12,11 +12,6 @@ export interface WorkflowDescription {
     name: string;
 
     /**
-     * The SLO that describes the maximum allowed response time (in milliseconds) for the entire workflow.
-     */
-    maxResponseTimeMs: number;
-
-    /**
      * The steps of this workflow.
      */
     steps: WorkflowStepDescription[];
@@ -74,8 +69,25 @@ export interface WorkflowStepDescription {
 
     /**
      * The results from profiling, if this step includes a serverless function.
+     *
+     * These results can be from exhaustive profiling or from Bayesian Optimization guided profiling.
+     *
+     * These results are used by the ResourceConfigurationStrategies to choose a resource profile for the current step.
      */
     profilingResults?: ProfilingSessionResults;
+
+    /**
+     * The results from exhaustive profiling, if this step includes a serverless function.
+     *
+     * These results are used during workflow execution to determine the actual time of the step under the current profile.
+     * There are three possible relationships between the `exhaustiveProfilingResults` and the `profilingResults` above.
+     *
+     * 1. `profilingResults` and `exhaustiveProfilingResults` are the same (or `exhaustiveProfilingResults` are not set).
+     * 2. `profilingResults` contain fewer profiled inputs than `exhaustiveProfilingResults`.
+     * 3. `profilingResults` are Bayesian Optimization guided, so some results are inferred, and `exhaustiveProfilingResults` contains
+     *    the results from the exhaustive (real) profiling runs.
+     */
+    exhaustiveProfilingResults?: ProfilingSessionResults;
 
 }
 
@@ -105,9 +117,22 @@ export interface WorkflowExecutionDescription {
     inputSizeBytes: number;
 
     /**
-     * This allows overriding the max response time SLO of the workflow.
+     * The type of SLO.
      */
-    maxResponseTimeMsOverride?: number;
+    sloType: string;
+
+    /**
+     * The limit value of the SLO.
+     */
+    sloLimit: number;
+
+    /**
+     * The max response time SLO of the workflow.
+     *
+     * @deprecated Use `sloType` and `sloLimit` instead. We only keep this for now,
+     * so that we don't need to modify the many existing scenarios that we have.
+     */
+    maxResponseTimeMs?: number;
 
     /**
      * The execution descriptions of the steps of the workflow.

@@ -1,6 +1,6 @@
 import { DirectedGraph } from 'graphology';
-import { WorkflowFunctionStep, WorkflowStep } from './step';
-import { ProfilingResult } from '../model';
+import { WorkflowFunctionStep, WorkflowStep, WorkflowStepsMap } from './step';
+import { ExecutionMetrics, ProfilingResult } from '../model';
 
 /**
  * A DAG of a workflow in two forms: using WorkflowSteps and using a graphology graph.
@@ -22,7 +22,7 @@ export interface WorkflowGraph {
     /**
      * Map of all steps in the workflow, indexed by their names.
      */
-    steps: Record<string, WorkflowStep>;
+    steps: WorkflowStepsMap;
 
     /**
      * The graphology graph that represents this workflow.
@@ -33,10 +33,17 @@ export interface WorkflowGraph {
      * Finds the critical path from the source step to the target step using the specified weight function.
      *
      * The critical path computation assumes that the source step has already executed, i.e., its weight is disregarded
-     * and not included in the executionTimeMs of the returned path.
+     * and not included in the weights of the returned path.
      * The steps of the path include the source node for completeness though.
+     *
+     * @param pathWeightKey The name of the weight property that should be used to compute the path weights. Default: 'sloWeight'.
      */
-    findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn): WorkflowPath;
+    findCriticalPath(source: WorkflowStep, target: WorkflowStep, weightFn: GetStepWeightFn, pathWeightKey?: StepWeightKey): WorkflowPath;
+
+    /**
+     * Creates a subgraph starting from the `start` step.
+     */
+    createSubgraph(start: WorkflowStep): WorkflowGraph;
 
 }
 
@@ -53,14 +60,33 @@ export interface WorkflowNodeAttributes {
 }
 
 /**
- * The weight of a WorkflowStep as returned by GetStepWeightFn.
+ * Contains the SLO weight metric and the optimization weight metric
+ * for a single WorkflowStep, a path, or the executed portion of the workflow.
  */
-export interface WorkflowStepWeight {
+export interface WeightMetrics {
 
     /**
-     * The weight that should be used for computing the critical path.
+     * The sum of these weights along a path are constrained by the SLO.
+     *
+     * Example: the `sloWeight` could be the execution time and the `optimizationWeight` could be the cost.
      */
-    weight: number;
+    sloWeight: number;
+
+    /**
+     * The sum of these weights along a path should be optimized (typically minimized).
+     *
+     * This weight needs to be optimized, while the sum of the sloWeights meet the SLO constraint.
+     *
+     * Example: the `sloWeight` could be the execution time and the `optimizationWeight` could be the cost.
+     */
+    optimizationWeight: number;
+
+}
+
+/**
+ * The weight of a WorkflowStep as returned by GetStepWeightFn.
+ */
+export interface WorkflowStepWeight extends WeightMetrics {
 
     /**
      * The ID of the resource profile that was used to compute the weight.
@@ -79,10 +105,15 @@ export interface WorkflowStepWeight {
  */
 export type GetStepWeightFn = (step: WorkflowFunctionStep) => WorkflowStepWeight;
 
+/** The name of the property of `WorkflowStepWeight` that should be used for computing the shortest path or critical path. */
+// ToDo: Refactor GetStepWeightFns to avoid having to use a StepWeightKey.
+// Idea: Declare which property an algorithm uses and then create a timeSloWeightFn() and a costSloWegihtFn().
+export type StepWeightKey = keyof Pick<WorkflowStepWeight, 'sloWeight' | 'optimizationWeight'>;
+
 /**
  * Describes a path between two workflow steps.
  */
-export interface WorkflowPath {
+export interface WorkflowPath extends ExecutionMetrics {
 
     /**
      * The steps of the path, from the source to the target.
@@ -90,12 +121,5 @@ export interface WorkflowPath {
      * This includes both, the source and the target.
      */
     steps: WorkflowStep[];
-
-    /**
-     * The expected execution time of the path.
-     *
-     * The execution time of the source node is NOT included.
-     */
-    executionTimeMs: number;
 
 }

@@ -1,10 +1,12 @@
 import { LinkedListQueue } from '../../collections';
-import { WorkflowExecutionDescription } from '../../model';
+import { ExecutionMetrics, WorkflowExecutionDescription } from '../../model';
+import { ServiceLevelObjective } from '../slo';
 import { StepState, WorkflowState } from '../state';
 import { WorkflowStep } from '../step';
 import { WorkflowThread } from '../thread';
+import { initSlo } from './slo.impl';
 
-export type WorkflowStateInitData = Pick<WorkflowState, 'maxExecutionTimeMs' | 'executionDescription'>;
+export type WorkflowStateInitData = Pick<WorkflowState, 'executionDescription'>;
 
 export class WorkflowStateImpl implements WorkflowState {
 
@@ -13,12 +15,19 @@ export class WorkflowStateImpl implements WorkflowState {
     steps: Record<string, StepState> = {};
     executionDescription: WorkflowExecutionDescription;
 
-    maxExecutionTimeMs: number;
+    slo: ServiceLevelObjective;
     totalCost = 0;
 
     constructor(initData: WorkflowStateInitData) {
-        this.maxExecutionTimeMs = initData.maxExecutionTimeMs;
         this.executionDescription = initData.executionDescription;
+        this.slo = initSlo(initData.executionDescription);
+    }
+
+    getExecutionMetrics(thread: WorkflowThread): ExecutionMetrics {
+        return {
+            executionTimeMs: thread.executionTimeMs,
+            executionCost: this.totalCost,
+        };
     }
 
 }

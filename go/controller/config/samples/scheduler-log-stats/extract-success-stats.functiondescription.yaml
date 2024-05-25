@@ -18,30 +18,30 @@ spec:
     typicalInputs:
       - sizeBytes: 2070369 # 2 MiB
         message:
-          url: http://10.152.183.192
+          url: http://10.152.183.26
           # This is a demo deployment, we don't care about the password here.
-          user: HYlOGOqiOSpSnBjP
-          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          user: 3IbgCHdvv7Yo82F4
+          password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
           bucket: logs
           objectKey: scheduler-scalability-jobs-01-successes.log
           objectSizeBytes: 2070369
 
       - sizeBytes: 21511278 # 21 MiB
         message:
-          url: http://10.152.183.192
+          url: http://10.152.183.26
           # This is a demo deployment, we don't care about the password here.
-          user: HYlOGOqiOSpSnBjP
-          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          user: 3IbgCHdvv7Yo82F4
+          password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
           bucket: logs
           objectKey: scheduler-scalability-jobs-15-successes.log
           objectSizeBytes: 21511278
 
       - sizeBytes: 21569326 # 21 MiB
         message:
-          url: http://10.152.183.192
+          url: http://10.152.183.26
           # This is a demo deployment, we don't care about the password here.
-          user: HYlOGOqiOSpSnBjP
-          password: wPJqmYXp7gGcEZHou3pdHYcrFXvgFdPx
+          user: 3IbgCHdvv7Yo82F4
+          password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
           bucket: logs
           objectKey: scheduler-scalability-jobs-13-successes.log
           objectSizeBytes: 21569326

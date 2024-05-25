@@ -1,0 +1,134 @@
+syntax = "proto3";
+package bayesianopt;
+
+option go_package = "polaris-slo-cloud.github.io/chunk-func/profiler/pkg/bayesianopt";
+
+// Describes an inclusive integer interval.
+message IntInterval {
+    uint64 lowerBound = 1;
+    uint64 upperBound = 2;
+}
+
+// Collects data needed to initialize a new BO model.
+// Either possibleXValues or interval is needed, the other two values are optional.
+message BoModelInitData {
+    // The discrete set of possible values of X.
+    repeated uint64 possibleXValues = 1;
+
+    // An inclusive integer interval for the possible values of X.
+    optional IntInterval interval = 2;
+
+    optional double kappa = 3;
+    optional double xi = 4;
+
+    // The maximum number of samples after which BO should stop (poi will drop to zero).
+    // This number is expressed as a percentage of the number of values in the input domain.
+    // The valid range is [0.0, 1.0] with 0.0 mapping to the default of 1.0.
+    double maxSamplesPercent = 5;
+}
+
+message BoModelId {
+    string modelId = 1;
+}
+
+message BoSuggestion {
+    // The suggested value of X for the next profiling run.
+    uint64 x = 1;
+
+    // Probability of improvement for the next profiling run.
+    // If this is zero, the value of X must be disregarded, because the input domain has been exhausted.
+    double poi = 2;
+
+    // The percentage of all possible X-values, which were already sampled.
+    // This only includes X-values, for which a Y-value has already been observed.
+    // So, the X-value from this suggestion is not included.
+    double percentageSampled = 3;
+}
+
+// The observation made during a profiling run.
+message BoObservation {
+    // The value of X, for which the profiling was executed.
+    uint64 x = 1;
+
+    // The result of the profiling.
+    double observation = 2;
+}
+
+// Requests a new suggestion for the next X value and
+// optionally submits an observation from the previous profiling run.
+message GetBoSuggestionRequest {
+    // The ID of the model to be used.
+    string modelId = 1;
+
+    // (optional) The observation from the last profiling run.
+    optional BoObservation observation = 2;
+}
+
+// Delivers a suggestion from a BO model.
+message GetBoSuggestionResponse {
+    // The ID of the model that was used.
+    string modelId = 1;
+
+    // The suggested value of X and the expected improvement.
+    BoSuggestion suggestion = 2;
+}
+
+// Requests an inference for a specific X.
+message InferYRequest {
+    // The ID of the model that was used.
+    string modelId = 1;
+
+    // The value of X, for which we want to infer Y.
+    uint64 x = 2;
+}
+
+// Delivers an inference for a specific X.
+message InferYResponse {
+    // The ID of the model that was used.
+    string modelId = 1;
+
+    // The value of X, for which we requested Y.
+    uint64 x = 2;
+
+    // The inferred Y value at position X.
+    double y = 3;
+}
+
+// Shrinks the input domain of an existing BO model.
+message ShrinkInputDomainRequest {
+    // The ID of the model to be used.
+    string modelId = 1;
+
+    // The discrete set of possible values of X.
+    repeated uint64 possibleXValues = 2;
+
+    // An inclusive integer interval for the possible values of X.
+    optional IntInterval interval = 3;
+}
+
+// Response to shrinking the input domain.
+message ShrinkInputDomainResponse {
+    // The ID of the model to be used.
+    string modelId = 1;
+
+    // The number of remaining values in the input domain, for which no observation had been made.
+    uint64 remainingXValuesCount = 2;
+}
+
+// A service for utilizing a BO model.
+service BayesianOptimizerService {
+    // Creates a new BO model and returns its ID.
+    rpc CreateBoModel(BoModelInitData) returns (BoModelId) {}
+
+    // Requests a suggestion for the next X value to explore, optionally supplying an observation from the previous profiling run.
+    rpc GetBoSuggestion(GetBoSuggestionRequest) returns (GetBoSuggestionResponse) {}
+
+    // Requests an inference of Y for a specific X.
+    rpc InferY(InferYRequest) returns (InferYResponse) {}
+
+    // Shrinks the input domain of a BO model.
+    rpc ShrinkInputDomain(ShrinkInputDomainRequest) returns (ShrinkInputDomainResponse) {}
+
+    // Delete the specified model.
+    rpc DeleteBoModel(BoModelId) returns (BoModelId) {}
+}

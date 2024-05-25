@@ -1,0 +1,14 @@
+# This is a WorkflowExecutionDescription that uses the median input sizes for the SLAM algorithm.
+scenarioName: slam-scenario
+inputSizeBytes: 972000 #  (40s * 720p * 30fps + 60s * 720p * 25fps) / 2
+
+maxResponseTimeMs: 200000 # The SLO of the SLAM scenario is ignored and replaced by the SLO of the eval scenario.
+stepExecutions:
+  validate-video-face-recog:
+    outputSizeBytes: 972000
+  transform-video:
+    outputSizeBytes: 6470674 # (6462780 + 6478567) / 2
+  detect-faces:
+    outputSizeBytes: 972000
+  mark-faces:
+    outputSizeBytes: 972000

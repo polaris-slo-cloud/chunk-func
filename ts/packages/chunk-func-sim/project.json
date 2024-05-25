@@ -33,6 +33,11 @@
               ".js": ".js"
             }
           }
+        },
+        "bundled": {
+          "bundle": true,
+          "external": [],
+          "thirdParty": true
         }
       }
     },
@@ -52,7 +57,7 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["packages/chunk-func-sim/**/*.ts"]
@@ -62,14 +67,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "packages/chunk-func-sim/jest.config.ts",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
+        "jestConfig": "packages/chunk-func-sim/jest.config.ts"
       }
     }
   },

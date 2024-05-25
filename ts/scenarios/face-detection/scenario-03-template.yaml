@@ -1,0 +1,15 @@
+# This is a WorkflowExecutionDescription
+scenarioName: scenario-03-input-20s-720p
+inputSizeBytes: 345600 # 20s * 720p * 24fps
+
+sloType: {{ .sloType }}
+sloLimit: {{ .sloLimit }}
+stepExecutions:
+  validate-video-face-recog:
+    outputSizeBytes: 345600
+  transform-video:
+    outputSizeBytes: 2200720
+  detect-faces:
+    outputSizeBytes: 345600
+  mark-faces:
+    outputSizeBytes: 345600
