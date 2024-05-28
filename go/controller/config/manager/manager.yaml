@@ -105,7 +105,7 @@ spec:
             value: REST
           # PROFILER can be either "Exhaustive" or "BayesianOpt"
           - name: PROFILER
-            value: Exhaustive
+            value: BayesianOpt
           # The number of profiling iterations that should be done for each resource profile and input size combination/configuration.
           - name: ITERATIONS_PER_CONFIGURATION
             value: '5'
@@ -134,7 +134,7 @@ spec:
         image: bayesian-optimizer:latest
         resources:
           limits:
-            cpu: 1000m
+            cpu: 2000m
             memory: 2Gi
         ports:
           - containerPort: 9000
