@@ -19,18 +19,18 @@ spec:
       - sizeBytes: 345600 # 20s * 720p * 24fps
         message:
           input:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: people-walking-20s-720p.mp4
             objectSizeBytes: 345600
           faces:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: people-walking-20s-720p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 72701
@@ -38,18 +38,18 @@ spec:
       - sizeBytes: 518400 # 20s * 1080p * 24fps
         message:
           input:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: people-walking-20s-1080p.mp4
             objectSizeBytes: 518400
           faces:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: people-walking-20s-1080p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 71413
@@ -57,18 +57,18 @@ spec:
       - sizeBytes: 864000 # 40s * 720p * 30fps
         message:
           input:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: workout-40s-720p.mp4
             objectSizeBytes: 864000
           faces:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: workout-40s-720p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 95911
@@ -76,18 +76,18 @@ spec:
       - sizeBytes: 1080000 # 60s * 720p * 25fps
         message:
           input:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: society-1m-720p.mp4
             objectSizeBytes: 1080000
           faces:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: society-1m-720p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 117518
@@ -95,18 +95,18 @@ spec:
       - sizeBytes: 1296000 # 40s * 1080p * 30fps
         message:
           input:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: workout-40s-1080p.mp4
             objectSizeBytes: 1296000
           faces:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: workout-40s-1080p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 95714
@@ -114,18 +114,18 @@ spec:
       - sizeBytes: 1620000 #  60s * 1080p * 25fps
         message:
           input:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: society-1m-1080p.mp4
             objectSizeBytes: 1620000
           faces:
-            url: http://10.152.183.26
+            url: http://10.152.183.40
             # This is a demo deployment, we don't care about the password here.
-            user: 3IbgCHdvv7Yo82F4
-            password: sEt8IXptcUK2n2dLpJyAnC6xbrHs3ZWP
+            user: Km64uOPSzqaR3nEy
+            password: OHJUVGP5GNyIqhYcMjXezzvT8MUFSPPD
             bucket: face-detection
             objectKey: society-1m-1080p-transcoded-to-360p.mp4-faces.json
             objectSizeBytes: 119860
