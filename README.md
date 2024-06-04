@@ -43,3 +43,9 @@ The avoidance of cold starts is (for now) beyond the scope of this project - a s
 * The [ChunkFunc Profiler](./go) is implemented as a Kubernetes controller using kubebuilder.
 * The ChunkFunc Workflow Optimizer is currently implemented as a [simulator](./ts) that replays actual workflow traces to evaluate our algorithms and compare them against other state-of-the-art approaches.
 * The [testbed](./testbed) contains three serverless workflows as use cases.
+
+
+
+## Deployment & Usage Documentation
+
+Instructions for deployment and usage can be found in the [docs](./docs) folder.

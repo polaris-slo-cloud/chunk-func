@@ -36,26 +36,6 @@ spec:
       labels:
         control-plane: controller-manager
     spec:
-      # TODO(user): Uncomment the following code to configure the nodeAffinity expression
-      # according to the platforms which are supported by your solution.
-      # It is considered best practice to support multiple architectures. You can
-      # build your manager image using the makefile target docker-buildx.
-      # affinity:
-      #   nodeAffinity:
-      #     requiredDuringSchedulingIgnoredDuringExecution:
-      #       nodeSelectorTerms:
-      #         - matchExpressions:
-      #           - key: kubernetes.io/arch
-      #             operator: In
-      #             values:
-      #               - amd64
-      #               - arm64
-      #               - ppc64le
-      #               - s390x
-      #           - key: kubernetes.io/os
-      #             operator: In
-      #             values:
-      #               - linux
       securityContext:
         runAsNonRoot: true
         # For common cases that do not require escalating privileges
@@ -64,12 +44,12 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-      - command:
+      - name: manager
+        command:
         - /manager
         args:
         - --leader-elect
         image: controller:latest
-        name: manager
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -87,8 +67,6 @@ spec:
             port: 8081
           initialDelaySeconds: 5
           periodSeconds: 10
-        # TODO(user): Configure the resources accordingly based on the project requirements.
-        # More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
         resources:
           limits:
             cpu: 500m
@@ -98,34 +76,52 @@ spec:
             memory: 64Mi
         env:
           # RESOURCE_PROFILES can be either "AWS" or "GCF"
+          # - GCF resembles the eight Google Cloud Function profiles in the range 128MB - 16384MB
+          # - AWS resembles the 159 profiles resulting from dividing the 128MB - 10240MB continuous range of AWS profiles into discrete 64MB steps.
           - name: RESOURCE_PROFILES
             value: AWS
+
           # FUNCTION_TRIGGER can be either "REST" or "MockedResults"
+          # - REST triggers the serverless function using a REST call.
+          # - MockedResults replays the results from the `../config/mockedresults` directory.
           - name: FUNCTION_TRIGGER
             value: REST
+
           # PROFILER can be either "Exhaustive" or "BayesianOpt"
+          # - Exhaustive profiles all input sizes with all available resource profiles.
+          # - BayesianOpt uses Bayesian Optimization to build a prediction model of the function's
+          #   behavior under all resource profiles about 1/4 - 1/3 of the profiling runs.
           - name: PROFILER
             value: BayesianOpt
+
           # The number of profiling iterations that should be done for each resource profile and input size combination/configuration.
           - name: ITERATIONS_PER_CONFIGURATION
             value: '5'
+
           # The number resource profiles that should be evaluated concurrently.
           - name: CONCURRENT_PROFILES
             value: '2'
 
           # The address of the BO server.
+          # This normally does not need to be changed, because the BO server is deployed in the same pod as the profiler.
           - name: BAYESIAN_OPT_SERVER
             value: localhost:9000
+
           # The minimum number of samples that will be collected by BO, as a percentage of the total number of profiles.
           # Having a minimum number of samples helps improve the quality of the model if the POI is already very low after the initial samples.
           - name: BAYESIAN_OPT_MIN_SAMPLES_PERCENT
             value: '0.1'
+
           # The maximum number of samples that will be collected by BO, as a percentage of the total number of profiles.
           - name: BAYESIAN_OPT_MAX_SAMPLES_PERCENT
             value: '0.4'
+
           # The xi hyperparameter for BO.
+          # Lower values favor exploitation (i.e., focussing on more knows ranges).
+          # Higher values favor exploration (i.e., exploring unknown ranges).
           - name: BAYESIAN_OPT_XI
             value: '0.01'
+
           # If the BO returns a probability of improvement below this threshold, profiling for the respective input size is marked as complete.
           - name: BAYESIAN_OPT_POI_THRESHOLD
             value: '0.02'

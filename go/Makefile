@@ -51,30 +51,6 @@ clean:
 	rm -rf ./vendor
 
 
-#### ToDo: Adapt for ChunkFunc
-
-###########################################
-# polaris-scheduler
-###########################################
-
-.PHONY: build-scheduler
-build-scheduler:
-	$(COMMONENVVAR) $(BUILDENVVAR) go build -ldflags '-X k8s.io/component-base/version.gitVersion=$(VERSION) -w' -o bin/polaris-scheduler scheduler/main.go
-
-.PHONY: build-scheduler-debug
-build-scheduler-debug: scheduler-debug-config
-	$(COMMONENVVAR) $(BUILDENVVAR) go build -gcflags="all=-N -l" -ldflags '-X k8s.io/component-base/version.gitVersion=$(VERSION)' -o bin/polaris-scheduler scheduler/main.go
-
-.PHONY: scheduler-debug-config
-scheduler-debug-config:
-	mkdir -p ./bin
-	cp scheduler/manifests/polaris-scheduler/default-polaris-scheduler-config.yaml bin/default-polaris-scheduler-config.yaml
-
-.PHONY: scheduler-release-image
-scheduler-release-image:
-	docker build -f ./scheduler/Dockerfile --build-arg RELEASE_VERSION="$(RELEASE_VERSION)" -t $(RELEASE_REGISTRY)/$(SCHEDULER_RELEASE_IMAGE) .
-
-
 ###########################################
 # chunk-func controller
 ###########################################
@@ -90,6 +66,10 @@ docker-build-controller:
 .PHONY: docker-push-controller
 docker-push-controller:
 	cd controller && make docker-push
+
+.PHONY: install-crds
+install-crds:
+	cd controller && make install
 
 .PHONY: deploy-controller
 deploy-controller:
