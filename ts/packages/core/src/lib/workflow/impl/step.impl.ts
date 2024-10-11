@@ -84,12 +84,16 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
             throw new Error('resourceProfile must not be undefined for WorkflowSteps of type Function.')
         }
 
+        if (!this.exhaustiveProfilingResults.profiledInputSizes) {
+            throw new Error('exhaustiveProfilingResults.profiledInputSizes is not set.')
+        }
+
         const profileResults = findResourceProfileResults(resourceProfile, this.exhaustiveProfilingResults);
         if (!profileResults || !profileResults.results) {
             throw new Error(`No Profiling results for ${getResourceProfileId(resourceProfile)}`);
         }
 
-        let result = findResultForInput(input.totalDataSizeBytes, profileResults.results);
+        let result = findResultForInput(input.totalDataSizeBytes, this.exhaustiveProfilingResults.profiledInputSizes, profileResults.results);
         if (!result && this.profilingResults.configurationsInferred) {
             // For partially inferred profiling results we allow switching to the next higher successful profile.
             result = this.findNextHigherProfilingResult(input, resourceProfile);
@@ -107,6 +111,10 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
     }
 
     protected findNextHigherProfilingResult(input: AccumulatedStepInput, minResourceProfile: ResourceProfile): ProfilingResult | undefined {
+        if (!this.exhaustiveProfilingResults.profiledInputSizes) {
+            throw new Error('exhaustiveProfilingResults.profiledInputSizes is not set.')
+        }
+
         const minProfileId = getResourceProfileId(minResourceProfile);
         let foundMin = false;
         for (const currResults of this.exhaustiveProfilingResults.results) {
@@ -118,7 +126,7 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
             }
 
             if (currResults.results) {
-                const result = findResultForInput(input.totalDataSizeBytes, currResults.results);
+                const result = findResultForInput(input.totalDataSizeBytes, this.exhaustiveProfilingResults.profiledInputSizes, currResults.results);
                 if (result) {
                     return result;
                 }

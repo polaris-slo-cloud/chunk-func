@@ -44,7 +44,7 @@ export interface ExecutionMetrics {
 }
 
 /**
- * Collects the result of a single profiling session.
+ * The result of a single profiled function execution.
  */
 export interface ProfilingResult extends ExecutionMetrics {
 
@@ -140,6 +140,14 @@ export interface ProfilingSessionResults {
     iterationsPerInputAndProfile: number;
 
     /**
+     * The list of profiled input sizes in bytes, sorted in ascending order.
+     *
+     * @TODO Currently, this is determined when building the workflow. I'm not happy about this, because now the
+     * interface doesn't match the YAML data structure anymore.
+     */
+    profiledInputSizes?: number[];
+
+    /**
      * The list of results grouped by ResourceProfiles, ordered by increasing memory size and base cost (per 100ms).
      */
     results: ResourceProfileResults[];
@@ -182,18 +190,25 @@ export function findResourceProfileResults(profile: ResourceProfile, profilingSe
 }
 
 /**
- * Finds the ProfilingResult for the specified inputSize, assuming the the profileResults are ordered by increasing input size.
- * If no profile with a success status code can be found, `undefined` is returned.
+ * Finds the `ProfilingResult` for the specified input size within all profiling results of a particular resource profile.
+ * If no result that matches the input size and has a success status code can be found, `undefined` is returned.
+ *
+ * If `inputSizeBytes` is greater than the largest input size, the result for the largest input size is returned, if it was successfully profiled.
+ *
+ * @param inputSizeBytes The input size for which to find the result.
+ * @param profiledInputSizes The list of all profiled input sizes, including those that are not in `profileResults` due to errors.
+ * @param profileResults The list of profiling results for a single resource profile. The results must be ordered by increasing input size.
  */
-export function findResultForInput(inputSizeBytes: number, profileResults: ProfilingResult[]): ProfilingResult | undefined {
-    if (profileResults.length === 0) {
+export function findResultForInput(inputSizeBytes: number, profiledInputSizes: number[], profileResults: ProfilingResult[]): ProfilingResult | undefined {
+    if (profiledInputSizes.length === 0 || profileResults.length === 0) {
         return undefined;
     }
 
     let profilingResult = profileResults.find(result => inputSizeBytes <= result.inputSizeBytes && isSuccessStatusCode(result.statusCode));
     if (!profilingResult) {
+        const largestProfiledInputSize = profiledInputSizes[profiledInputSizes.length - 1];
         const largestInputResult = profileResults[profileResults.length - 1];
-        if (isSuccessStatusCode(largestInputResult.statusCode)) {
+        if (isSuccessStatusCode(largestInputResult.statusCode) && inputSizeBytes > largestProfiledInputSize && largestInputResult.inputSizeBytes === largestProfiledInputSize) {
             profilingResult = largestInputResult;
         }
     }
@@ -210,11 +225,15 @@ export function isSuccessStatusCode(statusCode: number): boolean {
  * The iteration order goes from the profile with the smallest memory size to the one with the largest.
  */
 export function* getResultsForInput(profilingSessionResults: ProfilingSessionResults, inputSizeBytes: number): Generator<ProfilingResultWithProfileId> {
+    if (!profilingSessionResults.profiledInputSizes) {
+        throw new Error('profilingSessionResults.profiledInputSizes is not set.')
+    }
+
     for (const profileResult of profilingSessionResults.results) {
         if (!profileResult.results) {
             throw new Error(`ResourceProfileResults for ${profileResult.resourceProfileId} does not contain any results.`);
         }
-        const resultForInput = findResultForInput(inputSizeBytes, profileResult.results);
+        const resultForInput = findResultForInput(inputSizeBytes, profilingSessionResults.profiledInputSizes, profileResult.results);
         if (resultForInput) {
             yield {
                 resourceProfileId: profileResult.resourceProfileId,
