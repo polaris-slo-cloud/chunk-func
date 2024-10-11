@@ -200,7 +200,7 @@ export function findResourceProfileResults(profile: ResourceProfile, profilingSe
  * @param profileResults The list of profiling results for a single resource profile. The results must be ordered by increasing input size.
  */
 export function findResultForInput(inputSizeBytes: number, profiledInputSizes: number[], profileResults: ProfilingResult[]): ProfilingResult | undefined {
-    if (profiledInputSizes.length === 0) {
+    if (profiledInputSizes.length === 0 || profileResults.length === 0) {
         return undefined;
     }
 
