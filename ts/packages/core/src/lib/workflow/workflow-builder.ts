@@ -1,5 +1,6 @@
 import { DirectedGraph } from 'graphology';
 import {
+    ProfilingSessionResults,
     ResourceProfile,
     ResourceProfileResults,
     WorkflowDescription,
@@ -56,6 +57,33 @@ export class WorkflowBuilder {
         stepDesc.profilingResults.results = prunedResProfileResults;
     }
 
+    private determineProfiledInputSizes(profilingResults: ProfilingSessionResults): number[] {
+        const inputSizesSet = new Set<number>();
+        for (const resProfileResults of profilingResults.results) {
+            if (!resProfileResults.results) {
+                continue;
+            }
+            for (const inputSizeResult of resProfileResults.results) {
+                inputSizesSet.add(inputSizeResult.inputSizeBytes);
+            }
+        }
+
+        const inputSizes = Array.from(inputSizesSet.values());
+        inputSizes.sort((a, b) => a - b);
+        return inputSizes;
+    }
+
+    private prepareProfilingResults(stepDesc: WorkflowStepDescription): void {
+        if (stepDesc.profilingResults) {
+            this.pruneAndValidateProfilingResults(stepDesc);
+            stepDesc.profilingResults.profiledInputSizes = this.determineProfiledInputSizes(stepDesc.profilingResults);
+
+            if (stepDesc.exhaustiveProfilingResults) {
+                stepDesc.exhaustiveProfilingResults.profiledInputSizes = stepDesc.profilingResults.profiledInputSizes;
+            }
+        }
+    }
+
     /**
      * Builds an array of workflow steps and the nodes of the graph,
      * but does not set the required inputs or edges yet.
@@ -67,7 +95,7 @@ export class WorkflowBuilder {
         description.steps.forEach(stepDesc => {
             let step: WorkflowStep;
             if (stepDesc.type === WorkflowStepType.Function) {
-                this.pruneAndValidateProfilingResults(stepDesc);
+                this.prepareProfilingResults(stepDesc);
                 step = new WorkflowFunctionStepImpl(stepDesc);
             } else {
                 step = new GenericWorkflowStepImpl(stepDesc);
