@@ -21,13 +21,13 @@ SLO_TYPES=(
 )
 
 declare -A BASE_SLOS=(
-    ["gcf-MaxExecutionTime"]=5172015
-    ["aws-MaxExecutionTime"]=2019773
-    ["aws-bo-MaxExecutionTime"]=2019773
+    ["gcf-MaxExecutionTime"]=5319565
+    ["aws-MaxExecutionTime"]=4524399
+    ["aws-bo-MaxExecutionTime"]=4524399
 
-    ["gcf-MaxCost"]="2.6881165"
-    ["aws-MaxCost"]="0.109116499999999998"
-    ["aws-bo-MaxCost"]="0.109116499999999998"
+    ["gcf-MaxCost"]="2.8560485"
+    ["aws-MaxCost"]="0.1250145"
+    ["aws-bo-MaxCost"]="0.1250145"
 )
 
 declare -A SLO_RANGES_PERCENT=(

@@ -4,10 +4,10 @@
   "inputDataSizeMib": 227.84742832183838,
   "sloMs": 37000,
   "workflowOutput": {
-    "executionTimeMs": 16429,
-    "executionCost": 0.005285,
+    "executionTimeMs": 8792,
+    "executionCost": 0.002608,
     "data": {
-      "sizeBytes": 37873978
+      "sizeBytes": 19660106
     },
     "stepLogs": {
       "validate-video": {
@@ -23,39 +23,39 @@
       },
       "cut-video-segment-a": {
         "resourceProfile": {
-          "memoryMiB": 10176,
+          "memoryMiB": 9600,
           "milliCpu": 6000,
-          "pricePerUnit": 1.6565625000000002e-7,
+          "pricePerUnit": 1.562625e-7,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 15528,
-        "executionCost": 0.002572,
+        "executionTimeMs": 8260,
+        "executionCost": 0.001291,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "cut-video-segment-b": {
         "resourceProfile": {
-          "memoryMiB": 10176,
+          "memoryMiB": 9600,
           "milliCpu": 6000,
-          "pricePerUnit": 1.6565625000000002e-7,
+          "pricePerUnit": 1.562625e-7,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 15528,
-        "executionCost": 0.002572,
+        "executionTimeMs": 8260,
+        "executionCost": 0.001291,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "merge-videos": {
         "resourceProfile": {
-          "memoryMiB": 10240,
-          "milliCpu": 6000,
-          "pricePerUnit": 1.667e-7,
+          "memoryMiB": 2816,
+          "milliCpu": 2000,
+          "pricePerUnit": 4.5825e-8,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 811,
-        "executionCost": 0.000135,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "executionTimeMs": 442,
+        "executionCost": 0.00002,
+        "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0.25,
+    "avgResourceConfigStrategyExecutionTimeMs": 0,
     "sloFulfilled": true
   },
   "sloFulfilled": true

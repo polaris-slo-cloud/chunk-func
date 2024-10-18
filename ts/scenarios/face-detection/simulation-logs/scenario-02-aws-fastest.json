@@ -4,10 +4,10 @@
   "inputDataSizeMib": 0.823974609375,
   "sloMs": 150000,
   "workflowOutput": {
-    "executionTimeMs": 62152,
-    "executionCost": 0.009464,
+    "executionTimeMs": 77058,
+    "executionCost": 0.01284,
     "data": {
-      "sizeBytes": 864000
+      "sizeBytes": 1296000
     },
     "stepLogs": {
       "validate-video-face-recog": {
@@ -19,17 +19,17 @@
         },
         "executionTimeMs": 46,
         "executionCost": 0.000002,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "transform-video": {
         "resourceProfile": {
-          "memoryMiB": 9152,
+          "memoryMiB": 10240,
           "milliCpu": 6000,
-          "pricePerUnit": 1.4895624999999998e-7,
+          "pricePerUnit": 1.667e-7,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 5768,
-        "executionCost": 0.000859,
+        "executionTimeMs": 8412,
+        "executionCost": 0.001402,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "detect-faces": {
@@ -39,23 +39,23 @@
           "pricePerUnit": 1.667e-7,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 51389,
-        "executionCost": 0.008567,
+        "executionTimeMs": 51518,
+        "executionCost": 0.008588,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "mark-faces": {
         "resourceProfile": {
-          "memoryMiB": 448,
-          "milliCpu": 1000,
-          "pricePerUnit": 7.266666666666667e-9,
+          "memoryMiB": 10240,
+          "milliCpu": 6000,
+          "pricePerUnit": 1.667e-7,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 4949,
-        "executionCost": 0.000036,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "executionTimeMs": 17082,
+        "executionCost": 0.002848,
+        "resourceConfigStrategyExecutionTimeMs": 1
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0,
+    "avgResourceConfigStrategyExecutionTimeMs": 0.5,
     "sloFulfilled": true
   },
   "sloFulfilled": true
