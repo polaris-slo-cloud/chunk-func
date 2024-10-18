@@ -94,8 +94,8 @@ export class WorkflowFunctionStepImpl extends WorkflowStepBase implements Workfl
         }
 
         let result = findResultForInput(input.totalDataSizeBytes, this.exhaustiveProfilingResults.profiledInputSizes, profileResults.results);
-        if (!result && this.profilingResults.configurationsInferred) {
-            // For partially inferred profiling results we allow switching to the next higher successful profile.
+        if (!result) {
+            // If there is no profiling data on the selected profile, we allow switching to the next higher successful profile.
             result = this.findNextHigherProfilingResult(input, resourceProfile);
         }
         if (!result) {
