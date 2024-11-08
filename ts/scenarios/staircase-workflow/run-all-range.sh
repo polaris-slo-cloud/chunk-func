@@ -48,6 +48,7 @@ declare -A SCENARIOS=(
 
 declare -A CONFIG_STRATEGIES=(
     ["proportional-critical-path-slo"]="ProportionalCriticalPathSloConfigStrategy"
+    ["fixed-output-prop-cp"]="FixedOutputProportionalCPSloConfigStrategy"
     ["step-conf"]="StepConfConfigStrategy"
     # ["spread-search"]="SpreadSearchConfigStrategy"
     # ["hybrid-search"]="HybridSearchConfigStrategy"
