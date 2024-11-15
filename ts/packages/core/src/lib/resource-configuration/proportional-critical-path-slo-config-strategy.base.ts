@@ -53,7 +53,7 @@ export abstract class ProportionalCriticalPathSloConfigStrategyBase extends Reso
 
         // If the profiling results contain inferences, we decrease the stepSlo to introduce an additional safety margin.
         if (step.profilingResults.configurationsInferred) {
-            stepSlo *= 0.8;
+            stepSlo *= 0.75;
         }
 
         const selectedProfileId = findBestProfileForStepSlo(
