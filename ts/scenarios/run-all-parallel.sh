@@ -1,7 +1,7 @@
 #!/bin/bash
 # set -x
 
-MAX_PARALLEL=20
+MAX_PARALLEL=8
 
 SCENARIOS=(
     "./cyclic-workflow"
