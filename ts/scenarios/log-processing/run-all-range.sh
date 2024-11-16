@@ -21,25 +21,25 @@ SLO_TYPES=(
 )
 
 declare -A BASE_SLOS=(
-    ["gcf-MaxExecutionTime"]=12000
+    ["gcf-MaxExecutionTime"]=12151
 
     # All AWS profiles have at least 1 vCPU and Node.JS is single threaded, so there is not much difference between cheapest and fastest.
-    # Actually this scenario does not make sense for AWS, because the fastest possible exec time is ~99.3% of the BASE_SLO.
-    ["aws-MaxExecutionTime"]=1557
-    ["aws-bo-MaxExecutionTime"]=1557
+    # Actually this scenario does not make much sense for AWS, because the fastest possible exec time is ~92.9% of the BASE_SLO.
+    ["aws-MaxExecutionTime"]=5530
+    ["aws-bo-MaxExecutionTime"]=5530
 
     ["gcf-MaxCost"]="0.0057185"
-    ["aws-MaxCost"]=""
-    ["aws-bo-MaxCost"]=""
+    ["aws-MaxCost"]="0.00027"
+    ["aws-bo-MaxCost"]="0.00027"
 )
 
 declare -A SLO_RANGES_PERCENT=(
     ["gcf-MaxExecutionTime"]=15
 
     # All AWS profiles have at least 1 vCPU and Node.JS is single threaded, so there is not much difference between cheapest and fastest.
-    # Actually this scenario does not make sense for AWS, because the fastest possible exec time is ~99.3% of the BASE_SLO.
-    ["aws-MaxExecutionTime"]=1
-    ["aws-bo-MaxExecutionTime"]=1
+    # Actually this scenario does not make much sense for AWS, because the fastest possible exec time is ~92.9% of the BASE_SLO.
+    ["aws-MaxExecutionTime"]=6
+    ["aws-bo-MaxExecutionTime"]=6
 
     ["gcf-MaxCost"]=35
     ["aws-MaxCost"]=35
@@ -54,6 +54,7 @@ declare -A SCENARIOS=(
 
 declare -A CONFIG_STRATEGIES=(
     ["proportional-critical-path-slo"]="ProportionalCriticalPathSloConfigStrategy"
+    ["fixed-output-prop-cp"]="FixedOutputProportionalCPSloConfigStrategy"
     ["step-conf"]="StepConfConfigStrategy"
     # ["spread-search"]="SpreadSearchConfigStrategy"
     # ["hybrid-search"]="HybridSearchConfigStrategy"

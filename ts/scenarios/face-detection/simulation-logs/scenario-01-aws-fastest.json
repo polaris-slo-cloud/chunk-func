@@ -4,8 +4,8 @@
   "inputDataSizeMib": 1.544952392578125,
   "sloMs": 200000,
   "workflowOutput": {
-    "executionTimeMs": 81091,
-    "executionCost": 0.012721,
+    "executionTimeMs": 99385,
+    "executionCost": 0.01656,
     "data": {
       "sizeBytes": 1620000
     },
@@ -19,7 +19,7 @@
         },
         "executionTimeMs": 91,
         "executionCost": 0.000007,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "transform-video": {
         "resourceProfile": {
@@ -30,7 +30,7 @@
         },
         "executionTimeMs": 13099,
         "executionCost": 0.002184,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "detect-faces": {
         "resourceProfile": {
@@ -45,13 +45,13 @@
       },
       "mark-faces": {
         "resourceProfile": {
-          "memoryMiB": 448,
-          "milliCpu": 1000,
-          "pricePerUnit": 7.266666666666667e-9,
+          "memoryMiB": 10240,
+          "milliCpu": 6000,
+          "pricePerUnit": 1.667e-7,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 4949,
-        "executionCost": 0.000036,
+        "executionTimeMs": 23243,
+        "executionCost": 0.003875,
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },

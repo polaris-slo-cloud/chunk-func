@@ -21,13 +21,13 @@ SLO_TYPES=(
 )
 
 declare -A BASE_SLOS=(
-    ["gcf-MaxExecutionTime"]=5307604
-    ["aws-MaxExecutionTime"]=1729186
-    ["aws-bo-MaxExecutionTime"]=1729186
+    ["gcf-MaxExecutionTime"]=4146101
+    ["aws-MaxExecutionTime"]=3674840
+    ["aws-bo-MaxExecutionTime"]=3674840
 
-    ["gcf-MaxCost"]="2.117120999999999835"
-    ["aws-MaxCost"]="0.0899554999999999985"
-    ["aws-bo-MaxCost"]="0.0899554999999999985"
+    ["gcf-MaxCost"]="2.2492215"
+    ["aws-MaxCost"]="0.102776"
+    ["aws-bo-MaxCost"]="0.102776"
 )
 
 declare -A SLO_RANGES_PERCENT=(
@@ -48,6 +48,7 @@ declare -A SCENARIOS=(
 
 declare -A CONFIG_STRATEGIES=(
     ["proportional-critical-path-slo"]="ProportionalCriticalPathSloConfigStrategy"
+    ["fixed-output-prop-cp"]="FixedOutputProportionalCPSloConfigStrategy"
     ["step-conf"]="StepConfConfigStrategy"
     # ["spread-search"]="SpreadSearchConfigStrategy"
     # ["hybrid-search"]="HybridSearchConfigStrategy"

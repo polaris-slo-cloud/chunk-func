@@ -4,10 +4,10 @@
   "inputDataSizeMib": 0.823974609375,
   "sloMs": 150000,
   "workflowOutput": {
-    "executionTimeMs": 127460,
-    "executionCost": 0.24276799999999998,
+    "executionTimeMs": 142505,
+    "executionCost": 0.271329,
     "data": {
-      "sizeBytes": 864000
+      "sizeBytes": 1296000
     },
     "stepLogs": {
       "validate-video-face-recog": {
@@ -28,8 +28,8 @@
           "pricePerUnit": 0.0001904,
           "billingUnitMs": 100
         },
-        "executionTimeMs": 9731,
-        "executionCost": 0.018659,
+        "executionTimeMs": 13194,
+        "executionCost": 0.025133,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "detect-faces": {
@@ -39,8 +39,8 @@
           "pricePerUnit": 0.0001904,
           "billingUnitMs": 100
         },
-        "executionTimeMs": 109198,
-        "executionCost": 0.207917,
+        "executionTimeMs": 109363,
+        "executionCost": 0.208298,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "mark-faces": {
@@ -50,8 +50,8 @@
           "pricePerUnit": 0.0001904,
           "billingUnitMs": 100
         },
-        "executionTimeMs": 8448,
-        "executionCost": 0.016184,
+        "executionTimeMs": 19865,
+        "executionCost": 0.03789,
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },

@@ -4,54 +4,54 @@
   "inputDataSizeMib": 14.33668041229248,
   "sloMs": 1000,
   "workflowOutput": {
-    "executionTimeMs": 2285410,
-    "executionCost": 0.007793999999999996,
+    "executionTimeMs": 5705074,
+    "executionCost": 0.030719999999999997,
     "data": {
       "sizeBytes": 1
     },
     "stepLogs": {
       "step-0": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "executionTimeMs": 389647,
+        "executionCost": 0.002026,
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "step-1": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "step-2": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 75315,
+        "executionCost": 0.000469,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-3": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-4": {
@@ -67,25 +67,25 @@
       },
       "step-5": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389091,
+        "executionCost": 0.002023,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-6": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-7": {
         "resourceProfile": {
@@ -96,61 +96,61 @@
         },
         "executionTimeMs": 100,
         "executionCost": 0,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "step-8": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 75315,
+        "executionCost": 0.000469,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-9": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389091,
+        "executionCost": 0.002023,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-10": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-11": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389647,
+        "executionCost": 0.002026,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-12": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-13": {
@@ -162,7 +162,7 @@
         },
         "executionTimeMs": 97,
         "executionCost": 0,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "step-14": {
         "resourceProfile": {
@@ -177,36 +177,36 @@
       },
       "step-15": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-16": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-17": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-18": {
         "resourceProfile": {
@@ -221,13 +221,13 @@
       },
       "step-19": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 75315,
+        "executionCost": 0.000469,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-20": {
@@ -239,7 +239,7 @@
         },
         "executionTimeMs": 100,
         "executionCost": 0,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "step-21": {
         "resourceProfile": {
@@ -254,57 +254,57 @@
       },
       "step-22": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389091,
+        "executionCost": 0.002023,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-23": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389647,
+        "executionCost": 0.002026,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-24": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-25": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-26": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 75315,
+        "executionCost": 0.000469,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-27": {
@@ -320,25 +320,25 @@
       },
       "step-28": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "executionTimeMs": 75315,
+        "executionCost": 0.000469,
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "step-29": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-30": {
         "resourceProfile": {
@@ -353,35 +353,35 @@
       },
       "step-31": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
+        "executionTimeMs": 75315,
+        "executionCost": 0.000469,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-32": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389091,
+        "executionCost": 0.002023,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-33": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389647,
+        "executionCost": 0.002026,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-34": {
@@ -393,65 +393,65 @@
         },
         "executionTimeMs": 97,
         "executionCost": 0,
-        "resourceConfigStrategyExecutionTimeMs": 0
+        "resourceConfigStrategyExecutionTimeMs": 1
       },
       "step-35": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389647,
+        "executionCost": 0.002026,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-36": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389647,
+        "executionCost": 0.002026,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-37": {
         "resourceProfile": {
-          "memoryMiB": 256,
+          "memoryMiB": 384,
           "milliCpu": 1000,
-          "pricePerUnit": 4.166666666666666e-9,
+          "pricePerUnit": 6.233333333333333e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 34271,
-        "executionCost": 0.000143,
-        "resourceConfigStrategyExecutionTimeMs": 1
+        "executionTimeMs": 48314,
+        "executionCost": 0.000301,
+        "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-38": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389091,
+        "executionCost": 0.002023,
         "resourceConfigStrategyExecutionTimeMs": 0
       },
       "step-39": {
         "resourceProfile": {
-          "memoryMiB": 192,
+          "memoryMiB": 320,
           "milliCpu": 1000,
-          "pricePerUnit": 3.1333333333333333e-9,
+          "pricePerUnit": 5.2e-9,
           "billingUnitMs": 1
         },
-        "executionTimeMs": 138962,
-        "executionCost": 0.000435,
+        "executionTimeMs": 389091,
+        "executionCost": 0.002023,
         "resourceConfigStrategyExecutionTimeMs": 0
       }
     },
-    "avgResourceConfigStrategyExecutionTimeMs": 0.1,
+    "avgResourceConfigStrategyExecutionTimeMs": 0.175,
     "sloFulfilled": false
   },
   "sloFulfilled": false

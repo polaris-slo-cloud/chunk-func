@@ -1,5 +1,6 @@
 export * from './cheapest-config-strategy';
 export * from './fastest-config-strategy';
+export * from './fixed-output-proportional-cp-slo-config-strategy';
 export * from './preconfigured-config-strategy';
 export * from './proportional-critical-path-slo-config-strategy.base';
 export * from './proportional-critical-path-slo-config-strategy';
