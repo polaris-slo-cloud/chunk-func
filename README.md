@@ -49,3 +49,9 @@ The avoidance of cold starts is (for now) beyond the scope of this project - a s
 ## Deployment & Usage Documentation
 
 Instructions for deployment and usage can be found in the [docs](https://github.com/polaris-slo-cloud/chunk-func/tree/master/docs) folder of the repository.
+
+
+
+## Experiments
+
+Detailed experiment results to evaluate ChunkFunc can be found [here](./experiments).
