@@ -19,7 +19,7 @@ Thus, picking a function's resource configuration depending on the input data si
 ChunkFunc is a research prototype for input data size-aware selection of resource configurations in serverless workflows, with the aim of fulfilling the workflow's SLO, while minimizing costs.
 The prototype is implemented for [Knative](https://knative.dev) as the serverless orchestrator.
 
-![Overview of the ChunkFunc System and Lifecycle of a Serverless Workflow](./docs/assets/chunk-func-overview.svg)
+![Overview of the ChunkFunc System and Lifecycle of a Serverless Workflow](./assets/chunk-func-overview.svg)
 
 ChunkFunc consists of two main components: the ChunkFunc Profiler and the ChunkFunc Workflow Optimizer.
 The figure above provides an overview of the (final, planned) system and the lifecycle of a serverless workflow within it.
@@ -27,8 +27,8 @@ The figure above provides an overview of the (final, planned) system and the lif
 The *ChunkFunc Profiler* automatically picks up functions of a serverless workflow when they are submitted to the orchestrator and profiles them with their most common input data sizes and the resource configuration profiles available on the underlying platform.
 The result of this operation is a performance profile for every common input size.
 The profiler can operate in an *exhaustive* mode, where it profiles all specified inputs with all resource profiles or in a *Bayesian Optimization* mode, where it leverages Bayesian Optimization to build a surrogate model of the profiled function under the various resource profiles with typically 1/4 - 1/3 of the exhaustive profiling runs.
-As of now, those common input sizes, along with corresponding inputs, need to be defined in a [FunctionDescription](./go/controller/api/v1/functiondescription_types.go) custom resource.
-There are examples for our three use case workflows: [log file processing](./go/controller/config/samples/scheduler-log-stats), [video-processing](./go/controller/config/samples/video-processing), and [face-detection](./go/controller/config/samples/face-detection).
+As of now, those common input sizes, along with corresponding inputs, need to be defined in a [FunctionDescription](https://github.com/polaris-slo-cloud/chunk-func/tree/master/go/controller/api/v1/functiondescription_types.go) custom resource.
+There are examples for our three use case workflows: [log file processing](https://github.com/polaris-slo-cloud/chunk-func/tree/master/go/controller/config/samples/scheduler-log-stats), [video-processing](https://github.com/polaris-slo-cloud/chunk-func/tree/master/go/controller/config/samples/video-processing), and [face-detection](https://github.com/polaris-slo-cloud/chunk-func/tree/master/go/controller/config/samples/face-detection).
 
 The *ChunkFunc Workflow Optimizer* integrates with the serverless orchestrator to provide resource configurations for upcoming serverless function invocations.
 It currently supports a max response time (MRT) SLO, but it can be extended with any performance-based SLO.
@@ -40,12 +40,12 @@ The avoidance of cold starts is (for now) beyond the scope of this project - a s
 
 ## Implementation
 
-* The [ChunkFunc Profiler](./go) is implemented as a Kubernetes controller using kubebuilder.
-* The ChunkFunc Workflow Optimizer is currently implemented as a [simulator](./ts) that replays actual workflow traces to evaluate our algorithms and compare them against other state-of-the-art approaches.
-* The [testbed](./testbed) contains three serverless workflows as use cases.
+* The [ChunkFunc Profiler](https://github.com/polaris-slo-cloud/chunk-func/tree/master/go) is implemented as a Kubernetes controller using kubebuilder.
+* The ChunkFunc Workflow Optimizer is currently implemented as a [simulator](https://github.com/polaris-slo-cloud/chunk-func/tree/master/ts) that replays actual workflow traces to evaluate our algorithms and compare them against other state-of-the-art approaches.
+* The [testbed](https://github.com/polaris-slo-cloud/chunk-func/tree/master/testbed) contains three serverless workflows as use cases.
 
 
 
 ## Deployment & Usage Documentation
 
-Instructions for deployment and usage can be found in the [docs](./docs) folder.
+Instructions for deployment and usage can be found in the [docs](https://github.com/polaris-slo-cloud/chunk-func/tree/master/docs) folder of the repository.
