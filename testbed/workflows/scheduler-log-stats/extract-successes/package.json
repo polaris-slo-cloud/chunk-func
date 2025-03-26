@@ -15,7 +15,8 @@
     "test": "npm run test:unit && npm run test:integration",
     "start": "FUNC_LOG_LEVEL=info faas-js-runtime ./build/index.js",
     "lint": "eslint \"src/**/*.{js,ts,tsx}\" \"test/**/*.{js,ts,tsx}\" --quiet",
-    "debug": "nodemon --inspect ./node_modules/faas-js-runtime/bin/cli.js ./build/index.js"
+    "debug": "nodemon --inspect ./node_modules/faas-js-runtime/bin/cli.js ./build/index.js",
+    "docker-build": "docker build --tag polarissloc/chunk-func-extract-successes-profiling ."
   },
   "devDependencies": {
     "@types/tape": "^4.13.0",

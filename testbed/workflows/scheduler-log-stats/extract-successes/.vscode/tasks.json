@@ -7,6 +7,28 @@
             "label": "build-extract-successes",
             "type": "shell",
             "command": "npm run build"
+        },
+        {
+          "type": "docker-run",
+          "label": "docker-run: debug",
+          // https://code.visualstudio.com/docs/containers/debug-node
+          "dockerRun": {
+            // "command": "/layers/paketo-buildpacks_node-engine/node/bin/node --inspect=0.0.0.0:9229 /layers/paketo-buildpacks_npm-install/launch-modules/node_modules/.bin/faas-js-runtime ./build/index.js",
+            // "image": "polarissloc/chunk-func-extract-successes:latest",
+            "image": "polarissloc/chunk-func-extract-successes-profiling:latest",
+            "command": "node --inspect=0.0.0.0:9229 ./node_modules/.bin/faas-js-runtime ./build/index.js",
+            "customOptions": "--cpus=\"1.0\" --memory=\"2048m\"",
+            // "customOptions": "--cpus=\"0.583\" --memory=\"1024m\"",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "hostPort": 8080
+              }
+            ]
+          },
+          "node": {
+            "enableDebugging": true
+          }
         }
     ]
 }

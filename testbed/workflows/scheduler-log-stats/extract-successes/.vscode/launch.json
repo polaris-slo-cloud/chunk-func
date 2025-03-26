@@ -17,6 +17,16 @@
             ],
             "type": "node",
             "preLaunchTask": "build-extract-successes"
+        },
+        {
+          "name": "Docker Debug extract-successes",
+          "type": "docker",
+          "request": "launch",
+          "preLaunchTask": "docker-run: debug",
+          "platform": "node",
+          "node": {
+            "remoteRoot": "/usr/chunkfunc"
+          }
         }
     ]
 }
