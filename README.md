@@ -49,3 +49,8 @@ The avoidance of cold starts is (for now) beyond the scope of this project - a s
 ## Deployment & Usage Documentation
 
 Instructions for deployment and usage can be found in the [docs](./docs) folder.
+
+
+## Acknowledgements
+
+This work was supported by the Austrian Research Promotion Agency (FFG) through the project RapidREC under Project 903884 and by the Austrian Internet Stiftung NetIdee through the project LEO Trek under Grant 7442.
